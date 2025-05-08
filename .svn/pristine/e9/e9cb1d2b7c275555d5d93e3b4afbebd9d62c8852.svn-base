@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="loginMapper">
+
+<resultMap type="com.osan.portal.vo.LoginInfo" id="loginInfoResult">
+    <result column="USERNO"        property="userNo"/>
+    <result column="NAME"          property="name"/> 
+    <result column="PWD"           property="password"/> 
+    <result column="USERAUTH"      property="userAuth"/> 
+    <result column="REGNO"         property="regNo"/> 
+    <result column="EMAIL"         property="email"/> 
+    <result column="HTEL"          property="hTell"/> 
+    <result column="ORG"           property="org"/> 
+    <result column="STATUS"        property="status"/> 
+    <result column="TEL"           property="tel"/> 
+    <result column="ROLE"          property="role"/> 
+    <result column="FAX"           property="fax"/> 
+    <result column="CHGEPWDE"      property="chgePwDe"/> 
+    <result column="WORK_FLAG"     property="workFlag"/> 
+    <result column="WRPWCONT"      property="wrpwCont"/> 
+    <result column="SH_AT"         property="shAt"/> 
+    <result column="PK_AT"         property="pkAt"/> 
+    <result column="HJ_AT"         property="hjAt"/> 
+    <result column="CU_AT"         property="cuAt"/> 
+</resultMap>
+
+<!-- 사용자 조회 -->
+    <select id="selectUser" resultMap="loginInfoResult" parameterType="com.osan.portal.vo.LoginInfo">
+         SELECT DISTINCT a.USERNO    
+              , a.NAME      
+              , a.PWD       
+              , a.USERAUTH  
+              , a.REGNO     
+              , NVL(a.EMAIL,' ') AS EMAIL     
+              , a.ORG
+              , a.STATUS
+              , NVL(a.HTEL,' ') AS HTEL
+              , a.TEL
+              , a.FAX
+              , a.ROLE
+              , NVL(a.HP,' ') AS HP
+             <![CDATA[
+              , CASE WHEN NVL(CHGEPWDE,'99999999') <= TO_CHAR(ADD_MONTHS(SYSDATE,-6),'YYYYMMDD') 
+                     THEN 'N'
+                     ELSE 'Y'
+                 END AS CHGEPWAT
+              , CASE WHEN b.WORK_FLAG = 1 AND (TO_CHAR(SYSDATE, 'd') = 4 OR TO_CHAR(SYSDATE, 'd') = 6) AND TO_CHAR(SYSDATE, 'HH24MISS') > '180000' 
+                     THEN 'N'
+                     ELSE 'Y'
+                 END AS WORK_FLAG
+             ]]>
+              , NVL(a.WRPWCONT,0) AS WRPWCONT
+              , c.산학관리자 AS SH_AT
+              , c.평교관리자 AS PK_AT
+              , c.현장관리자 AS HJ_AT
+              , c.취업관리자 AS CU_AT
+           FROM PORTAL.PV_USER_M a
+LEFT OUTER JOIN V_PSNL_LOGIN b
+             ON b.PSNL_NUMB = a.USERNO
+LEFT OUTER JOIN VIEW_PSNL200_IS c
+             ON a.USERNO = c.교직원번호
+          WHERE a.USERNO = #{userNo}
+    </select>
+    
+<!-- 비밀번호 암호화 -->
+    <select id="selectEncPassword" resultType="String" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT NVL(damo.hash_str_data(#{password}),'') AS encPassword
+          FROM DUAL
+    </select>
+
+<!-- 인증번호 전송 -->
+    <insert id="insertVerifySms" parameterType="com.osan.portal.vo.LoginInfo">
+        <selectKey keyProperty="msgId" resultType="int" order="BEFORE">
+            SELECT SMS.SDK_SMS_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO SMS.SDK_SMS_SEND ( MSG_ID
+                                     , USER_ID
+                                     , SCHEDULE_TYPE
+                                     , SUBJECT
+                                     , NOW_DATE
+                                     , SEND_DATE
+                                     , CALLBACK
+                                     , DEST_COUNT
+                                     , DEST_INFO
+                                     , SMS_MSG )
+                              VALUES ( #{msgId}
+                                     , #{userNo}
+                                     , 0
+                                     , #{subject}
+                                     , TO_CHAR(SYSDATE,'yyyymmddhh24MI')
+                                     , TO_CHAR(SYSDATE,'yyyymmddhh24MI')
+                                     , #{callback}
+                                     , 1
+                                     , #{destInfo}
+                                     , #{smsMsg})
+    </insert>
+    
+<!-- 인증번호 저장 -->
+    <insert id="insertSentVerifyNumber" parameterType="com.osan.portal.vo.LoginInfo">
+        INSERT INTO USER_SMS_VERIFICATION ( USER_NO
+                                          , VERIFY_NO
+                                          , PHONE_NO
+                                          , SEND_DATE
+                                          , INS_DATE
+                                          , INS_USER_NO
+                                          , UPD_DATE
+                                          , UPD_USER_NO)
+                                   VALUES ( #{userNo}
+                                          , #{verifyNumber}
+                                          , #{hp}
+                                          , TO_CHAR(SYSDATE,'yyyymmddhh24MI')
+                                          , SYSDATE
+                                          , #{userNo}
+                                          , SYSDATE
+                                          , #{userNo})
+    </insert>
+<!-- 인증번호 확인 -->
+    <select id="selectOneVerifyNumberCheck" resultType="int" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT COUNT(1) AS verifyCnt
+          FROM USER_SMS_VERIFICATION
+         WHERE REPLACE(PHONE_NO,'-','') = #{cellPhone}
+           AND USER_NO = #{userNo}
+           AND VERIFY_NO = #{userVerifyNumber}
+    </select>
+<!-- ID 조회 -->
+    <select id="selectOneUserNo" resultMap="loginInfoResult" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT USERNO    
+          FROM PORTAL.PV_USER_M
+         WHERE NAME = #{name}
+           AND REGNO = #{regNo}
+    </select>
+<!-- 임시비밀번호 전송 -->
+    <insert id="insertTempPassword" parameterType="com.osan.portal.vo.LoginInfo">
+        <selectKey keyProperty="msgId" resultType="int" order="BEFORE">
+            SELECT SMS.SDK_SMS_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO SMS.SDK_SMS_SEND ( MSG_ID
+                                     , USER_ID
+                                     , SCHEDULE_TYPE
+                                     , SUBJECT
+                                     , NOW_DATE
+                                     , SEND_DATE
+                                     , CALLBACK
+                                     , DEST_COUNT
+                                     , DEST_INFO
+                                     , SMS_MSG )
+                              VALUES ( #{msgId}
+                                     , #{userNo}
+                                     , 0
+                                     , #{subject}
+                                     , TO_CHAR(SYSDATE,'yyyymmddhh24MI')
+                                     , TO_CHAR(SYSDATE,'yyyymmddhh24MI')
+                                     , #{callback}
+                                     , 1
+                                     , #{destInfo}
+                                     , #{smsMsg})
+    </insert>
+<!-- 사용자 조회(비밀번호 변경) -->
+    <select id="selectUserForFindPassword" resultMap="loginInfoResult" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT USERNO    
+             , NAME      
+             , PWD       
+             , USERAUTH  
+             , REGNO     
+             , NVL(EMAIL,' ') AS EMAIL     
+             , ORG
+             , STATUS
+             , NVL(HTEL,' ') AS HTEL
+             , TEL
+             , FAX
+             , ROLE
+             , NVL(HP,' ') AS HP
+          FROM PORTAL.PV_USER_M
+         WHERE USERNO = #{userNo}
+           AND NAME = #{name}
+           AND REGNO = #{regNo}
+    </select>
+<!-- 비밀번호 오류 횟수 업데이트(교직원) -->
+    <update id="updateUserWrongPasswordCnt" parameterType="com.osan.portal.vo.LoginInfo">
+        UPDATE OSANUNIV.PSNL200
+           SET WRPW_CONT = #{wrpwCont}
+             , UPDT_USID = #{userNo}    
+             , UPDT_DATE = SYSDATE      
+             , UPDT_ADDR = #{userIp}
+         WHERE PSNL_NUMB = #{userNo}
+    </update>
+<!-- 비밀번호 오류 횟수 업데이트(학생) -->
+    <update id="updateStntUserWrongPasswordCnt" parameterType="com.osan.portal.vo.LoginInfo">
+        UPDATE OSANUNIV.REGI100
+           SET WRPW_CONT = #{wrpwCont} 
+             , UPDT_USID = #{userNo}    
+             , UPDT_DATE = SYSDATE      
+             , UPDT_ADDR = #{userIp}
+         WHERE STNT_NUMB = #{userNo}
+    </update>
+<!-- 로그인 이력 저장 -->
+    <insert id="insertLoginInfo" parameterType="com.osan.portal.vo.LoginInfo">
+        INSERT INTO PORTAL.USER_LOGIN_HISTORY ( USER_NO
+                                              , LOGIN_DT
+                                              , LOGIN_IP
+                                              , MENU_ID)
+                                       VALUES ( #{userNo}
+                                              , SYSDATE
+                                              , #{userIp}
+                                              , #{menuId}) 
+    </insert>
+</mapper>

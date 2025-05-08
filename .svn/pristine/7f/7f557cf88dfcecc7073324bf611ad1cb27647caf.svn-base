@@ -1,0 +1,611 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page session="false" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="com.osan.portal.vo.LoginInfo" %>
+<%@ page import="sun.misc.BASE64Encoder" %>
+<html>
+<head>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;">
+    <meta name="viewport" content="width=device-width,user-scalable=yes">
+
+    <meta name="keywords" content="오산대학교, 오산대 포탈, 오산대, 포탈" />
+    <meta name="description" content="오산대학교 포탈" />
+    <meta name="author" content="오산대학교" />
+    <link rel="icon" type="image/png"  href="resources/img/favico.ico"/>    
+    <link rel="icon" type="image/png"  href="resources/img/favico.ico"/>
+
+    <title>오산대학교 포탈</title>
+
+    <script src="resources/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+    <script src="resources/js/jquery-ui.min.js" type="text/javascript"></script>
+    <link href="resources/css/layout.css" rel="stylesheet" type="text/css" />
+    <link type="text/css" href="resources/css/swiper.css" rel="stylesheet" />
+    <script type="text/javascript" src="resources/js/swiper.min.js"></script>
+    <script type="text/javascript" src="resources/js/masonry.pkgd.min.js"></script>
+    <script type="text/javascript" src="resources/js/common.js"></script>
+    
+
+	<script type="text/javascript">
+	    $(function(){
+	        $(window).load(function(){
+	        	pageResize();
+	        })
+	    })
+	    
+        $(function(){
+            /*장학금/등록금 현황 탭 설정*/
+            $(".tab_content").hide();
+            $(".tab_content:first").show();
+            $("#shshTab.tab li").click(function () {
+                $("#shshTab li a").removeClass("on");
+                $(this).children("a").addClass("on");
+                $(".tab_content").hide()
+                var activeTab = $(this).attr("rel");
+                $("#" + activeTab).fadeIn()
+                pageResize();
+            });
+            /*성적 조회 탭 설정*/
+            $(".tab_grad").hide();
+            $(".tab_grad:first").show();
+            $("#gradTab.tab li").click(function () {
+                $("#gradTab li a").removeClass("on");
+                $(this).children("a").addClass("on");
+                $(".tab_grad").hide()
+                var activeTab = $(this).attr("rel");
+                $("#" + activeTab).fadeIn()
+                if(activeTab == "tab8"){
+                	getSubjectGrad();
+                }
+                pageResize();
+            });
+            /*개인정보수정 탭 설정*/
+            $(".tab_user").hide();
+            $(".tab_user:first").show();
+            $("#userInfoTab.tab li").click(function () {
+                $("#userInfoTab li a").removeClass("on");
+                $(this).children("a").addClass("on");
+                $(".tab_user").hide()
+                var activeTab = $(this).attr("rel");
+                $("#" + activeTab).fadeIn()
+                pageResize();
+            });
+            /*채용공고 탭 설정*/
+            $(".tab_job").hide();
+            $(".tab_job:first").show();
+            $("#jobTab.tab li").click(function () {
+                $("#jobTab li a").removeClass("on");
+                $(this).children("a").addClass("on");
+                $(".tab_job").hide()
+                var activeTab = $(this).attr("rel");
+                $("#" + activeTab).fadeIn()
+            });
+        })
+        /*개인정보 수정*/
+        function updateUserInfo(){
+            var formData = $("#userInfoForm").serialize() + "&userNo="+ $("#userNo").val() + "&userAuth=" + $("#userAuth").val();
+            $.ajax({
+                type : "POST",
+                async : false,
+                url : "/updateUserInfo",
+                data : formData,
+                dataType : "text",
+                success : updateUserInfoOk
+            });
+        }
+        /*개인정보 수정 callback*/
+        function updateUserInfoOk(data, status){
+        	if(data == "UPDATE_OK"){
+        	    alert("개인정보가 수정되었습니다.");
+        	    reload();
+        	}else{
+        		alert("개인정보 수정이 정상적으로 처리되지 않았습니다.");
+        		return;
+        	}
+        }
+        /*비밀번호 입력 초기화*/
+        function clearInput(){
+        	if(confirm("초기화 하시겠습니까?")){
+        	    $('#userPasswordForm :input').val('');
+        	    $("#currentPassword").focus();
+        	}else{
+        		return;
+        	}
+        }
+        /*비밀번호 수정*/
+        function updatePassword(){
+            var newPassword = $("#newPassword").val();
+            var confirmPassword = $("#confirmPassword").val();
+            if(newPassword != confirmPassword){
+                alert("신규 비밀번호가 일치하지 않습니다.");
+                return;
+            }else{
+                if(checkPassWord(newPassword)){
+                    var formData = $("#userPasswordForm").serialize() + "&userNo="+ $("#userNo").val() + "&userAuth=" + $("#userAuth").val();
+                    $.ajax({
+                        type : "POST",
+                        async : false,
+                        url : "/updateUserPassword",
+                        data : formData,
+                        dataType : "text",
+                        success : updatePasswordOk
+                    });
+                }else{
+                    $("#newPassword").focus();
+                    return;
+                }
+            }
+        }
+        /*비밀번호 수정 callback*/
+        function updatePasswordOk(data, status){
+            if(data == "UPDATE_OK"){
+                alert("비밀번호가 변경되었습니다.");
+                $('#userPasswordForm :input').val('');
+                return;
+            }else if(data == "WRONG_PASSWORD"){
+                alert("현재 비밀번호가 일치하지 않습니다.");
+                return;
+            }else{
+                alert("비밀번호가 변경이 정상적으로 처리되지 않았습니다.");
+                return;
+            }
+        }
+        /*성적 조회(과목)*/
+        function getSubjectGrad(){
+            var formData = $("#gradForm").serialize() + "&userNo="+ $("#userNo").val();
+            $.ajax({
+                type : "POST",
+                async : false,
+                url : "/searchGrad",
+                data : formData,
+                dataType : "json",
+                success : getSubjectGradOk
+            });
+        }
+        /*성적 조회(과목) callback*/
+        function getSubjectGradOk(data, status){
+            var item=data.jsonList[0].result; 
+            var selectHtml=[]; 
+            var len=item.length; 
+            //데이타 그리기 
+            if(len >0){ 
+                $(item).each(function(i, item){ 
+                    selectHtml.push('<tr>'); 
+                    selectHtml.push('<td>'+item.sbjtCode+'</td>'); 
+                    selectHtml.push('<td class="cut">'+item.sbjtKrnm+'</td>'); 
+                    selectHtml.push('<td>'+item.lectPont+'</td>'); 
+                    selectHtml.push('<td>'+item.totlScor+'</td>'); 
+                    selectHtml.push('<td>'+item.lectGrad+'</td>'); 
+                    selectHtml.push('</tr>');
+                }); 
+            }else{ 
+                selectHtml.push('<tr>'); 
+                selectHtml.push('<td colspan="5">조회된 결과가 없습니다.</td>'); 
+                selectHtml.push('</tr>'); 
+            } 
+            $("#sbjtGradList").empty().html(selectHtml.join(''));
+            pageResize();
+        }
+    </script>
+    <!-- 세션체크해서 로그인 정보 있으면 메인화면으로 -->
+    <%
+    String userNo = "";
+    String userName = "";
+    String userAuth = "";
+    String encUserNo = "";
+    String hp = "";
+    String tel = "";
+    String hTell = "";
+    String fax = "";
+    String email = "";
+    HttpSession session = request.getSession(false);
+    if(session == null && session.getAttribute("sessionUserInfo") == null){
+    	%>
+        <script type="text/javascript">
+            alert("로그인 세션이 종료되었습니다. 로그인페이지로 이동합니다.");
+        </script>
+    	<% 
+        response.sendRedirect("/");
+    }else{
+        LoginInfo loginInfo = new LoginInfo();
+        loginInfo = (LoginInfo)session.getAttribute("sessionUserInfo");
+        
+        userNo = loginInfo.getUserNo();
+        userName = loginInfo.getName();
+        userAuth = loginInfo.getUserAuth();
+        hp = loginInfo.getHp();
+        tel = loginInfo.getTel();
+        hTell = loginInfo.gethTell();
+        fax = loginInfo.getFax();
+        email = loginInfo.getEmail();
+        
+        BASE64Encoder en = new BASE64Encoder();
+        encUserNo = URLEncoder.encode(en.encode(userNo.getBytes("UTF-8")),"UTF-8");
+        
+        System.out.println("#####################################세션정보########################################");
+        System.out.println("loginInfo.getUserNo() : " + loginInfo.getUserNo());
+        System.out.println("loginInfo.getName() : " + loginInfo.getName());
+        System.out.println("loginInfo.getUserAuth() : "  + loginInfo.getUserAuth());
+        System.out.println("#####################################세션정보########################################");
+    }
+    %>
+</head>
+<body>
+<form action="" method="post" name="hiddenForm" id="hiddenForm">
+    <input name="countPerPage" id="countPerPage" type="hidden" value="8"/>
+    <input name="pageNo" id="pageNo" type="hidden" value="1"/>
+    <input name="userNo" id="userNo" type="hidden" value="<%=userNo%>"/>
+    <input name="userAuth" id="userAuth" type="hidden" value="<%=userAuth%>"/>
+    <input name="encUserNo" id="encUserNo" type="hidden" value="<%=encUserNo%>"/>
+    <input name="searchYm" id="searchYm" type="hidden" value=""/>
+</form>
+<form action="" method="post" name="lectPlanReportForm" id="lectPlanReportForm">
+    <input name="filepath" id="filepath" type="hidden"/>
+    <input name="filename" id="filename" type="hidden"/>
+    <input name="param" id="param" type="hidden"/>
+</form>
+<div id="header">
+    <div class="article">
+        <h1><img src="resources/img/logo.png" alt="오산대학교 포탈 로고" onclick="reload();" style="cursor:pointer"/></h1>
+        <ul>
+            <li><a href="javascript:reload();">메인사이트</a></li>
+            <li><a href="/logout" class="logout">로그아웃</a></li>
+        </ul>
+    </div>
+</div>
+
+<div id="contents">
+    <div class="article">
+        <div id="left">
+            <ol>
+                <li><a href="javascript:openMenu('http://portal.osan.ac.kr/board/index.jsp', '8010700')"><strong>교직원/학생게시판</strong></a></li>
+                <li><a href="javascript:openMenu('http://osanuniv.osan.ac.kr/osu/index_sso.jsp', '8010100')"><strong>대학정보시스템</strong></a></li>
+                <li><a href="javascript:openMenu('/resources/sso/homepage_login.jsp?','8010300','')"><strong>홈페이지</strong></a></li>
+                <li><a href="javascript:openMenu('http://ncs.osan.ac.kr/NCS_SmartEIS/sso/index.jsp', '8011400')"><strong>NCS시스템</strong></a></li>
+                <li><a href="javascript:openMenu('http://as82.kr/osan/', '8011600')"><strong>원격지원</strong></a></li>
+            </ol>
+        </div>
+        <div id="right">
+            <div class="grid">
+                <div class="grid-item grid-item-width2 swiper-container swiper-image grid-item-default">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img src="resources/img/main_img01.jpg" alt="이미지" /></div>
+                        <div class="swiper-slide"><img src="resources/img/main_img02.jpg" alt="이미지" /></div>
+                        <div class="swiper-slide"><img src="resources/img/main_img03.jpg" alt="이미지" /></div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <script>
+                    var swiper = new Swiper('.swiper-image', {
+                        loop: true,
+                        autoplay: {
+                            delay: 2500,
+                            disableOnInteraction: false,
+                        },
+                        pagination: {
+                            el: '.swiper-pagination',
+                            clickable: true,
+                        },
+                    });
+                    </script>
+                </div>
+                <div class="grid-item grid-sizer grid-item-default">
+                    <h3>
+                                                        오산대소식<span>&nbsp;</span>
+                    </h3>
+                    <div class="box">
+                        <table class="op_table">
+                            <colgroup>
+                                <col style="width:*; " />
+                                <col style="width:23%; " />
+                                <col style="width:15%; " />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <td>제목</td>
+                                    <td>작성일</td>
+                                    <td>조회</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="${osanUniNewsList}" var="osanUniNewsList">
+                                <tr>
+                                    <td><a href="javascript:openMenu('https://www.osan.ac.kr/?menuno=135','','')" title="" class="cut">${osanUniNewsList.title}</a></td>
+                                    <td>${osanUniNewsList.regDate}</td>
+                                    <td>${osanUniNewsList.viewCount}</td>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="grid-item login">
+                    <h3>로그인<span>&nbsp;</span>
+                    </h3>
+                    <div class="box">
+                        <div class="info"><strong><%=userName%></strong> 님 안녕하세요.<br />오산대학교 포탈시스템 방문을 환영합니다.</div>
+                    </div>
+                </div>
+                <div class="grid-item">
+                    <h3>채용공고<span>&nbsp;</span>
+                    </h3>
+                    <div class="box">
+                        <ol class="tab" id="jobTab">
+                            <li rel="tab9"><a class="on">교내채용정보</a></li>
+                            <li rel="tab10"><a>아르바이트</a></li>
+                        </ol>
+                        <div id="tab9" class="tab_job">
+                            <table class="op_table">
+                                <colgroup>
+                                    <col style="width:*; " />
+                                    <col style="width:30%; " />
+                                    <col style="width:22%; " />
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <td>채용제목</td>
+                                        <td>업체명</td>
+                                        <td>마감일</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <c:forEach items="${jobList}" var="jobList">
+                                    <tr>
+                                        <td class="cut"><a href="javascript:openJobSite();" title="" class="cut">${jobList.title}</td>
+                                        <td class="cut">${jobList.compName}</td>
+                                        <td>${jobList.endDate}</td>
+                                    </tr>
+                                </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="tab10" class="tab_job">
+                            <table class="op_table">
+                                <colgroup>
+                                    <col style="width:*; " />
+                                    <col style="width:30%; " />
+                                    <col style="width:22%; " />
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <td>채용제목</td>
+                                        <td>업체명</td>
+                                        <td>마감일</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <c:forEach items="${parttimeJobList}" var="parttimeJobList">
+                                    <tr>
+                                        <td class="cut"><a href="javascript:openJobSite();" title="" class="cut">${parttimeJobList.title}</td>
+                                        <td class="cut">${parttimeJobList.compName}</td>
+                                        <td>${parttimeJobList.endDate}</td>
+                                    </tr>
+                                </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-item">
+                    <h3>
+                                                   성적조회<span>&nbsp;</span>
+                    </h3>
+                    <div class="box">
+                        <ol class="tab" id="gradTab">
+                            <li rel="tab6"><a class="on">전체</a></li>
+                            <li rel="tab7"><a>학기</a></li>
+                            <li rel="tab8"><a>과목</a></li>
+                        </ol>
+                        <div id="tab6" class="tab_grad">
+                            <table class="op_table">
+                                <colgroup>
+                                    <col style="width:*; " />
+                                    <col style="width:20%; " />
+                                    <col style="width:*; " />
+                                    <col style="width:20%; " />
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <th>신청과목수</th>
+                                        <td>${totalGrad.aplySjct}</td>
+                                        <th>이수과목수</th>
+                                        <td>${totalGrad.pobtSjct}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>신청학점</th>
+                                        <td>${totalGrad.aplyPont}</td>
+                                        <th>이수학점</th>
+                                        <td>${totalGrad.acqtPont}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>미취득학점</th>
+                                        <td>${totalGrad.unaqPont}</td>
+                                        <th>취득평점</th>
+                                        <td>${totalGrad.acqtMrks}</td>
+                                    </tr>
+                                   <tr>
+                                        <th>취득평점평균</th>
+                                        <td>${totalGrad.avrgMrks}</td>
+                                        <th>백분율</th>
+                                        <td>${totalGrad.acqtArsc}</td>
+                                    </tr>
+                                   <tr>
+                                        <th>취득점수</th>
+                                        <td>${totalGrad.acqtScor}</td>
+                                        <th></th>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="tab7" class="tab_grad">
+                        <table class="op_table">
+                            <colgroup>
+                                <col style="width:*; " />
+                                <col style="width:14%; " />
+                                <col style="width:18%; " />
+                                <col style="width:18%; " />
+                                <col style="width:18%; " />
+                                <col style="width:18%; " />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <td>년도</td>
+                                    <td>학기</td>
+                                    <td>신청학점</td>
+                                    <td>취득학점</td>
+                                    <td>평점평균</td>
+                                    <td>백분율</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="${shtmGradList}" var="shtmGradList">
+                                <tr>
+                                    <td>${shtmGradList.lectYear}</td>
+                                    <td>${shtmGradList.lectShtm}</td>
+                                    <td>${shtmGradList.aplyPont}</td>
+                                    <td>${shtmGradList.acqtPont}</td>
+                                    <td>${shtmGradList.avrgMrks}</td>
+                                    <td>${shtmGradList.acqtArsc}</td>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                        </div>
+                        <div id="tab8" class="tab_grad">
+                            <div class="info">
+                                <form action="" method="post" id="gradForm" name="gradForm">
+                                    <select id="lectYear" name="lectYear">
+                                        <c:forEach var="gradYearList" items="${gradYearList}" varStatus="status">
+                                            <option value="${gradYearList.lectYear}">${gradYearList.lectYear}년도</option>
+                                        </c:forEach>
+                                    </select>
+                                    <select id="lectShtm" name="lectShtm">
+                                            <option value="1">1학기</option>
+                                            <option value="2">2학기</option>
+                                    </select>
+                                    <ol class="btn right">
+                                        <li><button type="button" class="write" id="seachGrad" onclick="getSubjectGrad();">검색</button></li>
+                                    </ol>
+                                </form>
+                            </div>
+                            <table class="op_table">
+                                <colgroup>
+                                    <col style="width:22%; " />
+                                    <col style="width:*; " />
+                                    <col style="width:18%; " />
+                                    <col style="width:18%; " />
+                                    <col style="width:18%; " />
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <td>과목코드</td>
+                                        <td>과목명</td>
+                                        <td>학점</td>
+                                        <td>점수</td>
+                                        <td>등급</td>
+                                    </tr>
+                                </thead>
+                                <tbody id="sbjtGradList">
+                                    <tr>
+                                        <td colspan="5" class="ct">조회된 결과가 없습니다.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-item">
+                    <h3>개인정보수정<span>&nbsp;</span>
+                    </h3>
+                    <div class="box">
+                        <ol class="tab" id="userInfoTab">
+                            <li rel="tab4"><a class="on">개인정보변경</a></li>
+                            <li rel="tab5"><a>비밀번호변경</a></li>
+                        </ol>
+                        <div id="tab4" class="tab_user">
+                            <form action="" method="post" name="userInfoForm" id="userInfoForm">
+                                 <table class="op_table">
+                                     <colgroup>
+                                         <col style="width:*; " />
+                                         <col style="width:60%; " />
+                                     </colgroup>
+                                     <tbody>
+                                         <tr>
+                                             <th class="ct">이름</th>
+                                             <td><input type="text" name="userName" id="userName" value="<%=userName %>" /></td>
+                                         </tr>
+                                         <tr>
+                                             <th class="ct">휴대폰</th>
+                                             <td><input type="text" name="hp" id="hp" value="<%=hp %>" /></td>
+                                         </tr>
+                                         <tr>
+                                             <th class="ct">전화번호</th>
+                                             <td><input type="text" name="hTell" id="hTell" value="<%=hTell %>" /></td>
+                                         </tr>
+                                         <tr>
+                                             <th class="ct">E-MAIL</th>
+                                             <td><input type="text" name="email" id="email" value="<%=email %>" /></td>
+                                         </tr>
+                                     </tbody>
+                                 </table>
+                            <div class="info">
+                                <ol class="btn center">
+                                    <li><button type="button" class="write" onclick="updateUserInfo();">확인</button></li>
+                                </ol>
+                            </div>
+                            </form>
+                            <div class="info">※ 학교에서 제공하는 학사정보를 정확하게 수신할 수 있도록 휴대폰번호가 변경되었을 경우 반드시 개인정보를 수정하여 주세요.</div>
+                        </div>
+                        <div id="tab5" class="tab_user">
+                            <form action="" method="post" name="userPasswordForm" id="userPasswordForm">
+                                <table class="op_table">
+                                    <colgroup>
+                                        <col style="width:*; " />
+                                        <col style="width:60%; " />
+                                    </colgroup>
+                                    <tbody>
+                                        <tr>
+                                            <th>현재비밀번호</th>
+                                            <td><input type="password" name="password" id="password" value="" /></td>
+                                        </tr>
+                                        <tr>
+                                            <th>신규 비밀번호</th>
+                                            <td><input type="password" name="newPassword" id="newPassword" value="" /></td>
+                                        </tr>
+                                        <tr>
+                                            <th>신규 비밀번호 확인</th>
+                                            <td><input type="password" name="confirmPassword" id="confirmPassword" value="" /></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="info">
+                                    <ol class="btn center">
+                                        <li><button type="button" class="write" onclick="clearInput();">다시입력</button></li>
+                                        <li><button type="button" class="write" onclick="updatePassword();">확인</button></li>
+                                    </ol>
+                                </div>
+                            <div class="info">※ 비밀번호는 영문, 숫자, 특수문자를 혼합하여 8~12자리 이내로 입력해주세요.</div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="footer">
+    <div class="article">
+        <h6><img src="resources/img/logo.png" alt="오산대학교 포탈 로고" /></h6>
+        <p>
+            COPYRIGHT(C) 2018 Copyright(c) OSAN UNIVERSITY. All rights reserved. <br />
+            Tel. 031-370-2500 / Fax. 031-373-7388 / (18119) 경기도 오산시 청학로45
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

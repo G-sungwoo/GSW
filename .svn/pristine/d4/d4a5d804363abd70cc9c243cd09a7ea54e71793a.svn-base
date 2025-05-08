@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StudentMapper">
+
+<resultMap type="com.osan.portal.vo.StudentSearchInfo" id="studentInfo">
+    <result column="SRCH_STNT_NUMB"              property="srch_stnt_numb"/>
+</resultMap>
+
+    <select id="selectStudentInfo" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+         SELECT A.STNT_NUMB
+              , A.KORN_NAME
+              , B.STNT_HAND
+              , B.STNT_EMAL
+              , B.STNT_ZIPC
+              , B.STNT_BSAR
+              , B.STNT_DTAR
+              , B.PTRN_HAND
+              , DECODE(A.SRST_CODE,'A04002','XXXYYDDWWE','DDDWWWESSSX') AS SRST_CODE 
+           FROM REGI100 A
+LEFT OUTER JOIN REGI110 B
+             ON A.STNT_NUMB = B.STNT_NUMB
+          WHERE A.STNT_NUMB = #{srch_stnt_numb}
+    </select>
+    
+    <select id="selectStudentChange" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+         SELECT A.*
+              , F_CMMN_CDNM(A.SRCG_RSCD, '00') AS SRCG_RSCD_NAME
+              , A.CSST_SHTM || '학기' AS CSST_SHTM_K
+              , A.CSST_SHYR || '학년' AS CSST_SHYR_K
+              , A.RSEP_SHTM || '학기' AS RSEP_SHTM_K
+              , A.RSEP_SHYR || '학년' AS RSEP_SHYR_K
+              , F_CMMN_CDNM(A.ENST_CODE, '00') AS ENST_CODE_NAME
+              , C.SUST_CODE
+              , F_CMMN_DEPT_NAME(C.SUST_CODE,'') AS SUST_NAME
+              , C.CHGE_SUST
+              , F_CMMN_DEPT_NAME(C.CHGE_SUST,'') AS CHGE_NAME                                         
+           FROM REGI150 A
+LEFT OUTER JOIN (SELECT E.STNT_NUMB
+                      , E.ERSS_KRNM                                                       
+                   FROM REGI100 E                                                            
+                  WHERE E.STNT_NUMB NOT IN( SELECT STNT_NUMB                                         
+                                              FROM REGI150                                           
+                                             WHERE SRCG_CODE = 'A15012'                            
+                                               AND APST_CODE = 'A03003'                              
+                                           )                                                     
+                ) B                                                             
+             ON A.STNT_NUMB = B.STNT_NUMB                                                      
+LEFT OUTER JOIN (SELECT E.*                                                                          
+                      , D.DEPT_KRNM                                                               
+                   FROM REGI200 E                                                                   
+        LEFT OUTER JOIN CMMN510 D                                                                   
+                     ON E.SUST_CODE = D.DEPT_CODE) C                                                 
+             ON B.ERSS_KRNM = C.DEPT_KRNM 
+          WHERE A.STNT_NUMB = #{srch_stnt_numb}                                         
+            AND A.SRCG_CODE = 'A15004'                                                        
+            AND A.APST_CODE = 'A03003'                                                        
+            AND A.SRCG_RSCD != 'A18998'                                                      
+            AND A.APLY_DATE = (SELECT MAX(APLY_DATE)                                                   
+                               FROM REGI150 F                                                        
+                              WHERE F.STNT_NUMB = #{srch_stnt_numb}                               
+                                AND F.SRCG_CODE = 'A15004'                                     
+                                AND F.APST_CODE = 'A03003'                                     
+                                AND F.SRCG_RSCD != 'A18998')  
+    </select>
+</mapper>

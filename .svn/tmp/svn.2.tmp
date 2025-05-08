@@ -1,0 +1,107 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page session="false" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<html>
+<head>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;">
+    <meta name="viewport" content="width=device-width,user-scalable=yes">
+    <meta name="keywords" content="오산대학교, 오산대 포탈, 오산대, 포탈" />
+    <meta name="description" content="오산대학교 포탈" />
+    <meta name="author" content="오산대학교" />
+    <link rel="icon" type="image/png"  href="resources/img/favicon.ico"/>
+    <title>오산대학교 포탈</title>
+    <script src="resources/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+    <script src="resources/js/jquery-ui.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    function sendTempPassword(){
+        if($("#name").val() == ''){
+            alert("이름을 입력해주세요");
+            return;
+        }
+        if($("#regNo").val() == ''){
+            alert("생년월일을 입력해주세요");
+            return;
+        }
+        if($("#userNo").val() == ''){
+            alert("아이디를 입력해주세요");
+            return;
+        }
+        var formData = $("#findPwForm").serialize();
+        $.ajax({
+            type : "POST",
+            url : "/sendTempPassword",
+            data : formData,
+            dataType : "text",
+            success : sendTempPasswordOK
+        });
+    }
+    /*비밀번호 찾기 callback*/
+    function sendTempPasswordOK(data, status){
+        if(data == "NO_HP"){
+            alert("등록된 핸드폰 번호가 없습니다");
+            return;
+        }else if(data == "NO_USER"){
+            alert("입력하신 정보의 사용자가 존재하지 않습니다.");
+            return;
+        }else{
+        	var deHyphenData = data.replace("-","");
+        	var first = deHyphenData.substring(0,3);
+        	var mid1 = deHyphenData.substring(4,5);
+        	var mid2 = deHyphenData.substring(6,7);
+        	var last = deHyphenData.substring(8,9);
+        	var subdata = first + "-*" + mid1 + "*" + mid2 + "-" + last + "***";
+            $("#result").html($("#name").val() + " [ "+ subdata + " ] 번호로 임시 비밀번호를 발송하였습니다.");
+            $('#sendBtn').prop("disabled", true);
+        }
+    }
+    </script>
+    <link type="text/css" href="resources/css/layout.css" rel="stylesheet" />
+
+</head>
+<body>
+<div class="find">
+    <ul>
+        <li><a href="/findIdView">아이디 찾기</a></li>
+        <li><a href="/findPwView" class="on">비밀번호 찾기</a></li>
+    </ul>
+    <div class="box">
+        <p>비밀번호 찾기</p>
+        <form action="" method="post" name="findPwForm" id="findPwForm">
+        <table class="op_table">
+            <colgroup>
+                <col style="width:30%; " />
+                <col style="width:*; " />
+            </colgroup>
+            <tbody>
+                <tr>
+                    <th>아이디</th>
+                    <td><input type="text" name="userNo" id="userNo" value="" maxlength="10"/></td>
+                </tr>
+                <tr>
+                    <th>이름</th>
+                    <td><input type="text" name="name" id="name" value="" maxlength="20"/></td>
+                </tr>
+                <tr>
+                    <th>생년월일</th>
+                    <td><input type="text" name="regNo" id="regNo" value="" placeholder="YYMMDD  (예: 971201)" maxlength="6"/></td>
+                </tr>
+            </tbody>
+        </table>
+        </form>
+        <ol>
+            <li><button type="button" name="sendBtn" id="sendBtn" onclick="sendTempPassword();">임시비밀번호발급</button></li>
+            <li><button type="button" onclick="window.self.close();">닫기</button></li>
+        </ol>
+        <p>임시비밀 번호는 등록된 핸드폰 번호로 문자 발송됩니다.</p> 
+        <p>핸드폰 번호 변경 문의는 교무처(031-370-2539) 또는 소속학과 사무실로 연락바랍니다.</p>
+        <div style="text-align:center; padding-top:10px; height:50px;">
+        <p id="result"/>
+        </div>
+    </div>
+</div>
+</body>
+</html>

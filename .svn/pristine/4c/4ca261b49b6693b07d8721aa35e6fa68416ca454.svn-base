@@ -1,0 +1,983 @@
+package com.osan.portal;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.osan.portal.service.StudentService;
+import com.osan.portal.utils.CryptoJs;
+import com.osan.portal.utils.KISA_SEED_CBC;
+import com.osan.portal.vo.DualResearchInfo;
+import com.osan.portal.vo.LoginInfo;
+import com.osan.portal.vo.StudentSearchInfo;
+import com.osan.portal.vo.SurveyInfo;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Controller
+public class StudentController {
+	
+	private static Logger logger = LoggerFactory.getLogger(MainController.class);	
+	
+	@Autowired
+	SessionLocaleResolver localeResolver;
+
+	@Autowired
+	MessageSource messageSource;
+    
+	@Autowired
+	StudentService studentService;
+	
+    /*학생 휴학정보 조회*/
+    @RequestMapping(value="/selectStudentInfo")
+    public @ResponseBody Map<String, Object> selectStudentInfo(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        StudentSearchInfo studentSearchInfo = new StudentSearchInfo();
+        StudentSearchInfo studentChange = new StudentSearchInfo();
+        StudentSearchInfo studentParam = new StudentSearchInfo();
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        studentParam.setSrch_stnt_numb(sessionLoginInfo.getUserNo());
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        studentSearchInfo = studentService.selectStudentInfo(studentParam);
+        studentChange = studentService.selectStudentChange(studentParam);
+        jsonObject.put("studentInfo", studentSearchInfo);
+        jsonObject.put("studentChange", studentChange);
+        return jsonObject;
+    }
+
+	/**
+	 * 메인페이지
+	 * @return "student_main"
+	 */    
+    @RequestMapping(value="/student_main")
+    public String student_main(@RequestParam(value="userNo",required = false) String userNo, HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+    	    	
+        HttpSession httpSession = request.getSession(false);
+
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        
+        StudentSearchInfo studentInfo = new StudentSearchInfo();
+        
+        // 사용자 언어 확인
+        if(userNo.equals("web")){
+            String userLanguage = (String) httpSession.getAttribute("userLanguage");
+            Locale locale = (userLanguage != null) ? new Locale(userLanguage) : Locale.getDefault();
+            logger.info("userLanguage: {}", userLanguage);
+            logger.info("locale: {}", locale);
+            
+            studentInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+            logger.info("PC UserNo: {}", sessionLoginInfo.getUserNo());
+        } else {
+        	
+        	String stnt_numb = KISA_SEED_CBC.decodeSEED(userNo);
+        	
+        	logger.info("mobile UserNo2: {}", stnt_numb);
+        	
+        	studentInfo.setStnt_numb(stnt_numb);
+        }
+        
+        studentInfo  = studentService.getStudentInfo(studentInfo);
+        
+        logger.info("studentInfo: {}", studentInfo);
+        
+        httpSession.setAttribute("SSPT_FLAG", studentInfo.getSspt_flag());
+        httpSession.setAttribute("sust_name", studentInfo.getSust_name());
+        httpSession.setAttribute("korn_name", studentInfo.getKorn_name());
+        httpSession.setAttribute("stnt_numb", studentInfo.getStnt_numb());
+        
+        studentInfo  = studentService.getHakgi();
+        
+        httpSession.setAttribute("lect_Year", studentInfo.getLect_year());
+        httpSession.setAttribute("lect_shtm", studentInfo.getLect_shtm());
+
+        addSessionAttributesToModel(httpSession, model);
+        
+    	logger.info(studentInfo.toString());
+    	model.addAttribute("studentInfo", studentInfo);
+                
+    	return "mobile/student_main";
+    }
+
+	/**
+	 * 학적부 - 기본정보
+	 * @return "regiBase"
+	 */ 
+    @RequestMapping(value="/regiBase")
+    public String regiBase(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+
+        StudentSearchInfo studentInfo = new StudentSearchInfo();
+
+        studentInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+
+        studentInfo  = studentService.getStudentInfo(studentInfo);
+
+        addSessionAttributesToModel(httpSession, model);
+
+    	logger.info(studentInfo.toString());
+    	model.addAttribute("studentInfo", studentInfo);
+
+        
+    	return "mobile/regiBase";
+    }
+    
+	/**
+	 * 학적부 - 복학신청
+	 * @return "regiApply"
+	 */ 
+    @RequestMapping(value="/regiApply")
+    public String regiApply(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+    	    	
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        
+        
+        StudentSearchInfo studentInfo = new StudentSearchInfo();
+        StudentSearchInfo studentOffInfo = new StudentSearchInfo();
+        StudentSearchInfo applyInfo = new StudentSearchInfo();
+        StudentSearchInfo checkInfo = new StudentSearchInfo();
+        
+        studentInfo  = studentService.getHakgi();
+        
+        studentInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+        
+        
+        //studentInfo  = studentService.getApplyCheck(studentInfo);
+        
+        studentInfo  = studentService.getStudentInfo(studentInfo);
+        
+        studentOffInfo  = studentService.getOffInfo(studentInfo);
+        applyInfo  = studentService.getApplySchedule();
+
+        if(studentOffInfo == null || Objects.isNull(studentOffInfo)) {
+        	alertAndBack(response, "휴학 정보가 존재하지 않습니다.");
+        	return null;
+        } else if(!(studentInfo.getSrst_code().equals("A04002"))){
+        	alertAndBack(response, "휴학생이 아닙니다. 신청하실 수 없습니다.");
+        	return null;
+        } else if(studentOffInfo.getApst_code().equals("A03001") || studentOffInfo.getApst_code().equals("A03002") || studentOffInfo.getApst_code().equals("A03003")) {
+        	alertAndBack(response, "신청중이거나, 신청 및 접수가 완료된 상태입니다. 정보만 확인 가능합니다.");
+        	model.addAttribute("studentOffInfo", studentOffInfo);
+        } else if(applyInfo.getAppy_flag().equals("N")){
+        	alertAndBack(response, "복학신청 기간이 아닙니다.");
+        	return null;
+        } else {
+        	model.addAttribute("studentOffInfo", studentOffInfo);
+        }
+        	        
+        Map<String, Object> shtrInfo = new HashMap<String, Object>();
+        shtrInfo.put("1학년", 1);
+        shtrInfo.put("2학년", 2);
+        shtrInfo.put("3학년", 3);
+        model.addAttribute("shtrInfo", shtrInfo);
+        
+        Map<String, Object> shtmInfo = new HashMap<String, Object>();
+        shtmInfo.put("1학기", 1);
+        shtmInfo.put("2학기", 2);
+        model.addAttribute("shtmInfo", shtmInfo);
+        
+        addSessionAttributesToModel(httpSession, model);
+        
+    	logger.info(studentInfo.toString());
+    	model.addAttribute("studentInfo", studentInfo);
+        
+    	return "mobile/regiApply";
+    }    
+    
+	/**
+	 * 학생정보 - 업데이트
+	 * @return "regiBase"
+	 */    
+ 
+    @RequestMapping(value="/updateStntInfo" , method=RequestMethod.POST)
+    public void updateStntInfo(StudentSearchInfo StudentSearchInfo, HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+        
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+    	/*
+        String flag = (String) request.getAttribute("flag");
+        System.out.println(flag);
+        */
+        StudentSearchInfo.setUpdt_addr(request.getRemoteAddr());
+        StudentSearchInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+        int resultInt = 0;
+        /*
+        if(flag.equals("stnt")) {
+        	//학생 업데이트 구문
+        	resultInt = studentService.updateStntInfo(StudentSearchInfo);
+        } else if(flag.equals("prtn")) {
+        	//부모 업데이트 구문
+        	resultInt = studentService.updateStntInfo(StudentSearchInfo);
+        }
+        */
+    	logger.info(StudentSearchInfo.toString());
+    	
+        resultInt = studentService.updateStntInfo(StudentSearchInfo);
+        
+        if(resultInt > 0) {
+        	
+        	response.getWriter().write("UPDATE_OK");
+        } else {
+        	response.getWriter().write("UPDATE_FAIL");
+        }
+    }
+
+	/**
+	 * 수업정보 - 강의시간표(1주차 첫화면)
+	 * @return "lectSchedule"
+	 */    
+ 
+    @RequestMapping(value="/lectSchedule")
+    public String lectSchedule(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+    	    	
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        
+        StudentSearchInfo lectInfo = new StudentSearchInfo();
+        lectInfo  = studentService.getHakgi();
+
+        lectInfo.setLect_week("1");
+        lectInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+        List<StudentSearchInfo> lectList1 = studentService.getSchedule(lectInfo);
+        List<StudentSearchInfo> lectList2 = studentService.getScheduleInfo(lectInfo);
+
+        addSessionAttributesToModel(httpSession, model);
+
+    	logger.info(lectInfo.toString());
+    	model.addAttribute("lectInfo", lectInfo);
+    	model.addAttribute("scheduleList", lectList1);
+    	model.addAttribute("scheduleInfoList", lectList2);
+
+    	
+        
+    	return "mobile/lectSchedule";
+    } 
+
+	/**
+	 * 수업정보 - 강의시간표(15주차)
+	 * @return "weeklectTime"
+	 */    
+ 
+    @RequestMapping(value="/weeklectTime")
+    public String weeklectTime(HttpServletRequest request, HttpServletResponse response,  Model model, @RequestParam(value = "lectWeek") String lectWeek) throws Exception{
+    	    	
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        
+        StudentSearchInfo lectInfo = new StudentSearchInfo();
+        lectInfo  = studentService.getHakgi();
+
+        lectInfo.setLect_week(lectWeek);
+        lectInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+        List<StudentSearchInfo> lectList1 = studentService.getSchedule(lectInfo);
+        List<StudentSearchInfo> lectList2 = studentService.getScheduleInfo(lectInfo);
+        
+        addSessionAttributesToModel(httpSession, model);
+        
+    	logger.info(lectInfo.toString());
+    	model.addAttribute("scheduleList", lectList1);
+    	model.addAttribute("scheduleInfoList", lectList2);
+
+    	
+        
+    	return "mobile/scheduleCall";
+    }
+
+
+
+/**
+ * 전체 성적 정보
+ * @return "totalGrade"
+ */    
+
+@RequestMapping(value="/totalGrade")
+public String totalGrade(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+	    	
+    HttpSession httpSession = request.getSession(false);
+    LoginInfo sessionLoginInfo = new LoginInfo();
+    
+    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+    }
+    
+    /*
+    String msg = "데이터없음";
+    
+    model.addAttribute("msg", msg);
+     */
+    
+    StudentSearchInfo  gradeInfo = new StudentSearchInfo();
+    gradeInfo  = studentService.getHakgi();
+
+    gradeInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+    
+    List<StudentSearchInfo> gradeList1 = studentService.getCourInfo(gradeInfo);
+    gradeInfo = studentService.getTotalGrade(gradeInfo);
+
+    addSessionAttributesToModel(httpSession, model);
+
+	logger.info(gradeInfo.toString());
+	model.addAttribute("courInfo", gradeList1);
+	model.addAttribute("totalGrade", gradeInfo);
+
+
+	return "mobile/totalGrade";
+	}
+
+/**
+ * 전체 성적 정보
+ * @return "gradeCall"
+ */    
+
+@RequestMapping(value="/gradeList")
+public String gradeList(HttpServletRequest request, HttpServletResponse response,  Model model, @RequestParam("hakgiData") String hakgiData) throws Exception{
+	    	
+    HttpSession httpSession = request.getSession(false);
+    LoginInfo sessionLoginInfo = new LoginInfo();
+    
+    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+    }
+    
+    /*
+    String msg = "데이터없음";
+    
+    model.addAttribute("msg", msg);
+     */
+    
+    StudentSearchInfo  gradeInfo = new StudentSearchInfo();
+    gradeInfo  = studentService.getHakgi();
+
+    gradeInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+    gradeInfo.setLect_yesh(hakgiData);
+    
+    List<StudentSearchInfo> gradeList1 = studentService.getCourInfo(gradeInfo);
+    List<StudentSearchInfo> gradeList2 = studentService.getGradeList(gradeInfo);
+    
+	logger.info(gradeInfo.toString());
+	
+	gradeInfo = gradeList1.get(0);
+	
+	String avrg_mrks = gradeInfo.getAvrg_mrks();
+	String totl_aqpt = gradeInfo.getTotl_aqpt();
+	
+	model.addAttribute("gradeList", gradeList2);
+	model.addAttribute("avrg_mrks",avrg_mrks);
+	model.addAttribute("totl_aqpt",totl_aqpt);
+
+	addSessionAttributesToModel(httpSession, model);
+
+	return "mobile/gradeCall";
+	}
+
+/**
+ * 등록 정보
+ * @return "tuitInfo"
+ */    
+
+@RequestMapping(value="/tuitInfo")
+public String tuitInfo(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+	    	
+    HttpSession httpSession = request.getSession(false);
+    LoginInfo sessionLoginInfo = new LoginInfo();
+    
+    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+    }
+
+    /*
+    String msg = "데이터없음";
+
+    model.addAttribute("msg", msg);
+     */
+
+    StudentSearchInfo  tuitInfo = new StudentSearchInfo();
+
+    tuitInfo  = studentService.getTuitHakgi();
+
+    tuitInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+    
+    String stnt_numb = sessionLoginInfo.getUserNo();
+
+    List<StudentSearchInfo> tuitList = studentService.getTuitList(tuitInfo);
+
+    List<StudentSearchInfo> schoList = studentService.getSchoInfo(tuitInfo);
+
+    tuitInfo = studentService.getTuitInfo(tuitInfo);
+
+    addSessionAttributesToModel(httpSession, model);
+
+//	logger.info(tuitInfo.toString());
+    model.addAttribute("stnt_numb", stnt_numb);
+	model.addAttribute("tuitList", tuitList);
+	model.addAttribute("schoList", schoList);
+	model.addAttribute("tuitInfo", tuitInfo);
+
+
+	return "mobile/tuitInfo";
+	}
+
+/**
+ * 강의평가(기말)
+ * @return "courAppr"
+ */    
+
+@RequestMapping(value="/midTerm")
+public String midTerm(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+	    	
+    HttpSession httpSession = request.getSession(false);
+    LoginInfo sessionLoginInfo = new LoginInfo();
+    
+    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+    }
+    
+    SurveyInfo  CourInfo = new SurveyInfo();
+    
+    //일정체크
+    CourInfo  = studentService.getMidTerm();
+    
+    if(CourInfo.getAppr_flag().equals("N")){
+    	alertAndBack(response, "중간 강의평가 등록 기간이 아닙니다.");
+    	return null;
+    }
+    
+    CourInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+    
+    //과목 가져오기
+    List<SurveyInfo> MidTermList = studentService.getMidTermList(CourInfo);
+
+    addSessionAttributesToModel(httpSession, model);
+
+	logger.info(CourInfo.toString());
+	model.addAttribute("CourInfo", CourInfo);
+	model.addAttribute("MidTermList", MidTermList);
+
+	return "mobile/midTerm";
+	}
+
+/**
+ * 중간 강의평가 - 저장하기
+ * @return "courApprSave"
+ */    
+
+@RequestMapping(value="/midTermSave" , method=RequestMethod.POST)
+public String midTermSave(SurveyInfo SurveyInfo, HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+
+    HttpSession httpSession = request.getSession(false);
+    LoginInfo sessionLoginInfo = new LoginInfo();
+
+    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+    }
+
+    SurveyInfo.setInpt_addr(request.getRemoteAddr());
+    SurveyInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+
+    String action = SurveyInfo.getAction();
+    
+    if(action == null || Objects.isNull(action)){
+    	action = "";
+    }
+    
+    if(action.equals("save")) {
+    	
+    	int resultInt = 0;
+
+    	resultInt = studentService.SaveMidData(SurveyInfo);
+
+        if(resultInt > 0) {
+        	
+        	response.getWriter().write("success");
+        	
+        } else {
+        	response.getWriter().write("UPDATE_FAIL");
+        }
+    }
+    return "mobile/midTermSave";
+}
+
+	/**
+	 * 강의평가(기말)
+	 * @return "courAppr"
+	 */    
+
+	@RequestMapping(value="/courAppr")
+	public String courAppr(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+		    	
+	    HttpSession httpSession = request.getSession(false);
+	    LoginInfo sessionLoginInfo = new LoginInfo();
+	    
+	    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+	        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+	    }
+	    
+	    SurveyInfo  CourInfo = new SurveyInfo();
+	    //일정체크
+	    CourInfo  = studentService.getCourAppr();
+	    
+	    if(CourInfo.getAppr_flag().equals("N")){
+        	alertAndBack(response, "강의평가 등록 기간이 아닙니다.");
+        	return null;
+	    }
+	    
+	    CourInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+	    //과목 가져오기
+	    List<SurveyInfo> CourApprList = studentService.getCourApprList(CourInfo);
+
+	    addSessionAttributesToModel(httpSession, model);
+
+		logger.info(CourInfo.toString());
+		model.addAttribute("CourInfo", CourInfo);
+		model.addAttribute("CourApprList", CourApprList);
+
+		return "mobile/courAppr";
+		}
+
+	/**
+	 * 강의평가 - 저장하기
+	 * @return "courApprSave"
+	 */    
+ 
+    @RequestMapping(value="/courApprSave" , method=RequestMethod.POST)
+    public String courApprSave(SurveyInfo SurveyInfo, HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+
+        SurveyInfo.setInpt_addr(request.getRemoteAddr());
+        SurveyInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+        StudentSearchInfo  surveyInfo = new StudentSearchInfo();
+        // 받은 데이터 콘솔 출력
+        //System.out.println("Received Data: " + SurveyInfo);
+        
+        String action = SurveyInfo.getAction();
+        
+        if(action == null || Objects.isNull(action)){
+        	action = "";
+        }
+        
+        if(action.equals("save")) {
+        	
+        	int resultInt = 0;
+        	
+            resultInt = studentService.SaveCourAppryData(SurveyInfo);
+
+            //System.out.println("Received Data: " + resultInt);
+            
+            if(resultInt > 0) {
+            	System.out.println("Received Data: " + "성공");
+            	//response.getWriter().write("SAVE_OK");
+            } else {
+            	System.out.println("Received Data: " + "실패");
+            	//response.getWriter().write("SAVE_FAIL");
+            }
+            //return "courAppr";
+            
+        } else {
+        	
+    	    //만족도조사 -> 'B02049'
+            surveyInfo.setLect_year(SurveyInfo.getLect_year());
+            surveyInfo.setLect_shtm(SurveyInfo.getLect_shtm());
+            surveyInfo.setLect_type_code(SurveyInfo.getLect_type_code());
+            
+    	    //질문가져오기
+    	    List<StudentSearchInfo> questionList = studentService.getSurveyQInfo(surveyInfo);
+    	    //답변가져오기
+    	    List<StudentSearchInfo> answerList = studentService.getSurveyAInfo(surveyInfo);
+    	    
+    	    model.addAttribute("surveyInfo", SurveyInfo);
+    	    model.addAttribute("questionList", questionList);
+    	    model.addAttribute("answerList", answerList);
+    	    
+        }
+        
+        return "mobile/courApprSave";
+    }
+
+    
+    
+	/**
+	 * 듀얼지도교수상담조사
+	 * @return "dualresearch"
+	 */    
+
+	@RequestMapping(value="/dualresearch")
+	public String dualresearch(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+		    	
+	    HttpSession httpSession = request.getSession(false);
+	    LoginInfo sessionLoginInfo = new LoginInfo();
+	    
+	    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+	        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+	    }
+	    
+	    SurveyInfo  ScheduleInfo = new SurveyInfo();
+	    DualResearchInfo DualInfo = new DualResearchInfo();
+	    StudentSearchInfo  hakgiInfo = new StudentSearchInfo();
+
+	    //현재 학기 불러오기
+	    hakgiInfo = studentService.getHakgi();
+
+	    //성적 조회 일정 불러오기
+	    ScheduleInfo = studentService.getGradeSchedule();
+	    
+	    
+	    //성적 일정 조회 분기
+	    if(!(hakgiInfo.getLect_year().equals(ScheduleInfo.getAdpt_year()) && hakgiInfo.getLect_shtm().equals(ScheduleInfo.getAdpt_shtm()))) {
+        	alertAndBack(response, ""+hakgiInfo.getLect_year()+"-"+hakgiInfo.getLect_shtm()+"학기 성적조회 일정 정보가 존재하지 않습니다.");
+        	return null;
+        } else if(ScheduleInfo.getAppr_used().equals("N")){
+        	alertAndBack(response, "듀얼지도상담조사는 성적조회 기간중에 가능 합니다.");
+        	return null;
+        }
+
+	    DualInfo.setLect_year(ScheduleInfo.getAdpt_year());
+	    DualInfo.setLect_shtm(ScheduleInfo.getAdpt_shtm());
+	    DualInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+	    
+	    DualInfo = studentService.getStudInfo(DualInfo);
+	    
+	    if(DualInfo == null || Objects.isNull(DualInfo)) {
+	    	DualInfo.setPsnl_name1("데이터없음");
+	    	DualInfo.setPsnl_name2("데이터없음");
+	    }
+
+	    addSessionAttributesToModel(httpSession, model);
+
+	    logger.info(DualInfo.toString());
+	    model.addAttribute("DualInfo", DualInfo);
+
+		return "mobile/dualresearch";
+		}
+
+	/**
+	 * 듀얼지도교수상담조사 - 저장하기
+	 * @return "dualSave"
+	 */    
+ 
+    @RequestMapping(value="/dualSave" , method=RequestMethod.POST)
+    public void dualSave(DualResearchInfo DualResearchInfo, HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+
+        DualResearchInfo.setInpt_addr(request.getRemoteAddr());
+        DualResearchInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+
+        int resultInt = 0;
+        // 받은 데이터 콘솔 출력
+
+        if(DualResearchInfo.getPrbl_an10() == null) {
+        	logger.info("비어있음");
+        } else {
+        	logger.info("들어가있음");
+        }
+
+        logger.info(DualResearchInfo.toString());
+
+        resultInt = studentService.SaveDualData(DualResearchInfo);
+
+        if(resultInt > 0) {
+
+        	response.getWriter().write("UPDATE_OK");
+        } else {
+        	response.getWriter().write("UPDATE_FAIL");
+        }
+        
+    }
+    
+	/**
+	 * 만족도조사
+	 * @return "survey"
+	 */    
+
+	@RequestMapping(value="/survey")
+	public String survey(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+		    	
+	    HttpSession httpSession = request.getSession(false);
+	    LoginInfo sessionLoginInfo = new LoginInfo();
+	    
+	    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+	        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+	    }
+	    
+	    StudentSearchInfo  surveyFormInfo = new StudentSearchInfo();
+	    SurveyInfo  gradeInfo = new SurveyInfo();
+	    
+	    String sspt_Flag = (String) httpSession.getAttribute("SSPT_FLAG");
+
+	    logger.info(surveyFormInfo.toString());
+
+	    //현재 학기 불러오기
+	    surveyFormInfo = studentService.getHakgi();
+
+	    //성적 조회 일정 불러오기
+	    gradeInfo = studentService.getGradeSchedule();
+
+	    //성적 일정 조회 분기
+	    if(gradeInfo.getAdpt_shtm().equals("1")) {
+	    	alertAndBack(response, "만족도 조사는 2학기에만 진행합니다.");
+	    	return null;
+	    } else if(!(surveyFormInfo.getLect_year().equals(gradeInfo.getAdpt_year()) && surveyFormInfo.getLect_shtm().equals(gradeInfo.getAdpt_shtm()))) {
+        	alertAndBack(response, ""+surveyFormInfo.getLect_year()+"-"+surveyFormInfo.getLect_shtm()+"학기 성적조회 일정 정보가 존재하지 않습니다.");
+        	return null;
+        } else if(gradeInfo.getAppr_flag().equals("N")){
+        	alertAndBack(response, "성적조회기간:"+gradeInfo.getAdpt_strt()+"부터 가능합니다.");
+        	return null;
+        }
+
+	    // 재학생인지 전공심화인지 체크 필요
+	    System.out.println("Received Data: " + sspt_Flag);
+	    
+	    //sspt_flag: 일반(1),위탁(2),심화(3)
+	    if(sspt_Flag.equals("3")) {
+	    	surveyFormInfo.setLect_type_code("B02050"); //만족도 전공심화
+	    } else {
+	    	surveyFormInfo.setLect_type_code("B02049"); //만족도 일반
+	    }
+	    
+	    //질문가져오기
+	    List<StudentSearchInfo> questionList = studentService.getSurveyQInfo(surveyFormInfo);
+	    //답변가져오기
+	    List<StudentSearchInfo> answerList = studentService.getSurveyAInfo(surveyFormInfo);
+
+
+	    addSessionAttributesToModel(httpSession, model);
+
+		logger.info(surveyFormInfo.toString());
+		model.addAttribute("surveyInfo", surveyFormInfo);
+		model.addAttribute("questionList", questionList);
+		model.addAttribute("answerList", answerList);
+
+		return "mobile/survey";
+		}
+
+	/**
+	 * 만족도조사 - 저장하기
+	 * @return "surveySave"
+	 */    
+ 
+    @RequestMapping(value="/surveySave" , method=RequestMethod.POST)
+    public void surveySave(SurveyInfo SurveyInfo, HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+
+        SurveyInfo.setInpt_addr(request.getRemoteAddr());
+        SurveyInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+        String sspt_Flag = (String) httpSession.getAttribute("SSPT_FLAG");
+
+        int resultInt = 0;
+        // 받은 데이터 콘솔 출력
+        System.out.println("Received Data: " + sspt_Flag);
+
+        logger.info(SurveyInfo.toString());
+
+        //재학생 저장인지 전공심화 저장인지 분기 필요
+	    //sspt_flag: 일반(1),위탁(2),심화(3)
+	    if(sspt_Flag.equals("3")) {
+        	resultInt = studentService.SaveSurveyData_B02050(SurveyInfo);
+        } else {
+            resultInt = studentService.SaveSurveyData_B02049(SurveyInfo);
+        }
+
+        if(resultInt > 0) {
+
+        	response.getWriter().write("UPDATE_OK");
+        } else {
+        	response.getWriter().write("UPDATE_FAIL");
+        }
+        
+    }
+    
+	/**
+	 * 금학기성적조회
+	 * @return "gradeCheck"
+	 */    
+
+	@RequestMapping(value="/gradeCheck")
+	public String gradeCheck(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+		    	
+	    HttpSession httpSession = request.getSession(false);
+	    LoginInfo sessionLoginInfo = new LoginInfo();
+	    
+	    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+	        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+	    }
+
+
+	    SurveyInfo  gradeInfo = new SurveyInfo();
+        StudentSearchInfo studentInfo = new StudentSearchInfo();
+
+        //현재학기 불러오기
+        studentInfo  = studentService.getHakgi();
+	    //성적 조회 일정 불러오기
+	    gradeInfo = studentService.getGradeSchedule();
+
+	    
+	    //현재 학기 일정과 등록된 성적조회일정을 비교
+	    if(!(studentInfo.getLect_year().equals(gradeInfo.getAdpt_year()) && studentInfo.getLect_shtm().equals(gradeInfo.getAdpt_shtm()))) {
+        	alertAndBack(response, ""+studentInfo.getLect_year()+"-"+studentInfo.getLect_shtm()+"학기 성적조회 일정 정보가 존재하지 않습니다. 기존 성적은 누적성적조회에서 확인 하시기 바랍니다.");
+        	return null;
+        } else if(gradeInfo.getAppr_flag().equals("N")){
+        	alertAndBack(response, "성적조회 기간이 아닙니다. 성적조회기간:"+gradeInfo.getAdpt_strt()+"부터입니다.");
+        	return null;
+        }
+
+	    //파라미터 입력
+        gradeInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+	    gradeInfo.setLect_year(studentInfo.getLect_year());
+	    gradeInfo.setLect_shtm(studentInfo.getLect_shtm());
+	    
+        //1.강의평가 / 2.듀얼지도 / 3.만족도(2학기에만) 진행 여부
+        gradeInfo = studentService.getCheckAnswer(gradeInfo);
+        
+        /*
+        if(studentInfo.getLect_shtm().equals("1") || studentInfo.getLect_shtm().equals("2")) {
+
+            if(gradeInfo.getResult2().equals("N")) {
+            	alertAndBack(response, "듀얼지도교수제 설문조사로 이동합니다.");
+            	return "dualresearch";
+            } else if (gradeInfo.getResult1().equals("N")) {
+            	alertAndBack(response, "금학기 평가되지 않은 과목이 있습니다. 강의평가로 이동합니다.");
+            	return "courAppr";
+            } else if (gradeInfo.getResult3().equals("N") && gradeInfo.getLect_shtm().equals("2")) {
+            	alertAndBack(response, "2학기에는 '만족도'조사가 진행됩니다. 진행 후, 성적 조회가 가능합니다. 만족도 조사로 이동합니다.");
+            	return "survey";
+            }
+        }
+        */
+	    //파라미터 입력
+        gradeInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+	    gradeInfo.setLect_year(studentInfo.getLect_year());
+	    gradeInfo.setLect_shtm(studentInfo.getLect_shtm());
+	    
+	    //성적조회
+	    if(studentInfo.getLect_shtm().equals("2")){
+	    	List<SurveyInfo> gradeList = studentService.getGradeCheck_survey(gradeInfo);
+	    	System.out.println("기존 만족도 조사 미진행이면, 선택 사항으로 등급 및 평점이 나오지 않음 & 위 로직대로라면 필수.");
+	    	model.addAttribute("gradeList", gradeList);
+	    } else {
+	    	List<SurveyInfo> gradeList = studentService.getGradeCheck(gradeInfo);
+	    	System.out.println("만족도 조사 미 포함");
+	    	model.addAttribute("gradeList", gradeList);
+	    }
+
+	    addSessionAttributesToModel(httpSession, model);
+
+		logger.info(gradeInfo.toString());
+		model.addAttribute("gradeInfo", gradeInfo);
+		
+
+		return "mobile/gradeCheck";
+		}
+
+		//alert
+		public static void alertAndBack(HttpServletResponse response, String msg) {
+		    try {
+		        response.setContentType("text/html; charset=utf-8");
+		        PrintWriter w = response.getWriter();
+		        w.write("<script>alert('"+msg+"');history.go(-1);</script>");
+		        w.flush();
+		        w.close();
+		    } catch(Exception e) {
+		        e.printStackTrace();
+		    }
+		}
+		
+		//다국어 처리
+	    @RequestMapping("/languageSelection")
+	    public String showLanguageSelectionPage() {
+	        return "language"; // language.jsp로 이동
+	    }
+
+		//다국어 처리
+	    @RequestMapping("/setLanguage")
+	    public String setLanguage(@RequestParam String language, HttpServletRequest request) {
+	        // 사용자 언어 변경
+	        HttpSession session = request.getSession();
+	        session.setAttribute("userLanguage", "?lang="+language);
+	        
+	        String lang = "?lang=";
+	        // 메인 페이지로 리다이렉트
+	        return "redirect:mobile/student_main"+lang+language;
+	    }
+	    
+	    private void addSessionAttributesToModel(HttpSession session, Model model) {
+
+	        model.addAttribute("sust_name", session.getAttribute("sust_name"));
+	        model.addAttribute("korn_name", session.getAttribute("korn_name"));
+	        model.addAttribute("stnt_numb", session.getAttribute("stnt_numb"));
+
+	    }
+
+}

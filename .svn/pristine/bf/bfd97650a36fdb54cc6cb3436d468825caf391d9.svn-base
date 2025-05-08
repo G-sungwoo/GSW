@@ -1,0 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%@ page import="java.net.URL"%><%@ page import="java.net.URLConnection"%><%@ page import="java.net.HttpURLConnection "%><%@ page import="java.net.URLEncoder"%><%@ page import="java.io.BufferedReader"%><%@ page import="java.io.InputStreamReader"%><%@ page import="com.osan.portal.vo.LoginInfo" %><%	String yearEndUrl = "https://yearend.osan.ac.kr/yeartax/login";
+    String acsAlowUrl = "PEGOSU";
+	String userId = "";	try {	    LoginInfo loginSessionInfo = (LoginInfo)request.getSession().getAttribute("sessionUserInfo");	    userId = loginSessionInfo.getUserNo();	} catch (Exception e) {	    userId ="";	}%><!DOCTYPE HTML><html><head></head><body><form name="yearEndForm" id="yearEndForm" method="post" action="<%=yearEndUrl %>">
+    <input type="hidden" name="comp_code" value="<%=acsAlowUrl %>" />
+    <input type="hidden" name="stafno" value="<%=userId %>" />
+</form>	<script type="text/javascript">		var f = document.getElementById("yearEndForm");		f.submit();	</script></body></html>	

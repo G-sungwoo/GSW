@@ -1,0 +1,54 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.net.URL"%>
+<%@ page import="java.net.URLConnection"%>
+<%@ page import="java.net.HttpURLConnection "%>
+<%@ page import="java.net.URLEncoder"%>
+<%@ page import="java.io.BufferedReader"%>
+<%@ page import="java.io.InputStreamReader"%>
+<%@ page import="com.osan.portal.vo.LoginInfo" %>
+
+<%
+	String RegUrl = "https://www.osan.ac.kr/?menuno=396&act=portal&type=2&id=";
+	String StudentUrl = "http://www.osan.ac.kr";
+	LoginInfo loginSessionInfo = (LoginInfo)request.getSession().getAttribute("sessionUserInfo");
+    String userId = loginSessionInfo.getUserNo();
+
+    try {
+       userId = userId;
+    } catch (Exception e) {
+        userId ="";
+    }
+    
+	RegUrl = RegUrl + userId;
+	String mbmerType = "";
+	if (userId.length() > 7){ 
+		mbmerType = "S";
+	}else{
+		mbmerType = "P";
+	}
+%>
+
+<!DOCTYPE HTML>
+<html>
+<head>
+<link rel="icon" type="image/png"  href="./img/favico.ico"/>
+</head>
+<body>
+<% if (mbmerType.equals("P")&&userId.length() > 0) { %>
+<form name="RegForm" id="RegForm" method="post" action="<%=RegUrl %>">
+    <input type="hidden" name="id" value="<%=userId %>" />
+</form>
+	<script type="text/javascript">
+		var f = document.getElementById("RegForm");
+		f.submit();
+	</script>
+	<% }else{ %>
+		<form name="RegForm" id="RegForm" method="post" action="<%=StudentUrl %>">
+	</form>
+	<script type="text/javascript">
+		var f = document.getElementById("RegForm");
+		f.submit();
+	</script>
+	<% } %>
+</body>
+</html>	

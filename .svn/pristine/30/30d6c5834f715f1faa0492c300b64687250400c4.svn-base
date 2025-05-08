@@ -1,0 +1,181 @@
+/*context path 조회*/
+function getContextPath() {
+	var hostIndex = location.href.indexOf( location.host ) + location.host.length;
+	return location.href.substring( hostIndex, location.href.indexOf('/', hostIndex + 1) );
+}
+/*새창 열기*/
+function openMenu(url, menuId, settings){
+    var contextPath = getContextPath();
+    var forwardUrl = contextPath + '/resources/sso/forward_menu.jsp?menuLink=' + encodeURIComponent(url) + '&menuId=' + menuId;
+    //교직원/학생게시판 
+    if(menuId == 'board'){
+    	settings = 'left='+(screen.availWidth-840)/2+', top='+(screen.availHeight-680)/2+', width=840, height=680, toolbar=no, location=no, directories=no, status=yes, menubar=no, scrollbars=yes, copyhistory=no, resizable=no';
+    }else{
+    	settings = 'toolbar=yes, location=yes, directories=yes, status=yes, menubar=yes, scrollbars=yes, copyhistory=yes, resizable=yes';
+    }
+    window.open(forwardUrl ,menuId ,settings);
+}
+/*화면 새로고침*/
+function reload(){
+    window.location.reload();	
+}
+/*게시판 글쓰기*/
+function writeBoard(encUserNo){
+    var settings = 'left='+(screen.availWidth-840)/2+', top='+(screen.availHeight-680)/2+', width=840, height=680, toolbar=no, location=no, directories=no, status=yes, menubar=no, scrollbars=yes, copyhistory=no, resizable=no';
+    var url = 'https://portal.osan.ac.kr/board/index_form.jsp?userNo='+ encUserNo;
+    window.open(url, '_portal', settings);
+}
+/*게시판 글조회*/
+function readBoard(encUserNo, article_seq){
+    var settings = 'left='+(screen.availWidth-840)/2+', top='+(screen.availHeight-680)/2+', width=840, height=680, toolbar=no, location=no, directories=no, status=yes, menubar=no, scrollbars=yes, copyhistory=no, resizable=no';
+    var url = 'http://portal.osan.ac.kr/board/index_view.jsp?userNo='+ encUserNo + '&article_seq=' + article_seq;
+    window.open(url, '_portal', settings);
+}
+/*데이트 포맷 yyyymm*/
+function fn_dateToString(date){
+    var yyyy = date.getFullYear().toString();
+    var mm = (date.getMonth() + 1).toString();
+    return yyyy + (mm[1] ? mm : '0'+mm[0]);
+}
+/*핸드폰번호 유효성 체크*/
+function isCellPhone() {
+    var x = document.getElementById("cellPhone");
+    var p = x.value;
+    p = p.split('-').join('');
+    var regPhone = /^((01[1|6|7|8|9])[1-9]+[0-9]{6,7})|(010[1-9][0-9]{7})$/;
+    return regPhone.test(p);
+}
+/*핸드폰 자동 하이픈*/
+function autoHypen() {
+    var x = document.getElementById("cellPhone");
+    x.value = x.value.replace(/[^0-9]/g, '');
+    var tmp = "";
+    if (x.value.length > 3 && x.value.length <= 7) {
+        tmp += x.value.substr(0, 3);
+        tmp += '-';
+        tmp += x.value.substr(3);
+        x.value = tmp;
+    } else if (x.value.length > 7) {
+        tmp += x.value.substr(0, 3);
+        tmp += '-';
+        tmp += x.value.substr(3, 4);
+        tmp += '-';
+        tmp += x.value.substr(7);
+        x.value = tmp;
+    }
+}
+/*비밀번호 체크*/
+function checkPassWord(str){
+    var pw = str;
+    var num = pw.search(/[0-9]/g);
+    var eng = pw.search(/[a-z]/ig);
+    var spe = pw.search(/[`~!@@#$%^&*()|₩₩₩'₩";:₩/?]/gi);
+    if(pw.length < 8 || pw.length > 12){
+        alert("8자리 ~ 12자리 이내로 입력해주세요.");
+        return false;
+    }
+    if(pw.search(/₩s/) != -1){
+        alert("비밀번호는 공백업이 입력해주세요.");
+        return false;
+    } if(num < 0 || eng < 0 || spe < 0 ){
+        alert("영문, 숫자, 특수문자를 혼합하여 입력해주세요.");
+        return false;
+    }
+    return true;
+}
+/*페이징 처리*/
+function getPagingInfo(totalCnt, dataSize, pageSize, pageNo, totalPage, searchFnName){
+    totalCnt = parseInt(totalCnt);  // 전체레코드수 
+    dataSize = parseInt(dataSize); // 페이지당 보여줄 데이타수 
+    pageSize = parseInt(pageSize); // 페이지 그룹 범위 1 2 3 5 6 7 8 9 10 
+    pageNo = parseInt(pageNo); // 현재페이지
+    totalPage = parseInt(totalPage); // 총페이지
+    var html = new Array(); 
+    if(totalCnt < 9){ 
+    	return ""; 
+    } 
+    if(totalPage < pageSize){
+    	pageSize = totalPage;
+    }
+    // 페이지 카운트
+    var pageCnt = totalCnt % dataSize; 
+    if(pageCnt == 0){ 
+    	pageCnt = parseInt(totalCnt / dataSize); 
+    }else{ 
+    	pageCnt = parseInt(totalCnt / dataSize) + 1; 
+    } 
+    var pRCnt = parseInt(pageNo / pageSize); 
+    if(pageNo % pageSize == 0){ 
+    	pRCnt = parseInt(pageNo / pageSize) - 1; 
+    }
+    html.push('<span class="paging_comm"><a class="first" href=javascript:' + searchFnName +'(1) title="First page">First</a>');
+    //이전 화살표 
+    if(pageNo > pageSize){ 
+    	var s2; 
+    	if(pageNo % pageSize == 0){ 
+    		s2 = pageNo - pageSize; 
+    	}else{ 
+    		s2 = pageNo - pageNo % pageSize; 
+    	} 
+    	html.push('<a class="prev" title="Prev page" href=javascript:' + searchFnName +'("'); 
+    	html.push(s2); 
+    	html.push('");>'); 
+    	html.push("</a>"); 
+    }else{ 
+    	html.push('<a class="prev">\n'); 
+    	html.push('</a>'); 
+    } 
+    //paging Bar 
+    for(var index=pRCnt * pageSize + 1;index<(pRCnt + 1)*pageSize + 1;index++){ 
+    	if(index == pageNo){ 
+    		html.push('<b>'); 
+    		html.push(index); 
+    		html.push('</b>'); 
+    	}else{ 
+    		html.push('<a href=javascript:' + searchFnName +'("'); 
+    		html.push(index); 
+    		html.push('");>'); 
+    		html.push(index); 
+    		html.push('</a>'); 
+    	} 
+    }
+    //다음 화살표 
+    if(pageCnt > (pRCnt + 1) * pageSize){ 
+    	html.push('<a class="next" title="Next page" href=javascript:' + searchFnName +'("'); 
+    	html.push((pRCnt + 1)*pageSize+1); 
+    	html.push('");>'); 
+    	html.push('</a>'); 
+    }else{ 
+    	html.push('<a class="next">'); 
+    	html.push('</a>'); 
+    }
+    html.push('<a class="last" title="Last page" href=javascript:' + searchFnName +'("');
+    html.push(totalPage); 
+    html.push('");>'); 
+    html.push('Last</a></span>');
+    return html.join("");
+}
+function pageResize(){
+    $('.grid').masonry({
+        itemSelector: '.grid-item',
+        columnWidth: '.grid-sizer',
+        horizontalOrder: true,
+        percentPosition: true
+    });
+}
+/*취업지원센터 페이지 열기*/
+function openJobSite(){
+	window.open("https://job.osan.ac.kr/member/login.asp" ,"" ,"");
+}
+/*고지서출력 페이지 열기*/
+function openRegiEtaxSite(){
+	window.open("https://osanuniv.osan.ac.kr/osanuniv/ipsi/findRegiEtax.jsp" ,"" ,"");
+}
+/*아이디 비밀번호 찾기 페이지 열기*/
+function openPopupFindId(){
+	window.open("/findIdView" ,"" ,"width=440, height=380, toolbar=no, location=no, directories=no, status=yes, menubar=no, scrollbars=yes, copyhistory=no, resizable=no");
+}
+/*출결관리 팝업 호출*/
+function openPopupAttandance(){
+	window.open("/attendanceView" ,"" ,"width=1500, height=1000, toolbar=no, location=no, directories=no, status=yes, menubar=no, scrollbars=yes, copyhistory=no, resizable=no");
+}

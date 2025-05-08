@@ -1,0 +1,41 @@
+
+a {color:#5a5a5a; text-decoration:none}
+
+body{font-size:11px;  line-height:1.5em }
+
+/* 기존 팝업 */
+#privacy_info{margin: 15px 20px 20px 20px;}
+#privacy_info h1{padding:10px 0 10px 0 ; font-size:20px; font-weight:bold ; border-bottom: 2px solid #4e1f67 }
+#privacy_info  h2, #privacy_info dd{padding:20px; background:#f9f9f9;}
+#privacy_info  h2 {margin:15px 0 30px 0; padding:20px; font-size:11px; }
+
+#privacy_info dt{margin:10px 0 5px 0;font-weight:bold; color:#9424c6;}
+#privacy_info dd{margin:0px; color:#5a5a5a}
+
+#privacy_info .top{text-align:right; color:#446da5;}
+#privacy_info .top a{ color:#9424c6}
+#privacy_info .btn{margin:0 auto; width:97px;   font-weight:bold; text-align:center; background:#4e1f67; }
+#privacy_info .btn a{display:block; padding:10px 0; color:#fff;}
+
+#privacy_info .top_txt{margin:0px; padding:10px 0 0 0;}
+
+#privacy_info .top_img{text-align:center;}
+
+#privacy_info .box{margin-bottom:20px;padding:20px  20px;  background:#f9f9f9;}
+
+/* 새로운 가이드 팝업 */
+#pop_wrap {position:relative; font-size:12px;}
+
+#pop_wrap p, #pop_wrap form {margin-top:20px;}
+#pop_wrap p:first-child {margin-top:0;}
+
+
+#pop_title {background:#fb6a7b; padding:11px 0;}
+#pop_title h1 {margin-left:13px; font-size:18px; font-weight:bold; color:white;}
+
+#pop_wrap .contents {padding:30px; color:#606060;}
+
+#pop_wrap .close {position:absolute; right:32px; top:11px;}
+
+/* 버튼 */
+.pop_btn_style01 {background:#494949; border:none; width:65px; padding:6px 0; font-size:11px; font-weight:bold; color:white;} /* Gray */

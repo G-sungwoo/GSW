@@ -1,0 +1,32 @@
+package com.osan.portal.service;
+
+import com.osan.portal.vo.LoginInfo;
+
+public interface LoginService {
+	/*사용자 정보 조회*/
+    public LoginInfo selectUser(LoginInfo loginInfo);
+    /*비밀번호 암호화*/
+    public String selectEncPassword(LoginInfo loginInfo);
+    /*sms인증번호 생성*/
+    public int selelctRandomNumber(int length);
+    /*sms인증번호 저장*/
+    public int insertVerifySms(LoginInfo loginInfo);
+    /*sms인증번호 발송*/
+    public int insertSentVerifyNumber(LoginInfo loginInfo);
+    /*sms인증번호 확인*/
+    public int selectOneVerifyNumberCheck(LoginInfo loginInfo);
+    /*사용자 ID 확인*/
+    public LoginInfo selectOneUserNo(LoginInfo loginInfo);
+    /*임시 비밀번호 생성*/
+    public String selelctTempPassword();
+    /*임시 비밀번호 발송*/
+    public int insertTempPassword(LoginInfo loginInfo);
+	/*사용자 정보 조회(비밀번호 찾기)*/
+    public LoginInfo selectUserForFindPassword(LoginInfo loginInfo);
+    /*비밀번호 오류횟수 저장(교직원)*/
+    public int updateUserWrongPasswordCnt(LoginInfo loginInfo);
+    /*비밀번호 오류횟수 저장(학생)*/
+    public int updateStntUserWrongPasswordCnt(LoginInfo loginInfo);
+    /*로그인 이력 저장*/
+    public int insertLoginInfo(LoginInfo loginInfo);
+}

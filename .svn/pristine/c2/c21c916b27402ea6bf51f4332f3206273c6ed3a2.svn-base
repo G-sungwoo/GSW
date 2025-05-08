@@ -1,0 +1,714 @@
+package com.osan.portal;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.bandi.motp.BandiMOTP;
+import com.bandi.oauth.BandiSSOAgent;
+import com.bandi.oauth.CookieManager;
+import com.ksign.access.api.SSORspData;
+import com.ksign.access.api.SSOService;
+import com.osan.portal.service.LoginService;
+import com.osan.portal.service.MainService;
+import com.osan.portal.vo.HomePageInfo;
+import com.osan.portal.vo.LoginInfo;
+
+@Controller
+public class MainController {
+    private static Logger logger = LoggerFactory.getLogger(MainController.class);
+	
+    @Autowired
+    LoginService loginService;
+    
+    @Autowired
+    MainService mainService;
+    
+    @Value("${sms.subject}") 
+    private String smsSubject;
+    
+    @Value("${sms.callback.number}") 
+    private String smsCallbackNumber;
+    
+    @Value("${sms.body.first}") 
+    private String smsBodyFirst;
+    
+    @Value("${sms.body.last}") 
+    private String smsBodyLast;
+    
+    @Value("${sms.pw.subject}") 
+    private String smsPwSubject;
+
+    @Value("${sms.pw.body.first}") 
+    private String smsPwBodyFirst;
+    
+    @Value("${sms.pw.body.last}") 
+    private String smsPwBodyLast;
+    
+	private static String ssoUri = "https://auth.osan.ac.kr/oauth2/token.do";	// 개발서버 URL
+	private static String clientId = "5b6018008ced40578210c6c4a6089a8f";
+	private static String clientSecret = "31w8lz5y35ui93ymljgh33q5d";
+	private static String scope = "http://sso.osan.ac.kr";						// 고정
+	private static String domain = ".osan.ac.kr";
+    
+    /*�α��� ������ �̵�*/
+    @RequestMapping(value="/")
+    public ModelAndView mainView(ModelAndView mv) {
+        String page = "/index_sso";
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    /*�α���(����) ������ �̵�*/
+    @RequestMapping(value="/login")
+    public ModelAndView lgoinView(ModelAndView mv) {
+        String page = "/login";
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    /*���̵� ã�� ������ �̵�*/
+    @RequestMapping(value="/findIdView")
+    public ModelAndView findIdView(ModelAndView mv) {
+        String page = "/find_id";
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    /*��й�ȣ ã�� ������ �̵�*/
+    @RequestMapping(value="/findPwView")
+    public ModelAndView findPwView(ModelAndView mv) {
+        String page = "/find_pw";
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    /*��й�ȣ ���� ������ �̵�*/
+    @RequestMapping(value="/changePw")
+    public ModelAndView changeView(ModelAndView mv) {
+    	String page = "/change_pw";
+    	mv.setViewName(page);
+    	return mv;
+    }
+    
+    @RequestMapping(value="/login_sso")
+    public ModelAndView lgoinSsoView(ModelAndView mv) {
+        String page = "/index_sso";
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    /*ajax �α���(����� ����) üũ*/
+    @RequestMapping(value="/loginCheck" , method=RequestMethod.POST)
+    public void loginCheck(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	LoginInfo resultLoginInfo = new LoginInfo();
+        String encPassword = loginService.selectEncPassword(loginInfo);
+        //String encPassword = loginInfo.getPassword();
+        resultLoginInfo = loginService.selectUser(loginInfo);
+        if(resultLoginInfo != null) {
+        	resultLoginInfo.setUserIp(request.getRemoteAddr());
+            if(resultLoginInfo.getWrpwCont() > 8) {
+            	response.getWriter().write("5TIMES_WRONG_PASSWORD");
+            }else if(!resultLoginInfo.getPassword().equals(encPassword)) {
+            	/*��й�ȣ ������ ����Ƚ�� ����*/
+            	resultLoginInfo.setWrpwCont(resultLoginInfo.getWrpwCont() + 1);
+            	if(resultLoginInfo.getUserAuth().equals("1")||resultLoginInfo.getUserAuth().equals("2")||resultLoginInfo.getUserAuth().equals("3")||resultLoginInfo.getUserAuth().equals("4")){
+                    loginService.updateUserWrongPasswordCnt(resultLoginInfo);
+            	}else if(resultLoginInfo.getUserAuth().equals("5")||resultLoginInfo.getUserAuth().equals("6")) {
+            		loginService.updateStntUserWrongPasswordCnt(resultLoginInfo);
+            	}
+                response.getWriter().write("WRONG_PASSWORD");
+            }else if(resultLoginInfo.getWorkFlag().equals("N")) {
+            	//��,�� 6�� ���� �α��� ����
+            	response.getWriter().write("GO_HOME");
+            }else if(resultLoginInfo.getChgePwAt().equals("N")) {
+            	//�н����� ���� 6���� �̻��� ���
+            	HttpSession session = request.getSession(true);
+            	session.setAttribute("sessionUserInfo", resultLoginInfo);
+            	response.getWriter().write("CHANGE_PASSWORD");
+            }else if((resultLoginInfo.getUserAuth().equals("1")||resultLoginInfo.getUserAuth().equals("4")) && !loginInfo.getVerifiedAt().equals("Y")) {
+            	//������ ��� SMS���� �ʿ�
+            	response.getWriter().write("NEED_FOR_SMS");
+            }else {
+            	if(resultLoginInfo.getWrpwCont() > 0) {
+            	    /*�α��� ������ ��й�ȣ ����Ƚ�� �ʱ�ȭ*/
+            	    resultLoginInfo.setWrpwCont(0);
+            	    if(resultLoginInfo.getUserAuth().equals("1")||resultLoginInfo.getUserAuth().equals("2")||resultLoginInfo.getUserAuth().equals("3")||resultLoginInfo.getUserAuth().equals("4")){
+                        loginService.updateUserWrongPasswordCnt(resultLoginInfo);
+            	    }else if(resultLoginInfo.getUserAuth().equals("5")||resultLoginInfo.getUserAuth().equals("6")) {
+            	    	loginService.updateStntUserWrongPasswordCnt(resultLoginInfo);
+            	    }
+            	}
+                response.getWriter().write("LOGIN_SUCCESS");
+            }
+        }else {
+            response.getWriter().write("NOT_EXIST_USER");
+        }
+    }
+    @RequestMapping(value="/main")
+    public void ssoLogin(ModelAndView mv, LoginInfo loginInfo, HttpServletRequest request, Model model, HttpServletResponse response) throws Exception {
+        LoginInfo resultLoginInfo = new LoginInfo();
+        String page = "main_sso";
+        /*********************����� ���� ���� ó��*******************/
+        HttpSession httpSession = request.getSession(false);
+        //���������ϸ� ���� ������ ����� ���� ����
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            resultLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        } else {
+            //����� ���� ��ȸ
+            resultLoginInfo = loginService.selectUserWithPassword(loginInfo);
+            if(resultLoginInfo == null) {
+                page = "/index";
+                return;
+            }else {
+                //���� ����
+                HttpSession session = request.getSession(true);
+                session.setAttribute("sessionUserInfo", resultLoginInfo);
+            }
+        }
+    	/*sso ó�� */
+        SSORspData rspData = null;
+        SSOService ssoService = SSOService.getInstance();
+        String clientIP = request.getRemoteAddr();
+        String returl = "https://info.osan.ac.kr/" + page;
+        rspData = ssoService.ssoReqIssueToken( request
+                                             , response
+                                             , "form-based"
+                                             , resultLoginInfo.getUserNo()
+                                             , resultLoginInfo.getName()
+                                             , resultLoginInfo.getRegNo()
+                                             , ""
+                                             , "11111"
+                                             , returl
+                                             , clientIP
+                                             , "211.221.231.13");
+    }
+    //����� ���� �� ���� �α��� ó�� �� ���� ȭ�� ������ ��ȸ
+    @RequestMapping(value="/main_sso")
+    public ModelAndView login(ModelAndView mv, LoginInfo loginInfo, HttpServletRequest request, Model model, HttpServletResponse response) throws Exception {
+        LoginInfo resultLoginInfo = new LoginInfo();
+        String page = "main";
+        if(request.getHeader("referer") == null) {
+    		page = "/index_sso";
+    		mv.setViewName(page);
+    		return mv;
+        }
+        /*********************����� ���� ���� ó��*******************/
+        HttpSession httpSession = request.getSession(false);
+        //���������ϸ� ���� ������ ����� ���� ����
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            resultLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        } else {
+        	if(loginInfo == null) {
+        		page = "/index_sso";
+        		mv.setViewName(page);
+        		return mv;
+        	}
+        	if(loginInfo.getUserNo() == null) {
+        		page = "/index_sso";
+        		mv.setViewName(page);
+        		return mv;
+        	}
+            //����� ���� ��ȸ
+            resultLoginInfo = loginService.selectUserWithPassword(loginInfo);
+            if(resultLoginInfo == null) {
+        		page = "/index_sso";
+        		mv.setViewName(page);
+        		return mv;
+            }else {
+                //���� ����
+                HttpSession session = request.getSession(true);
+                session.setAttribute("sessionUserInfo", resultLoginInfo);
+            }
+        }
+        resultLoginInfo.setUserIp(request.getRemoteAddr());
+        resultLoginInfo.setMenuId("login");
+        loginService.insertLoginInfo(resultLoginInfo);
+        //���� ����
+        if(resultLoginInfo.getUserAuth().equals("2") || resultLoginInfo.getUserAuth().equals("3")) {
+        	/*********************QnA        *********************/
+        	List<HomePageInfo> osanUniQnAList = mainService.selectListOsanUniQnA(resultLoginInfo) ;
+        	model.addAttribute("osanUniQnAList", osanUniQnAList);
+        	/*********************Ȩ������ ��������*********************/
+        	//���а���
+        	List<HomePageInfo> uniNoticeList = mainService.selectListHomepageUniNotice(resultLoginInfo) ;
+        	model.addAttribute("uniNoticeList", uniNoticeList);
+        	//�Խð���
+        	List<HomePageInfo> iphakNoticeList = mainService.selectListHomepageIphakNotice(resultLoginInfo) ;
+        	model.addAttribute("iphakNoticeList", iphakNoticeList);
+        	//��������
+        	List<HomePageInfo> bidNoticeList = mainService.selectListHomepageBidNotice(resultLoginInfo) ;
+        	model.addAttribute("bidNoticeList", bidNoticeList);
+        	List<HomePageInfo> coronaNoticeList = mainService.selectListHomepageCoronaNotice(resultLoginInfo) ;
+        	model.addAttribute("coronaNoticeList", coronaNoticeList);
+        	page = "main_w";
+        //����(�ð�����)	
+        }else if(resultLoginInfo.getUserAuth().equals("1") || resultLoginInfo.getUserAuth().equals("4")) {
+        	/*********************Ȩ������ ��������*********************/
+        	//���а���
+        	List<HomePageInfo> uniNoticeList = mainService.selectListHomepageUniNotice(resultLoginInfo) ;
+        	model.addAttribute("uniNoticeList", uniNoticeList);
+        	//�Խð���
+        	List<HomePageInfo> iphakNoticeList = mainService.selectListHomepageIphakNotice(resultLoginInfo) ;
+        	model.addAttribute("iphakNoticeList", iphakNoticeList);
+        	//��������
+        	List<HomePageInfo> bidNoticeList = mainService.selectListHomepageBidNotice(resultLoginInfo) ;
+        	model.addAttribute("bidNoticeList", bidNoticeList);
+        	List<HomePageInfo> coronaNoticeList = mainService.selectListHomepageCoronaNotice(resultLoginInfo) ;
+        	model.addAttribute("coronaNoticeList", coronaNoticeList);
+        	/*********************���� �ð�ǥ**************************/
+        	List<HomePageInfo> lectTimetableList = mainService.selectListLectTimetable(resultLoginInfo) ;
+        	model.addAttribute("lectTimetableList", lectTimetableList);
+        	/*********************���� ��ȹ��**************************/
+        	List<HomePageInfo> lectPlanList = mainService.selectListLectPlan(resultLoginInfo) ;
+        	model.addAttribute("lectPlanList", lectPlanList);
+        	page = "main_p";
+        //���л�
+        }else if(resultLoginInfo.getUserAuth().equals("5")) {
+        	/*********************���� �ð�ǥ*****************************/
+        	List<HomePageInfo> lectTimetableList = mainService.selectListLectTimetableForStnt(resultLoginInfo) ;
+        	model.addAttribute("lectTimetableList", lectTimetableList);
+        	HomePageInfo stntInfo = mainService.selectStntInfo(resultLoginInfo);
+        	model.addAttribute("stntInfo", stntInfo);
+        	/*********************���� ��ȹ��*****************************/
+        	List<HomePageInfo> lectPlanList = mainService.selectListLectPlanForStnt(resultLoginInfo) ;
+        	model.addAttribute("lectPlanList", lectPlanList);
+        	/*********************��ϱ� ��Ȳ*****************************/
+        	List<HomePageInfo> lesnAmntList = mainService.selectListLesnAmnt(resultLoginInfo) ;
+        	model.addAttribute("lesnAmntList", lesnAmntList);
+        	/*********************���б� ��Ȳ*****************************/
+        	List<HomePageInfo> shshAmntList = mainService.selectListShshAmnt(resultLoginInfo) ;
+        	model.addAttribute("shshAmntList", shshAmntList);
+        	/*********************���� ��ȸ(��ü)**************************/
+        	HomePageInfo totalGrad = mainService.selectTotalGrad(resultLoginInfo) ;
+        	model.addAttribute("totalGrad", totalGrad);
+        	/*********************���� ��ȸ(�б�)**************************/
+        	List<HomePageInfo> shtmGradList = mainService.selectListShtmGrad(resultLoginInfo) ;
+        	model.addAttribute("shtmGradList", shtmGradList);
+        	/*********************������ȸ(������ �ִ� ���� ��ȸ)****************/
+        	List<HomePageInfo> gradYearList = mainService.selectListGradYear(resultLoginInfo) ;
+        	model.addAttribute("gradYearList", gradYearList);
+        	/*********************ä�������ȸ(����ä������)*******************/
+        	List<HomePageInfo> jobList = mainService.selectListJob() ;
+        	model.addAttribute("jobList", jobList);
+        	/*********************ä�������ȸ(�Ƹ�����Ʈ)********************/
+        	List<HomePageInfo> parttimeJobList = mainService.selectListParttimeJob() ;
+        	model.addAttribute("parttimeJobList", parttimeJobList);
+        	/*********************���� ���� ���****************************/
+        	List<HomePageInfo> uniNoticeList = mainService.selectListHomepageUniNotice(resultLoginInfo) ;
+        	model.addAttribute("uniNoticeList", uniNoticeList);
+        	//�Խð���
+        	List<HomePageInfo> iphakNoticeList = mainService.selectListHomepageIphakNotice(resultLoginInfo) ;
+        	model.addAttribute("iphakNoticeList", iphakNoticeList);
+        	//��������
+        	List<HomePageInfo> bidNoticeList = mainService.selectListHomepageBidNotice(resultLoginInfo) ;
+        	model.addAttribute("bidNoticeList", bidNoticeList);
+        	List<HomePageInfo> coronaNoticeList = mainService.selectListHomepageCoronaNotice(resultLoginInfo) ;
+        	model.addAttribute("coronaNoticeList", coronaNoticeList);
+        	//List<HomePageInfo> rentBookList = mainService.selectListRentBook(resultLoginInfo) ;
+        	//model.addAttribute("rentBookList", rentBookList);
+        	page = "main_s";
+        //������
+        }else if(resultLoginInfo.getUserAuth().equals("6")) {
+        	/*********************���� ��ȸ(��ü)**************************/
+        	HomePageInfo totalGrad = mainService.selectTotalGrad(resultLoginInfo) ;
+        	model.addAttribute("totalGrad", totalGrad);
+        	/*********************���� ��ȸ(�б�)**************************/
+        	List<HomePageInfo> shtmGradList = mainService.selectListShtmGrad(resultLoginInfo) ;
+        	model.addAttribute("shtmGradList", shtmGradList);
+        	/*********************������ȸ(������ �ִ� ���� ��ȸ)****************/
+        	List<HomePageInfo> gradYearList = mainService.selectListGradYear(resultLoginInfo) ;
+        	model.addAttribute("gradYearList", gradYearList);
+        	/*********************ä�������ȸ(����ä������)*******************/
+        	List<HomePageInfo> jobList = mainService.selectListJob() ;
+        	model.addAttribute("jobList", jobList);
+        	/*********************ä�������ȸ(�Ƹ�����Ʈ)********************/
+        	List<HomePageInfo> parttimeJobList = mainService.selectListParttimeJob() ;
+        	model.addAttribute("parttimeJobList", parttimeJobList);
+        	page = "main_g";
+        }
+        /*********************����� �ҽ�         *********************/
+        List<HomePageInfo> osanUniNewsList = mainService.selectListOsanUniNews(resultLoginInfo) ;
+        model.addAttribute("osanUniNewsList", osanUniNewsList);
+        mv.setViewName(page);
+        return mv;
+    }
+    //�α׾ƿ�
+    @RequestMapping(value="/logout")
+    public ModelAndView logout(ModelAndView mv, HttpSession session, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        String page = "logout";
+        Cookie[] cookies = request.getCookies(); 
+        for(int i = 0 ; i<cookies.length; i++){  
+        	cookies[i].setMaxAge(0);                        // Ư�� ��Ű�� �� �̻� ������� ���ϰ� �ϱ� ���ؼ��� 
+        	response.addCookie(cookies[i]);            // �ش� ��Ű�� ���信 �߰�(����)�Ѵ�.
+        	}
+        session.invalidate();
+		// 쿠키 관련 class
+		CookieManager cookieManager = new CookieManager();
+		
+		// api 관련 class
+		BandiSSOAgent agent = new BandiSSOAgent(ssoUri, clientId, clientSecret, scope);
+		
+		// 사용자 접속 ip
+		String client_ip = request.getRemoteAddr();
+		
+		String accessToken = cookieManager.check("access_token", request);
+		String refreshToken = cookieManager.check("refresh_token", request);
+				
+		// 3. 로그아웃
+		// 로그아웃 버튼 클릭 시 동작
+		// access_token에 대한 무효화
+		agent.logout(accessToken, client_ip);
+		cookieManager.remove(domain, "access_token", "/", response);
+		cookieManager.remove(domain, "refresh_token", "/", response);
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    //�α��� ���� SMS ����
+    @RequestMapping(value="/sendSms")
+    public void sendSmsVerifyNumber(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        LoginInfo resultLoginInfo = new LoginInfo();
+        resultLoginInfo = loginService.selectUser(loginInfo);
+        String paramCellNum = loginInfo.getCellPhone();
+        paramCellNum = paramCellNum.replace("-", "");
+        if(resultLoginInfo != null) {
+        	String hp = "";
+        	hp = resultLoginInfo.getHp().replace("-", "");
+            if(!paramCellNum.equals(hp)) {
+                response.getWriter().write("NOT_MATCH_NUM");
+            }else {
+                //���� 6�ڸ� ������ȣ ����
+                int verifyNumber = loginService.selelctRandomNumber(6);
+                resultLoginInfo.setVerifyNumber(verifyNumber);
+                /*������ ���� ����*/
+                resultLoginInfo.setDestInfo(resultLoginInfo.getName()+"^"+StringUtils.replace(paramCellNum, "-", ""));
+                /*sms ���� ���� ����*/
+                resultLoginInfo.setSmsMsg(smsBodyFirst + "[" + verifyNumber + "]" + smsBodyLast);
+                /*sms ����*/
+                resultLoginInfo.setSubject(smsSubject);
+                /*sms callback*/
+                resultLoginInfo.setCallback(smsCallbackNumber);
+                int resultInt = loginService.insertVerifySms(resultLoginInfo);
+                if(resultInt == 1) {
+                	response.getWriter().write("SMS_SEND_OK");	
+                }
+            }
+        }
+    }
+    
+    //�α��� SMS ����ó��
+    @RequestMapping(value="/verifyUser")
+    public void verifyUser(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	loginInfo.setCellPhone(loginInfo.getCellPhone().replace("-", ""));
+        int resultInt = loginService.selectOneVerifyNumberCheck(loginInfo);
+        if(resultInt > 0) {
+            response.getWriter().write("VERIFY_OK");
+        }else {
+            response.getWriter().write("NOT_MATCH_NUM");
+        }
+    }
+    
+    //������ �л� �Խ��� ��ȸ
+    @RequestMapping(value="/boardArticle" , method=RequestMethod.POST)
+    public @ResponseBody Map<String, Object> selectListBoardArticle(LoginInfo loginInfo, HttpServletRequest request) throws Exception{
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        ArrayList<Map<String, Object>> jsonList = new ArrayList<Map<String, Object>>();
+        jsonList.add(mainService.selectListBoardArticle(loginInfo, request));
+        jsonObject.put("jsonList", jsonList);
+        return jsonObject;
+    }
+    
+    //�л�� ��ȸ
+    @RequestMapping(value="/academicSchedule" , method=RequestMethod.POST)
+    public @ResponseBody Map<String, Object> selectListAcademicSchedule(LoginInfo loginInfo, HttpServletRequest request) throws Exception{
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        ArrayList<Map<String, Object>> jsonList = new ArrayList<Map<String, Object>>();
+        jsonList.add(mainService.selectListAcademicSchedule(loginInfo));
+        jsonObject.put("jsonList", jsonList);
+        return jsonObject;
+    }
+    
+    //����� ���� ����
+    @RequestMapping(value="/updateUserInfo" , method=RequestMethod.POST)
+    public void updateUserInfo(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws Exception{
+    	loginInfo.setUserIp(request.getRemoteAddr());
+    	int resultInt = 0;
+    	//������
+    	if(loginInfo.getUserAuth().equals("1") || loginInfo.getUserAuth().equals("2") || loginInfo.getUserAuth().equals("3") || loginInfo.getUserAuth().equals("4")) {
+    		resultInt = mainService.updateUserInfo(loginInfo);
+    	//�л�
+    	}else {
+    		resultInt = mainService.updateStntUserInfo(loginInfo);
+    	}
+        if(resultInt > 0) {
+            /*������ ������ ���� �缳��*/
+            LoginInfo resultLoginInfo = new LoginInfo();
+            resultLoginInfo = loginService.selectUser(loginInfo);
+            HttpSession session = request.getSession(false);
+            session.setAttribute("sessionUserInfo", resultLoginInfo);
+            response.getWriter().write("UPDATE_OK");
+        }else {
+        	response.getWriter().write("UPDATE_FAIL");
+        }
+    }
+    
+    //��й�ȣ ����
+    @RequestMapping(value="/updateUserPassword")
+    public void updateUserPassword(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        /*********************���� ���� ��������*******************/
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        //���������ϸ� ���� ������ ����� ���� ����
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+    	loginInfo.setUserIp(request.getRemoteAddr());
+    	if(loginInfo.getUserNo() == null || loginInfo.getUserNo() == "") {
+    		loginInfo.setUserNo(sessionLoginInfo.getUserNo());
+    	}
+    	if(loginInfo.getUserAuth() == null || loginInfo.getUserAuth() == "") {
+    		loginInfo.setUserAuth(sessionLoginInfo.getUserAuth());
+    	}
+        String encPassword = loginService.selectEncPassword(loginInfo);
+        LoginInfo resultLoginInfo = new LoginInfo();
+        resultLoginInfo = loginService.selectUser(loginInfo);
+        int resultInt = 0;
+        if(resultLoginInfo != null) {
+            if(!resultLoginInfo.getPassword().equals(encPassword)) {
+                response.getWriter().write("WRONG_PASSWORD");
+            }else {
+            	//������
+                if(loginInfo.getUserAuth().equals("1") || loginInfo.getUserAuth().equals("2") || loginInfo.getUserAuth().equals("3") || loginInfo.getUserAuth().equals("4")) {
+                	resultInt = mainService.updateUserPassword(loginInfo);
+                //�л�
+                }else {
+                    resultInt = mainService.updateStntUserPassword(loginInfo);
+                }
+                if(resultInt > 0) {
+                	response.getWriter().write("UPDATE_OK");
+                }else {
+                	response.getWriter().write("UPDATE_FAIL");
+                }
+            }
+        }
+    }
+    
+    //������ �˻�
+    @RequestMapping(value="/searchWorker")
+    public @ResponseBody Map<String, Object> selectListSearchWorker(LoginInfo loginInfo, HttpServletRequest request) throws Exception{
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        ArrayList<Map<String, Object>> jsonList = new ArrayList<Map<String, Object>>();
+        jsonList.add(mainService.selectListSearchWorker(loginInfo, request));
+        jsonObject.put("jsonList", jsonList);
+        return jsonObject;
+    }
+    
+    //�л� ���� ��ȸ
+    @RequestMapping(value="/getStudentImg")
+    public ResponseEntity<byte[]> getByteImage(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+    	LoginInfo resultLoginInfo = new LoginInfo();
+        HttpSession httpSession = request.getSession(false);
+        //���������ϸ� ���� ������ ����� ���� ����
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            resultLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        Map<String, Object> map = mainService.selectStntPhoto(resultLoginInfo);
+        byte[] imageContent = (byte[]) map.get("pictFile");
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<byte[]>(imageContent, headers, HttpStatus.OK);
+    }
+    
+    //���� ��ȸ
+    @RequestMapping(value="/searchGrad")
+    public @ResponseBody Map<String, Object> selectListSearchGrad(LoginInfo loginInfo) throws Exception{
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        ArrayList<Map<String, Object>> jsonList = new ArrayList<Map<String, Object>>();
+        jsonList.add(mainService.selectListSubjectGrad(loginInfo));
+        jsonObject.put("jsonList", jsonList);
+        return jsonObject;
+    }
+    
+    //ID ã��
+    @RequestMapping(value="/findId")
+    public void selectOneUserNo(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	LoginInfo resultLoginInfo = new LoginInfo();
+    	resultLoginInfo = loginService.selectOneUserNo(loginInfo);
+    	if(resultLoginInfo != null) {
+    		if(resultLoginInfo.getUserNo() != null && resultLoginInfo.getUserNo() != "") {
+    			response.getWriter().write(resultLoginInfo.getUserNo());
+    		}
+    	}else {
+            response.getWriter().write("NO_MATCH_USER");
+        }
+    }
+    
+    //�ӽ� ��й�ȣ �߱�
+    @RequestMapping(value="/sendTempPassword")
+    public void sendTempPassword(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        LoginInfo resultLoginInfo = new LoginInfo();
+        resultLoginInfo = loginService.selectUserForFindPassword(loginInfo);
+        if(resultLoginInfo != null) {
+            if(resultLoginInfo.getHp() == null || resultLoginInfo.getHp().equals("")) {
+                response.getWriter().write("NO_HP");
+            }else {
+            	resultLoginInfo.setUserIp(request.getRemoteAddr());
+                //�ӽú�й�ȣ ����
+                String tempPassword = loginService.selelctTempPassword();
+                /*������ ���� ����*/
+                resultLoginInfo.setDestInfo(resultLoginInfo.getName()+"^"+StringUtils.replace(resultLoginInfo.getHp(), "-", ""));
+                /*sms ���� ���� ����*/
+                resultLoginInfo.setSmsMsg(smsPwBodyFirst + " " + tempPassword + " " + smsPwBodyLast);
+                /*sms ����*/
+                resultLoginInfo.setSubject(smsPwSubject);
+                /*sms callback*/
+                resultLoginInfo.setCallback(smsCallbackNumber);
+                resultLoginInfo.setNewPassword(tempPassword);
+                int resultInt = loginService.insertTempPassword(resultLoginInfo);
+                if(resultInt == 1) {
+                	response.getWriter().write(resultLoginInfo.getHp());	
+                }
+            }
+        }else {
+        	response.getWriter().write("NO_USER");
+        }
+    }
+    //���ο������ ��ȸ
+    @RequestMapping(value="/psnlGwInfo")
+    public @ResponseBody Map<String, Object> selectPsnlGwInfo(LoginInfo loginInfo, HttpServletRequest request) throws Exception{
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        jsonObject.put("signDocCnt", mainService.selectSignDocCnt(loginInfo));
+        jsonObject.put("publicDocCnt", mainService.selectPublicDocCnt(loginInfo));
+        jsonObject.put("inboxDocCnt", mainService.selectInboxDocCnt(loginInfo));
+        return jsonObject;
+    }
+    //�α� ����
+    @RequestMapping(value="/insertMenuLog")
+    public void insertMenuLog(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        //���������ϸ� ���� ������ ����� ���� ����
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+    	loginInfo.setUserIp(request.getRemoteAddr());
+    	loginInfo.setUserNo(sessionLoginInfo.getUserNo());
+    	loginService.insertLoginInfo(loginInfo);
+    }
+    /*������*/
+    @RequestMapping(value="/attendanceView")
+    public ModelAndView attendanceView(ModelAndView mv) {
+        String page = "/attendance";
+        mv.setViewName(page);
+        return mv;
+    }
+    @RequestMapping(value="/login_check_sso")
+	public void bandi_sso(ModelAndView mv, LoginInfo loginInfo, HttpServletRequest request, Model model, HttpServletResponse response) throws Exception {
+		// 쿠키 관련 class
+		CookieManager cookieManager = new CookieManager();
+		// api 관련 class
+		BandiSSOAgent agent = new BandiSSOAgent(ssoUri, clientId, clientSecret, scope);
+		// 사용자 접속 ip
+		String client_ip = request.getRemoteAddr();
+		// 1. 토큰 발급
+		String user_id = loginInfo.getUserNo();
+		String user_pwd = loginInfo.getPassword();
+		HashMap<String, String> login = agent.accessToken(user_id, user_pwd, client_ip);
+		String otpFlag = login.get("OTP_FILTER_FLAG");
+		
+		if(login.get("error").equals("0000") || login.get("error").equals("VL-3130")) {
+			// 로그인 성공 및 기존사용자 제한 일 경우
+			// 쿠키 및 세션 생성
+			cookieManager.create(domain, "access_token", login.get("access_token"), login.get("expires_in"), "/", response);
+			cookieManager.create(domain, "refresh_token", login.get("refresh_token"), "-1", "/", response);
+			
+			// 사용자 정보 확인
+			HashMap<String, String> getUserInfo = agent.userInfo(login.get("access_token"), client_ip);
+			if(getUserInfo.get("error").equals("0000")) {
+		        LoginInfo resultLoginInfo = new LoginInfo();
+		        HttpSession session = request.getSession(true);
+	            resultLoginInfo = loginService.selectUserWithPassword(loginInfo);
+		        session.setAttribute("sessionUserInfo", resultLoginInfo);
+				response.getWriter().write(otpFlag);
+			} else {
+				// 사용자 정보 요청 실패
+				cookieManager.remove(domain, "access_token", "/", response);
+				cookieManager.remove(domain, "refresh_token", "/", response);
+				response.setCharacterEncoding("UTF-8"); 
+				response.setContentType("text/html; charset=UTF-8");
+				response.getWriter().write(getUserInfo.get("error_message"));
+			}
+		} else {
+			// 로그인 실패
+			// 로그인 페이지로 이동
+			System.out.println("[login error] "+login.get("error"));
+			System.out.println("[login error_message] "+login.get("error_message"));
+			response.setCharacterEncoding("UTF-8"); 
+			response.setContentType("text/html; charset=UTF-8");
+			response.getWriter().write(login.get("error_message"));
+		}
+	}
+    @RequestMapping(value="/otpView")
+    public ModelAndView otpView(ModelAndView mv) {
+        String page = "/otp";
+        mv.setViewName(page);
+        return mv;
+    }
+    @RequestMapping(value="/checkOtp")
+    public void checkOtp(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	LoginInfo resultLoginInfo = new LoginInfo();
+        HttpSession httpSession = request.getSession(false);
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            resultLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        String otpUri = "https://auth.osan.ac.kr/otp/checkOtp.do";
+        String clientId = "5b6018008ced40578210c6c4a6089a8f";
+        String clientSecret = "31w8lz5y35ui93ymljgh33q5d";
+        String user_id = resultLoginInfo.getUserNo();
+        String hp_no = StringUtils.replaceChars(resultLoginInfo.getHp(), "-", "");
+        String code = loginInfo.getConfirmOtp();
+        String ip = request.getRemoteAddr();
+        BandiMOTP otp = new BandiMOTP(otpUri, clientId, clientSecret);
+        HashMap<String, String> result = otp.checkOtp(user_id, hp_no, code, ip);
+        System.out.println(result.toString());
+        if(result.get("error").equals("0000")) {
+            System.out.println("인증처리완료");
+            if(result.get("otp_result").equals("true")) {
+            	response.getWriter().write(result.get("error"));
+            } else {
+    			response.setCharacterEncoding("UTF-8"); 
+    			response.setContentType("text/html; charset=UTF-8");
+    			response.getWriter().write(result.get("error_message"));
+            }
+        } else {
+			response.setCharacterEncoding("UTF-8"); 
+			response.setContentType("text/html; charset=UTF-8");
+			response.getWriter().write(result.get("error_message"));
+        }
+    }
+}

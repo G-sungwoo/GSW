@@ -1,0 +1,592 @@
+package com.osan.portal.vo;
+
+public class HomePageInfo {
+
+    private String newsId;
+    private String title;
+    private String creatorId;
+    private String viewCount;
+    private String regDate;
+    private String fileName;
+    private String replyAt;
+    private String articleSeq;
+    private String insertName;
+    private String insertDate;
+    private String pkId;
+    private String endDate;
+    private String currentYm;
+    private String userName;
+    private String deptName;
+    private String psnlGbnm;
+    private String tel;
+    private String hp;
+    private String boardNo;
+    
+    /*���ǽð�ǥ*/
+    private String lectYear;
+    private String lectShtm;
+    private String termNumb;
+    private String lectMond1;
+    private String lectMond2;
+    private String lectMond3;
+    private String lectTued1;
+    private String lectTued2;
+    private String lectTued3;
+    private String lectWedd1;
+    private String lectWedd2;
+    private String lectWedd3;
+    private String lectThrd1;
+    private String lectThrd2;
+    private String lectThrd3;
+    private String lectFrid1;
+    private String lectFrid2;
+    private String lectFrid3;
+    
+    /*���ǰ�ȹ��*/
+    private String haksNumb;
+    private String corsShyr;
+    private String clssNumb;
+    private String sbjtKrnm;
+    private String sprfKrnm;
+    private String sprfNumb;
+    private String lectPont;
+    private String lectTime;
+    private String haksNumb2;
+    private String lincYsno;
+    private String corsSust;
+    private String corsMajr;
+    
+    /*�л�����*/
+    private String stntNumb;
+    private String kornName;
+    private String stntShyr;
+    private String sustName;
+    private String majrName;
+    private String stntClss;
+    private String stntHand;
+    private String stntEmail;
+    private String sustUrl;
+    
+    /*���б�/��ϱ� ��Ȳ*/
+    private String regiYear;
+    private String regiShtm;
+    private String entrAmnt;
+    private String lesnAmnt;
+    private String shshEtam;
+    private String shshLsam;
+    private String shshAmnt;
+    private String rlpdAmnt;
+    private String paidName;
+    private String shshKrnm;
+    
+    /*���� ��ȸ*/
+    private String aplySjct;
+    private String pobtSjct;
+    private String aplyPont;
+    private String acqtPont;
+    private String unaqPont;
+    private String acqtMrks;
+    private String avrgMrks;
+    private String acqtGrad;
+    private String acqtScor;
+    private String acqtArsc;
+    private String sbjtCode;
+    private String totlScor;
+    private String lectGrad;
+    
+    /*ä������*/
+    private String compName;
+
+    public String getNewsId() {
+		return newsId;
+	}
+	public void setNewsId(String newsId) {
+		this.newsId = newsId;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getCreatorId() {
+		return creatorId;
+	}
+	public void setCreatorId(String creatorId) {
+		this.creatorId = creatorId;
+	}
+	public String getViewCount() {
+		return viewCount;
+	}
+	public void setViewCount(String viewCount) {
+		this.viewCount = viewCount;
+	}
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	public String getReplyAt() {
+		return replyAt;
+	}
+	public void setReplyAt(String replyAt) {
+		this.replyAt = replyAt;
+	}
+	public String getArticleSeq() {
+		return articleSeq;
+	}
+	public void setArticleSeq(String articleSeq) {
+		this.articleSeq = articleSeq;
+	}
+	public String getInsertName() {
+		return insertName;
+	}
+	public void setInsertName(String insertName) {
+		this.insertName = insertName;
+	}
+	public String getInsertDate() {
+		return insertDate;
+	}
+	public void setInsertDate(String insertDate) {
+		this.insertDate = insertDate;
+	}
+	public String getPkId() {
+		return pkId;
+	}
+	public void setPkId(String pkId) {
+		this.pkId = pkId;
+	}
+	public String getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+	public String getCurrentYm() {
+		return currentYm;
+	}
+	public void setCurrentYm(String currentYm) {
+		this.currentYm = currentYm;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getDeptName() {
+		return deptName;
+	}
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+	public String getPsnlGbnm() {
+		return psnlGbnm;
+	}
+	public void setPsnlGbnm(String psnlGbnm) {
+		this.psnlGbnm = psnlGbnm;
+	}
+	public String getTel() {
+		return tel;
+	}
+	public void setTel(String tel) {
+		this.tel = tel;
+	}
+	public String getHp() {
+		return hp;
+	}
+	public void setHp(String hp) {
+		this.hp = hp;
+	}
+	public String getLectYear() {
+		return lectYear;
+	}
+	public void setLectYear(String lectYear) {
+		this.lectYear = lectYear;
+	}
+	public String getLectShtm() {
+		return lectShtm;
+	}
+	public void setLectShtm(String lectShtm) {
+		this.lectShtm = lectShtm;
+	}
+	public String getTermNumb() {
+		return termNumb;
+	}
+	public void setTermNumb(String termNumb) {
+		this.termNumb = termNumb;
+	}
+	public String getLectMond1() {
+		return lectMond1;
+	}
+	public void setLectMond1(String lectMond1) {
+		this.lectMond1 = lectMond1;
+	}
+	public String getLectMond2() {
+		return lectMond2;
+	}
+	public void setLectMond2(String lectMond2) {
+		this.lectMond2 = lectMond2;
+	}
+	public String getLectMond3() {
+		return lectMond3;
+	}
+	public void setLectMond3(String lectMond3) {
+		this.lectMond3 = lectMond3;
+	}
+	public String getLectTued1() {
+		return lectTued1;
+	}
+	public void setLectTued1(String lectTued1) {
+		this.lectTued1 = lectTued1;
+	}
+	public String getLectTued2() {
+		return lectTued2;
+	}
+	public void setLectTued2(String lectTued2) {
+		this.lectTued2 = lectTued2;
+	}
+	public String getLectTued3() {
+		return lectTued3;
+	}
+	public void setLectTued3(String lectTued3) {
+		this.lectTued3 = lectTued3;
+	}
+	public String getLectWedd1() {
+		return lectWedd1;
+	}
+	public void setLectWedd1(String lectWedd1) {
+		this.lectWedd1 = lectWedd1;
+	}
+	public String getLectWedd2() {
+		return lectWedd2;
+	}
+	public void setLectWedd2(String lectWedd2) {
+		this.lectWedd2 = lectWedd2;
+	}
+	public String getLectWedd3() {
+		return lectWedd3;
+	}
+	public void setLectWedd3(String lectWedd3) {
+		this.lectWedd3 = lectWedd3;
+	}
+	public String getLectThrd1() {
+		return lectThrd1;
+	}
+	public void setLectThrd1(String lectThrd1) {
+		this.lectThrd1 = lectThrd1;
+	}
+	public String getLectThrd2() {
+		return lectThrd2;
+	}
+	public void setLectThrd2(String lectThrd2) {
+		this.lectThrd2 = lectThrd2;
+	}
+	public String getLectThrd3() {
+		return lectThrd3;
+	}
+	public void setLectThrd3(String lectThrd3) {
+		this.lectThrd3 = lectThrd3;
+	}
+	public String getLectFrid1() {
+		return lectFrid1;
+	}
+	public void setLectFrid1(String lectFrid1) {
+		this.lectFrid1 = lectFrid1;
+	}
+	public String getLectFrid2() {
+		return lectFrid2;
+	}
+	public void setLectFrid2(String lectFrid2) {
+		this.lectFrid2 = lectFrid2;
+	}
+	public String getLectFrid3() {
+		return lectFrid3;
+	}
+	public void setLectFrid3(String lectFrid3) {
+		this.lectFrid3 = lectFrid3;
+	}
+	public String getHaksNumb() {
+		return haksNumb;
+	}
+	public void setHaksNumb(String haksNumb) {
+		this.haksNumb = haksNumb;
+	}
+	public String getCorsShyr() {
+		return corsShyr;
+	}
+	public void setCorsShyr(String corsShyr) {
+		this.corsShyr = corsShyr;
+	}
+	public String getClssNumb() {
+		return clssNumb;
+	}
+	public void setClssNumb(String clssNumb) {
+		this.clssNumb = clssNumb;
+	}
+	public String getSbjtKrnm() {
+		return sbjtKrnm;
+	}
+	public void setSbjtKrnm(String sbjtKrnm) {
+		this.sbjtKrnm = sbjtKrnm;
+	}
+	public String getSprfKrnm() {
+		return sprfKrnm;
+	}
+	public void setSprfKrnm(String sprfKrnm) {
+		this.sprfKrnm = sprfKrnm;
+	}
+	public String getSprfNumb() {
+		return sprfNumb;
+	}
+	public void setSprfNumb(String sprfNumb) {
+		this.sprfNumb = sprfNumb;
+	}
+	public String getStntNumb() {
+		return stntNumb;
+	}
+	public void setStntNumb(String stntNumb) {
+		this.stntNumb = stntNumb;
+	}
+	public String getKornName() {
+		return kornName;
+	}
+	public void setKornName(String kornName) {
+		this.kornName = kornName;
+	}
+	public String getStntShyr() {
+		return stntShyr;
+	}
+	public void setStntShyr(String stntShyr) {
+		this.stntShyr = stntShyr;
+	}
+	public String getSustName() {
+		return sustName;
+	}
+	public void setSustName(String sustName) {
+		this.sustName = sustName;
+	}
+	public String getMajrName() {
+		return majrName;
+	}
+	public void setMajrName(String majrName) {
+		this.majrName = majrName;
+	}
+	public String getStntClss() {
+		return stntClss;
+	}
+	public void setStntClss(String stntClss) {
+		this.stntClss = stntClss;
+	}
+	public String getStntHand() {
+		return stntHand;
+	}
+	public void setStntHand(String stntHand) {
+		this.stntHand = stntHand;
+	}
+	public String getStntEmail() {
+		return stntEmail;
+	}
+	public void setStntEmail(String stntEmail) {
+		this.stntEmail = stntEmail;
+	}
+	public String getSustUrl() {
+		return sustUrl;
+	}
+	public void setSustUrl(String sustUrl) {
+		this.sustUrl = sustUrl;
+	}
+	public String getLectPont() {
+		return lectPont;
+	}
+	public void setLectPont(String lectPont) {
+		this.lectPont = lectPont;
+	}
+	public String getLectTime() {
+		return lectTime;
+	}
+	public void setLectTime(String lectTime) {
+		this.lectTime = lectTime;
+	}
+	public String getRegiYear() {
+		return regiYear;
+	}
+	public void setRegiYear(String regiYear) {
+		this.regiYear = regiYear;
+	}
+	public String getRegiShtm() {
+		return regiShtm;
+	}
+	public void setRegiShtm(String regiShtm) {
+		this.regiShtm = regiShtm;
+	}
+	public String getEntrAmnt() {
+		return entrAmnt;
+	}
+	public void setEntrAmnt(String entrAmnt) {
+		this.entrAmnt = entrAmnt;
+	}
+	public String getLesnAmnt() {
+		return lesnAmnt;
+	}
+	public void setLesnAmnt(String lesnAmnt) {
+		this.lesnAmnt = lesnAmnt;
+	}
+	public String getShshEtam() {
+		return shshEtam;
+	}
+	public void setShshEtam(String shshEtam) {
+		this.shshEtam = shshEtam;
+	}
+	public String getShshLsam() {
+		return shshLsam;
+	}
+	public void setShshLsam(String shshLsam) {
+		this.shshLsam = shshLsam;
+	}
+	public String getShshAmnt() {
+		return shshAmnt;
+	}
+	public void setShshAmnt(String shshAmnt) {
+		this.shshAmnt = shshAmnt;
+	}
+	public String getRlpdAmnt() {
+		return rlpdAmnt;
+	}
+	public void setRlpdAmnt(String rlpdAmnt) {
+		this.rlpdAmnt = rlpdAmnt;
+	}
+	public String getPaidName() {
+		return paidName;
+	}
+	public void setPaidName(String paidName) {
+		this.paidName = paidName;
+	}
+	public String getShshKrnm() {
+		return shshKrnm;
+	}
+	public void setShshKrnm(String shshKrnm) {
+		this.shshKrnm = shshKrnm;
+	}
+	public String getAplySjct() {
+		return aplySjct;
+	}
+	public void setAplySjct(String aplySjct) {
+		this.aplySjct = aplySjct;
+	}
+	public String getPobtSjct() {
+		return pobtSjct;
+	}
+	public void setPobtSjct(String pobtSjct) {
+		this.pobtSjct = pobtSjct;
+	}
+	public String getAplyPont() {
+		return aplyPont;
+	}
+	public void setAplyPont(String aplyPont) {
+		this.aplyPont = aplyPont;
+	}
+	public String getAcqtPont() {
+		return acqtPont;
+	}
+	public void setAcqtPont(String acqtPont) {
+		this.acqtPont = acqtPont;
+	}
+	public String getUnaqPont() {
+		return unaqPont;
+	}
+	public void setUnaqPont(String unaqPont) {
+		this.unaqPont = unaqPont;
+	}
+	public String getAcqtMrks() {
+		return acqtMrks;
+	}
+	public void setAcqtMrks(String acqtMrks) {
+		this.acqtMrks = acqtMrks;
+	}
+	public String getAvrgMrks() {
+		return avrgMrks;
+	}
+	public void setAvrgMrks(String avrgMrks) {
+		this.avrgMrks = avrgMrks;
+	}
+	public String getAcqtGrad() {
+		return acqtGrad;
+	}
+	public void setAcqtGrad(String acqtGrad) {
+		this.acqtGrad = acqtGrad;
+	}
+	public String getAcqtScor() {
+		return acqtScor;
+	}
+	public void setAcqtScor(String acqtScor) {
+		this.acqtScor = acqtScor;
+	}
+	public String getAcqtArsc() {
+		return acqtArsc;
+	}
+	public void setAcqtArsc(String acqtArsc) {
+		this.acqtArsc = acqtArsc;
+	}
+	public String getSbjtCode() {
+		return sbjtCode;
+	}
+	public void setSbjtCode(String sbjtCode) {
+		this.sbjtCode = sbjtCode;
+	}
+	public String getTotlScor() {
+		return totlScor;
+	}
+	public void setTotlScor(String totlScor) {
+		this.totlScor = totlScor;
+	}
+	public String getLectGrad() {
+		return lectGrad;
+	}
+	public void setLectGrad(String lectGrad) {
+		this.lectGrad = lectGrad;
+	}
+	public String getCompName() {
+		return compName;
+	}
+	public void setCompName(String compName) {
+		this.compName = compName;
+	}
+	public String getHaksNumb2() {
+		return haksNumb2;
+	}
+	public void setHaksNumb2(String haksNumb2) {
+		this.haksNumb2 = haksNumb2;
+	}
+	public String getLincYsno() {
+		return lincYsno;
+	}
+	public void setLincYsno(String lincYsno) {
+		this.lincYsno = lincYsno;
+	}
+	public String getCorsSust() {
+		return corsSust;
+	}
+	public void setCorsSust(String corsSust) {
+		this.corsSust = corsSust;
+	}
+	public String getCorsMajr() {
+		return corsMajr;
+	}
+	public void setCorsMajr(String corsMajr) {
+		this.corsMajr = corsMajr;
+	}
+	public String getBoardNo() {
+		return boardNo;
+	}
+	public void setBoardNo(String boardNo) {
+		this.boardNo = boardNo;
+	}
+}

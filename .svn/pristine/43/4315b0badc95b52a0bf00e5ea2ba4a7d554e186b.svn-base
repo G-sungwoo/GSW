@@ -1,0 +1,12 @@
+package com.osan.portal.service;
+
+import com.osan.portal.vo.StudentSearchInfo;
+
+public interface StudentService {
+
+	public StudentSearchInfo selectStudentInfo(StudentSearchInfo studentSearchInfo);
+	
+	public StudentSearchInfo selectStudentChange(StudentSearchInfo studentSearchInfo);
+	
+}
+

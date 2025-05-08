@@ -1,0 +1,42 @@
+package com.osan.portal.service;
+
+import java.util.List;
+
+import com.osan.portal.vo.StudentSearchInfo;
+
+public interface StudentService {
+
+	public StudentSearchInfo selectStudentInfo(StudentSearchInfo studentSearchInfo);
+	
+	public StudentSearchInfo selectStudentChange(StudentSearchInfo studentSearchInfo);
+
+	public StudentSearchInfo getStudentInfo(StudentSearchInfo studentSearchInfo);
+
+	public StudentSearchInfo getHakgi();
+
+	public List<StudentSearchInfo> getSchedule(StudentSearchInfo lectInfo);
+
+	public List<StudentSearchInfo> getScheduleInfo(StudentSearchInfo lectInfo);
+
+	public List<StudentSearchInfo> getCourInfo(StudentSearchInfo gradeInfo);
+
+	public StudentSearchInfo getTotalGrade(StudentSearchInfo gradeInfo);
+
+	public List<StudentSearchInfo> getGradeList(StudentSearchInfo gradeInfo);
+
+	public StudentSearchInfo getTuitHakgi();
+
+	public List<StudentSearchInfo> getSchoInfo(StudentSearchInfo tuitInfo);
+
+	public StudentSearchInfo getTuitInfo(StudentSearchInfo tuitInfo);
+
+	public List<StudentSearchInfo> getTuitList(StudentSearchInfo tuitInfo);
+
+	public int updateStntInfo(StudentSearchInfo studentSearchInfo);
+
+	public StudentSearchInfo getOffInfo(StudentSearchInfo studentInfo);
+
+	public StudentSearchInfo getApplySchedule();
+
+}
+

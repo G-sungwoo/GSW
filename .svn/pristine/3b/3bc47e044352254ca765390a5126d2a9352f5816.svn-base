@@ -1,0 +1,88 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="/WEB-INF/views/jstl.jsp"%>
+<!DOCTYPE html>
+
+                    <h1 class="h3 mb-4 text-gray-800">교과목 : '${surveyInfo.sbjt_krnm}'</h1>
+                    <form  action="" method="post" name="surveyForm" id="surveyForm">
+                        <table class="table table-bordered" style="text-align: center;" border="1">
+                        <input name="lect_year" id="lect_year" type="hidden" value="${surveyInfo.lect_year}" />
+                        <input name="lect_shtm" id="lect_shtm" type="hidden" value="${surveyInfo.lect_shtm}" />
+                        <input name="haks_numb" id="haks_numb" type="hidden" value="${surveyInfo.haks_numb}" />
+                        <input name="clss_numb" id="clss_numb" type="hidden" value="${surveyInfo.clss_numb}" />
+                        <input name="sprf_numb" id="sprf_numb" type="hidden" value="${surveyInfo.sprf_numb}" />
+                        <input name="lect_type_code" id="lect_type_code" type="hidden" value="${surveyInfo.lect_type_code}" />
+                        <input name="action" id="action" type="hidden" value="save" />
+                            <thead class="table-light">
+                                <tr>
+                                    <th>순번</th>
+                                    <th>문항명</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="${questionList}" var="list">
+                                        <tr><td rowspan="2" id="question[${list.prbl_numb}]"> ${list.prbl_numb}</td><td> ${list.prbl_ctnt}</td></tr>
+                                        <tr><td>
+                                        <div class="mydict">
+                                            <div>
+                                        <c:forEach items="${answerList}" var="Alist">
+                                            <c:if test="${Alist.prbl_numb eq list.prbl_numb }">
+                                                 <label>
+                                                 <input type="radio" name="answers${Alist.prbl_numb}" id="answers${Alist.prbl_numb}" value="${Alist.prbl_scor }"/><span style="font-size:9pt;">${Alist.prbl_ctnt}</span>
+                                                 </label>
+                                            </c:if>
+                                        </c:forEach>
+                                            </div>
+                                        </div>
+                                        </td></tr>
+                                </c:forEach>
+                                    <tr>
+                                        <td>주관식</td><td>본 강의에 대한 전반적인 소감을 적어 주시기 바랍니다. <br> <input type="text" name="dscp_ansr" id="dscp_ansr" /></td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <div class="container-div" style="text-align:center; padding-bottom:15px;">
+                    <a href="javascript:void(0);" onclick="validateForm();" class="btn btn-info btn-icon-split btn-la">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
+                        <span class="text">강의평가 제출
+                        </span>
+                    </a>
+                    </div>
+                    
+    <script type="text/javascript">
+    
+    function validateForm() {
+        // 선택되지 않은 라디오 버튼이 있는지 확인하는 변수
+        var allQuestionsAnswered = true;
+        
+        <c:forEach items="${questionList}" var="list" varStatus="loop">
+            var radioName = "answers${list.prbl_numb}";
+            var radios = document.getElementsByName(radioName);
+            var radioChecked = false;
+            for (var i = 0; i < radios.length; i++) {
+                
+                if (radios[i].checked) {
+                    radioChecked = true;
+                    break;    
+                    }
+                }
+    
+            if (!radioChecked) {
+                allQuestionsAnswered = false;
+                alert("${list.prbl_numb}번 문항을 선택해 주세요.");
+                return false;
+            }    
+            
+        </c:forEach>
+
+        if (!allQuestionsAnswered) {
+            return false;
+        }
+        
+      saveApprSurvey();
+    }
+    
+    
+    </script>

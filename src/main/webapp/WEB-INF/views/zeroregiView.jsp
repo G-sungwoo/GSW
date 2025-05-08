@@ -1,0 +1,269 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page session="false" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="com.osan.portal.vo.LoginInfo" %>
+<%@ page import="sun.misc.BASE64Encoder" %>
+<html>
+<head>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;">
+    <meta name="viewport" content="width=device-width,user-scalable=yes">
+    <meta name="keywords" content="오산대학교, 오산대 포탈, 오산대, 포탈" />
+    <meta name="description" content="오산대학교 포탈" />
+    <meta name="author" content="오산대학교" />
+    <link rel="icon" type="image/png"  href="resources/img/favicon.ico"/>
+    <title>오산대학교 포탈</title>
+    <script src="resources/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+    <script src="resources/js/jquery-ui.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    
+    var query = window.location.search;
+    var param = new URLSearchParams(query);
+    var year = param.get('regi_year');
+    var shtm = param.get('regi_shtm');
+    var numb = param.get('stnt_numb');
+    var flag = param.get('regi_flag');
+    
+    history.replaceState({}, null, location.pathname);
+    
+        
+    $(document).ready(function() {
+/*
+    	$.ajax({
+            type : "POST",
+            url : "/zeroregi",
+            data : {
+            	"regi_year" : year
+               ,"regi_shtm" : shtm
+               ,"stnt_numb" : numb
+            },
+            dataType : "text"
+        });
+*/
+        var formData = $("#findPwForm").serialize();
+    	$.ajax({
+    		type : "POST",
+    		url : "/zeroregi",
+    		data : formData,
+    		dataType : "text",
+    		success : smsSuccess
+    	});
+     });   	
+    	
+    function pagereload(){
+        var formData = $("#findPwForm").serialize();
+        $.ajax({
+            type : "POST",
+            url : "/zeroregi",
+            data : formData,
+            dataType : "text",
+            success : smsSuccess
+        });
+    }
+    function smsSuccess(data,status){
+    	
+        if(data == "REGI_OK"){
+            alert("이미 '등록'이 완료되었습니다. 등록확인은 대학정보시스템을 통해 확인하시기 바랍니다.");
+            window.self.close();
+        }else if(data == "SMS_SEND_OK"){
+            alert("인증번호가 발송되었습니다"); 
+            setTimeout(Decrement,1000);
+        }
+    }
+    
+    var mins = 1;  //Set the number of minutes you need
+    var secs = mins * 60;
+    var currentSeconds = 0;
+    var currentMinutes = 0;
+
+    function Decrement() {
+        currentMinutes = Math.floor(secs / 60);
+        currentSeconds = secs % 60;
+        if(currentSeconds <= 9) currentSeconds = "0" + currentSeconds;
+        secs--;
+        document.getElementById("timerText").innerHTML = "(0" + currentMinutes + ":" + currentSeconds + ")"; //Set the element id you need the time put into.
+        if(secs !== -1) setTimeout('Decrement()',1000);
+    }
+    //인증번호 체크    
+    function checkVerifyNumber(){
+        if($.trim($("#input_regno").val()) == ""){	
+        	alert("생년월일(6자리)를 입력해주세요")
+        	return;
+        }else if($.trim($("#userVerifyNumber").val()) == ""){
+            alert("인증번호를 입력해주세요");
+            return;
+        }else if(currentSeconds == 0){
+            alert("인증 시간이 만료되었습니다. 인증번호발송을 다시 클릭해주세요");
+            $("#verifiedAt").val("N");
+            return;
+        }else{
+            verifyUser();
+        }
+    }
+    //인증번호 확인(서버)
+    function verifyUser(){
+        var formData = $("#findPwForm").serialize();
+        $.ajax({
+            type : "POST",
+            url : "/verifyUser",
+            data : formData,
+            dataType : "text",
+            success : verifyUserSuccess
+        });
+    }
+    
+    function verifyUserSuccess(data, status){
+        if(data == "NOT_MATCH_NUM"){
+            alert("인증번호가 일치하지 않습니다.");
+            $("#verifiedAt").val("N");
+            return;
+        }else if(data == "VERIFY_OK"){
+            $("#verifiedAt").val("Y");
+            var formData = $("#findPwForm").serialize();
+            $.ajax({
+                type : "POST",
+                url : "/zeroregi",
+                data : formData,
+                dataType : "text",
+                success : updateSuccess
+            });
+            
+        }else{
+            alert("오류가 발생하였습니다");
+        }
+    }
+    
+    function updateSuccess(data, status){
+
+    	if(data == "REGI_UPDATE_OK"){
+    		alert("'0원'등록이 완료되었습니다. 등록확인은 대학정보시스템을 통해 확인하시기 바랍니다.");
+    		window.self.close();
+    	} else if (data == "NOT_MATCH_REGINO") {
+    		alert("입력된 생년월일이 다릅니다.")
+    		return;
+    	}
+    }
+    
+    </script>
+    <link type="text/css" href="resources/css/layout.css" rel="stylesheet" />
+    <!-- 세션체크해서 로그인 정보 있으면 메인화면으로 -->
+    <%
+    String userNo = "";
+    String userName = "";
+    String userAuth = "";
+    String encUserNo = "";
+    String hp = "";
+    String tel = "";
+    String hTell = "";
+    String fax = "";
+    String email = "";
+    String regi_year = "";
+    String regi_shtm = "";
+    String stnt_numb = "";
+    String regi_flag = "";
+    String userRegNo = "";
+    HttpSession session = request.getSession(false);
+    if(session == null && session.getAttribute("sessionUserInfo") == null){
+        %>
+        <script type="text/javascript">
+            alert("로그인 세션이 종료되었습니다. 로그인페이지로 이동합니다.");
+        </script>
+        <% 
+        response.sendRedirect("/");
+    }else{
+        LoginInfo loginInfo = new LoginInfo();
+        loginInfo = (LoginInfo)session.getAttribute("sessionUserInfo");
+        
+        regi_year = request.getParameter("regi_year");
+        regi_shtm = request.getParameter("regi_shtm");
+       
+        stnt_numb = request.getParameter("stnt_numb");
+        regi_flag = request.getParameter("regi_flag");
+        
+        userNo = loginInfo.getUserNo();
+        userName = loginInfo.getName();
+        userAuth = loginInfo.getUserAuth();
+        userRegNo = loginInfo.getRegNo();
+        hp = loginInfo.getHp();
+        tel = loginInfo.getTel();
+        hTell = loginInfo.gethTell();
+        fax = loginInfo.getFax();
+        email = loginInfo.getEmail();
+        
+        BASE64Encoder en = new BASE64Encoder();
+        encUserNo = URLEncoder.encode(en.encode(userNo.getBytes("UTF-8")),"UTF-8");
+        
+        System.out.println("#####################################세션정보########################################");
+        System.out.println("loginInfo.getUserNo() : " + loginInfo.getUserNo());
+        System.out.println("loginInfo.getName() : " + loginInfo.getName());
+        System.out.println("loginInfo.getUserAuth() : "  + loginInfo.getUserAuth());
+        System.out.println("#####################################세션정보########################################");
+    }
+    %>
+</head>
+<body>
+<div class="zero">
+    <ul>
+        <li>'0'원 등록 페이지</li>
+    </ul>
+    <div class="box">
+        <p>- 안내사항</p>
+        <p> 현재 대학정보시스템에 저장된 휴대폰 번호로 인증번호가 자동 발송됩니다. 전달 받은 인증번호를 입력 후, 확인 버튼을 누르면 자동으로 '등록'처리 됩니다.</p>
+        <p> 인증번호는 1분 이내로 입력하시고, 입력시간이 초과되거나 틀린경우에는 '재발송'버튼을 통해 다시 받으시기 바랍니다.</p>
+        <p> 아래의 현재 저장된 휴대폰 번호를 확인하시기 바랍니다. </p>
+        <form action="" method="post" name="findPwForm" id="findPwForm">
+        <input name="regi_year" id="regi_year" type="hidden" value="<%=regi_year %>" />
+        <input name="regi_shtm" id="regi_shtm" type="hidden" value="<%=regi_shtm %>" />
+        <input name="stnt_numb" id="stnt_numb" type="hidden" value="<%=stnt_numb %>" />
+        <input name="regi_flag" id="regi_flag" type="hidden" value="<%=regi_flag %>" />
+        <input name="userRegNo" id="userRegNo" type="hidden" value="<%=userRegNo %>" />
+        <input name="cellPhone" id="cellPhone" type="hidden" value="<%=hp %>">
+        <input name="verifiedAt" id="verifiedAt" type="hidden" value="N" />
+        <table class="op_table">
+            <colgroup>
+                <col style="width:30%; " />
+                <col style="width:*; " />
+            </colgroup>
+            <tbody>
+                <tr>
+                    <th>아이디</th>
+                    <td><input type="text" name="userNo" id="userNo" value="<%=userNo %>" maxlength="10" readonly/></td>
+                </tr>
+                <tr>
+                    <th>이름</th>
+                    <td><input type="text" name="name" id="name" value="<%=userName %>" maxlength="20" readonly/></td>
+                </tr>
+                <tr>
+                    <th>핸드폰 번호</th>
+                    <td><input type="text" name="hp" id="hp" value="<%=hp %> [※현재  저장된 휴대폰 번호입니다.]" maxlength="20" disabled/></td>
+                </tr>
+                <tr>
+                    <th>※생년월일(6자리)</th>
+                    <td><input type="text" name="input_regno" id="input_regno" value="" maxlength="6"/></td>
+                </tr>
+                <tr>
+                    <th>※인증번호</th>
+                    <td><input type="password" name="userVerifyNumber" id="userVerifyNumber" value="" placeholder= "인증번호 6자리 입력" maxlength="6"/><span id="timerText">(01:00)</span><button type="button" onclick="pagereload();">인증번호 재발송</button></td>
+                </tr>    
+            </tbody>
+        </table>
+        <div class="info">
+            <ol class="btn center">
+                <li><button type="button" class="write" onclick="checkVerifyNumber();">확인</button></li>
+                <li><button type="button" onclick="window.self.close();">취소</button></li>
+            </ol>
+        </div>
+        </form>
+        <p>저장된 번호가 다르거나 번호양식이 틀린경우, 소속학과 및</p>
+        <p>교무처(031-370-2539)로 연락하셔서 변경하시기 바랍니다.</p>
+        <div style="text-align:center; padding-top:10px; height:50px;">
+        <p id="result"/>
+        </div>
+    </div>
+</div>
+</body>
+</html>

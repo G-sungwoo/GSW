@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	                    http://www.springframework.org/schema/beans/spring-beans.xsd 
+	                    http://www.springframework.org/schema/context
+	                    http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+    <!-- 프로퍼티 파일 설정 -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="/WEB-INF/config/config.properties"/>
+        <property name="fileEncoding" value="UTF-8" />
+    </bean>
+    
+    <!-- db접속 정보 설정 -->
+    <!-- 대학정보시스템 (운영)-->
+    <bean id="dataSource1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db.oracle.driver}"/>
+        <property name="url" value="${db.real.osuIs.url}"/>
+        <property name="username" value="${db.real.osuIs.username}"/>
+        <property name="password" value="${db.real.osuIs.password}"/>
+        <property name="maxActive" value="50"/>
+        <property name="minIdle" value="1"/>
+    </bean>
+    <bean id="sqlSessionFactory1" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource1"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+     <bean id="sqlSession1" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory1" />
+     </bean>
+     <bean id="transactionManager1" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource1"/>
+     </bean>
+
+    <!-- 홈페이지 -->
+    <bean id="dataSource2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db.sqlserver.driver}"/>
+        <property name="url" value="${db.real.hp.url}"/>
+        <property name="username" value="${db.real.hp.username}"/>
+        <property name="password" value="${db.real.hp.password}"/>
+        <property name="maxActive" value="50"/>
+        <property name="minIdle" value="1"/>
+    </bean>
+    <bean id="sqlSessionFactory2" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource2"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+     <bean id="sqlSession2" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory2" />
+     </bean>
+     <bean id="transactionManager2" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource2"/>
+     </bean>
+     
+    <!-- sms -->
+    <bean id="dataSource3" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db.oracle.driver}"/>
+        <property name="url" value="${db.real.osuIs.url}"/>
+        <property name="username" value="${db.real.sms.username}"/>
+        <property name="password" value="${db.real.sms.password}"/>
+        <property name="maxActive" value="50"/>
+        <property name="minIdle" value="1"/>
+    </bean>
+    <bean id="sqlSessionFactory3" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource3"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+     <bean id="sqlSession3" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory3" />
+     </bean>
+     <bean id="transactionManager3" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource3"/>
+     </bean>
+    
+    <!-- portal(test)
+    <bean id="dataSourceSpied4" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${db.oracle.driver}"/>
+        <property name="url" value="${db.test.osuIs.url}"/>
+        <property name="username" value="${db.test.portal.username}"/>
+        <property name="password" value="${db.test.portal.password}"/>
+    </bean>--> 
+    <!-- portal(운영)-->
+    <bean id="dataSource4" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db.oracle.driver}"/>
+        <property name="url" value="${db.real.osuIs.url}"/>
+        <property name="username" value="${db.real.portal.username}"/>
+        <property name="password" value="${db.real.portal.password}"/>
+        <property name="maxActive" value="50"/>
+        <property name="minIdle" value="1"/>
+    </bean>
+    <bean id="sqlSessionFactory4" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource4"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+     <bean id="sqlSession4" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory4" />
+     </bean>
+     <bean id="transactionManager4" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource4"/>
+     </bean>
+    <!-- 채용--> 
+    <bean id="dataSource5" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db.sqlserver.driver}"/>
+        <property name="url" value="${db.real.job.url}"/>
+        <property name="username" value="${db.real.job.username}"/>
+        <property name="password" value="${db.real.job.password}"/>
+        <property name="maxActive" value="50"/>
+        <property name="minIdle" value="1"/>
+    </bean>
+    <bean id="sqlSessionFactory5" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource5"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+     <bean id="sqlSession5" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory5" />
+     </bean>
+     <bean id="transactionManager5" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource5"/>
+     </bean>
+    <!-- 도서관--> 
+    <bean id="dataSource6" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db.sqlserver.driver}"/>
+        <property name="url" value="${db.real.lib.url}"/>
+        <property name="username" value="${db.real.lib.username}"/>
+        <property name="password" value="${db.real.lib.password}"/>
+        <property name="maxActive" value="50"/>
+        <property name="minIdle" value="1"/>
+    </bean>
+    <bean id="sqlSessionFactory6" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource6"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+     <bean id="sqlSession6" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory5" />
+     </bean>
+     <bean id="transactionManager6" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource6"/>
+     </bean>
+</beans>

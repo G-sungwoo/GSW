@@ -1,0 +1,111 @@
+<!--http://portal.osan.ac.kr/o365/o365RegGuide.jsp?fr=ptl&pmenu=sch&smenu=data1 -->
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="KISA_SEED_CBC.jsp"%>
+<%@ page import="java.net.URL"%>
+<%@ page import="java.net.URLConnection"%>
+<%@ page import="java.net.HttpURLConnection"%>
+<%@ page import="java.net.URLEncoder"%>
+<%@ page import="java.io.BufferedReader"%>
+<%@ page import="java.io.InputStreamReader"%>
+<%@ page import="java.util.Calendar"%>
+<%@ page import="java.util.Date"%>
+<%@ page import="java.text.DecimalFormat"%>
+<%@ page import="java.text.SimpleDateFormat"%>
+<%@ page import="org.apache.commons.codec.binary.Base64"%>
+<%@ page import="com.osan.portal.vo.LoginInfo" %>
+
+<%!
+
+private static final byte[] key = {
+    0x00, 0x68, 0x00, 0x61,
+    0x00, 0x70, 0x00, 0x70,
+    0x00, 0x79, 0x00, 0x38,
+    0x00, 0x30, 0x00, 0x33
+};
+
+private static final byte[] iv = {
+    0x01, 0x02, 0x03, 0x04,
+    0x05, 0x06, 0x07, 0x08,
+    0x09, 0x0A, 0x0B, 0x0C,
+    0x0D, 0x0E, 0x0F, 0x10
+};
+public static String getDate()
+{
+   DecimalFormat df = new DecimalFormat("00");
+   Calendar calendar = Calendar.getInstance();
+
+
+   String year = Integer.toString(calendar.get(Calendar.YEAR)); //년도를 구한다
+   String month = df.format(calendar.get(Calendar.MONTH) + 1); //달을 구한다
+   String day = df.format(calendar.get(Calendar.DATE)); //날짜를 구한다
+
+   String hour = ""; //시간을 구한다
+   if( calendar.get(Calendar.AM_PM) == Calendar.PM){
+      hour = df.format(calendar.get(Calendar.HOUR)+12); //Calendar.PM이면 12를 더한다
+   } else {
+      hour = df.format(calendar.get(Calendar.HOUR));
+   }
+
+   String minute = df.format(calendar.get(Calendar.MINUTE)); //분을 구한다
+   String second = df.format(calendar.get(Calendar.SECOND)); //초를 구한다
+   String date = year + month + day + hour + minute ; 
+
+  
+   return date;
+}
+
+/**
+ * seed 암호화 메소드 
+ * base64 인코딩 추가
+ * @param strPlainText 평문 텍스트
+ * @return seed로 암호화되서 base64로 인코딩된 문자열
+ */
+public static String encodeSEED(String strPlainText) {
+    try {
+        byte[] plainText = strPlainText.trim().getBytes();
+        byte [] cipherText = SEED_CBC_Encrypt(key, iv, plainText, 0, plainText.length);
+        return new String(Base64.encodeBase64(cipherText));
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}
+
+%>
+<%
+String today = getDate(); //java.util 패키지의 Calendar 클래스를 이용
+String MailUrl = "https://webmail.osan.ac.kr/gw/link/min/screen/minScreen.do";
+String userId = "";
+
+try {
+    LoginInfo loginSessionInfo = (LoginInfo)request.getSession().getAttribute("sessionUserInfo");
+    userId = loginSessionInfo.getUserNo();
+} catch (Exception e) {
+    userId ="";
+}
+
+String lKey= "userId=" + userId +"&dt="+ today +"&lang=ko";
+String lkey_encode= encodeSEED(lKey);
+
+%>
+<!DOCTYPE HTML>
+<html>
+<head>
+<link rel="icon" type="image/png"  href="./img/favicon.ico"/>
+</head>
+<body>
+<% if(userId.equals("")){ 
+ MailUrl = "https://webmail.osan.ac.kr/gw/sub/common/login/cmmLogin.do";%>
+<form name="MailForm" id="MailForm" method="get" action="<%=MailUrl%>">
+<%} else { %>
+
+<form name="MailForm" id="MailForm" method="get" action="<%=MailUrl%>">
+    <input type="hidden" name="lkey3" value="<%=lkey_encode%>" />
+<% } %>
+</form>
+<script type="text/javascript">
+    var f = document.getElementById("MailForm");
+    f.submit();
+</script>
+</body>
+</html>	

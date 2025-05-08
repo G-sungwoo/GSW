@@ -1,0 +1,118 @@
+package com.osan.portal.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.osan.portal.service.StudentService;
+import com.osan.portal.vo.StudentSearchInfo;
+
+@Repository
+public class StudentServiceImpl implements StudentService{
+	
+	@Autowired
+    @Resource(name="sqlSession1")
+    private SqlSession osanPortalSql;
+	
+	
+	public StudentSearchInfo selectStudentInfo(StudentSearchInfo studentSearchInfo) {
+		StudentSearchInfo resultStudentInfo = osanPortalSql.selectOne("selectStudentInfo", studentSearchInfo);
+		return resultStudentInfo;
+	}
+	
+	public StudentSearchInfo selectStudentChange(StudentSearchInfo studentSearchInfo) {
+		StudentSearchInfo resultStudentChange = osanPortalSql.selectOne("selectStudentChange", studentSearchInfo);
+		return resultStudentChange;
+	}
+
+	@Override
+	public StudentSearchInfo getStudentInfo(StudentSearchInfo studentSearchInfo) {
+		StudentSearchInfo resultgetStudentInfo = osanPortalSql.selectOne("getStudentInfo", studentSearchInfo);
+		return resultgetStudentInfo;
+	}
+
+	@Override
+	public StudentSearchInfo getHakgi() {
+		StudentSearchInfo resultgetHakgi = osanPortalSql.selectOne("getHakgi");
+		return resultgetHakgi;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getSchedule(StudentSearchInfo lectInfo) {
+		List<StudentSearchInfo> resultgetSchedule = osanPortalSql.selectList("getSchedule", lectInfo);
+		return resultgetSchedule;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getScheduleInfo(StudentSearchInfo lectInfo) {
+		List<StudentSearchInfo> resultgetScheduleInfo = osanPortalSql.selectList("getScheduleInfo", lectInfo);
+		return resultgetScheduleInfo;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getCourInfo(StudentSearchInfo gradeInfo) {
+		List<StudentSearchInfo> resultgetCourInfo = osanPortalSql.selectList("getCourInfo", gradeInfo);
+		return resultgetCourInfo;
+	}
+
+	@Override
+	public StudentSearchInfo getTotalGrade(StudentSearchInfo gradeInfo) {
+		StudentSearchInfo resultgetTotalGrade = osanPortalSql.selectOne("getTotalGrade", gradeInfo);
+		return resultgetTotalGrade;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getGradeList(StudentSearchInfo gradeInfo) {
+		List<StudentSearchInfo> resultgetGradeList = osanPortalSql.selectList("getGradeList", gradeInfo);
+		return resultgetGradeList;
+	}
+
+	@Override
+	public StudentSearchInfo getTuitHakgi() {
+		StudentSearchInfo resultgetTuitHakgi = osanPortalSql.selectOne("getTuitHakgi");
+		return resultgetTuitHakgi;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getSchoInfo(StudentSearchInfo tuitInfo) {
+		List<StudentSearchInfo> resultgetSchoInfo = osanPortalSql.selectList("getSchoInfo", tuitInfo);
+		return resultgetSchoInfo;
+	}
+
+	@Override
+	public StudentSearchInfo getTuitInfo(StudentSearchInfo tuitInfo) {
+		StudentSearchInfo resultgetTuitInfo = osanPortalSql.selectOne("getTuitInfo", tuitInfo);
+		return resultgetTuitInfo;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getTuitList(StudentSearchInfo tuitInfo) {
+		List<StudentSearchInfo> resultgetTuitList = osanPortalSql.selectList("getTuitList", tuitInfo);
+		return resultgetTuitList;
+	}
+
+	@Override
+	public int updateStntInfo(StudentSearchInfo studentSearchInfo) {
+    	return osanPortalSql.update("updateStntInfo",studentSearchInfo);
+	}
+
+	@Override
+	public StudentSearchInfo getOffInfo(StudentSearchInfo studentInfo) {
+		StudentSearchInfo resultgetOffInfo = osanPortalSql.selectOne("getOffInfo", studentInfo);
+		return resultgetOffInfo;
+	}
+
+	@Override
+	public StudentSearchInfo getApplySchedule() {
+		
+		StudentSearchInfo resultgetApplySchedule = osanPortalSql.selectOne("getApplySchedule");
+		
+		return resultgetApplySchedule;
+	}
+
+
+}

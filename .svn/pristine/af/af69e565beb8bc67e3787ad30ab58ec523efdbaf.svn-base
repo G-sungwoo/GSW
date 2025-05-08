@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	                    http://www.springframework.org/schema/beans/spring-beans.xsd 
+	                    http://www.springframework.org/schema/context
+	                    http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+    <!-- 프로퍼티 파일 설정 -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="/WEB-INF/config/config.properties"/>
+        <property name="fileEncoding" value="UTF-8" />
+    </bean>
+    
+    <!-- db접속 정보 설정 -->
+    <!-- 대학정보시스템 (test) -->
+    <bean id="dataSourceSpied1" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${db.oracle.driver}"/>
+        <property name="url" value="${db.test.osuIs.url}"/>
+        <property name="username" value="${db.test.osuIs.username}"/>
+        <property name="password" value="${db.test.osuIs.password}"/>
+    </bean>
+    <!-- 대학정보시스템 (운영)
+    <bean id="dataSourceSpied1" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${db.oracle.driver}"/>
+        <property name="url" value="${db.real.osuIs.url}"/>
+        <property name="username" value="${db.real.osuIs.username}"/>
+        <property name="password" value="${db.real.osuIs.password}"/>
+    </bean>
+    -->
+    <bean id="dataSource1" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="dataSourceSpied1" />
+        <property name="logFormatter">
+            <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+                <property name="loggingType" value="MULTI_LINE" />
+                <property name="sqlPrefix" value="SQL         :  "/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- SqlSession Bean 설정 -->
+    <bean id="sqlSessionFactory1" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource1"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+    
+        <bean id="sqlSessionTemplate1" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory1"/>
+    </bean>
+    
+    <!-- 홈페이지 -->
+    <bean id="dataSourceSpied2" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${db.sqlserver.driver}"/>
+        <property name="url" value="${db.real.hp.url}"/>
+        <property name="username" value="${db.real.hp.username}"/>
+        <property name="password" value="${db.real.hp.password}"/>
+    </bean>
+    
+    <bean id="dataSource2" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="dataSourceSpied2" />
+        <property name="logFormatter">
+            <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+                <property name="loggingType" value="MULTI_LINE" />
+                <property name="sqlPrefix" value="SQL         :  "/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="sqlSessionFactory2" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource2"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+    
+    <bean id="sqlSessionTemplate2" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory2"/>
+    </bean>
+    
+    <!-- sms -->
+    <bean id="dataSourceSpied3" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="url" value="${db.real.osuIs.url}"/>
+        <property name="username" value="${db.real.sms.username}"/>
+        <property name="password" value="${db.real.sms.password}"/>
+    </bean>
+    <bean id="dataSource3" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="dataSourceSpied3" />
+        <property name="logFormatter">
+            <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+                <property name="loggingType" value="MULTI_LINE" />
+                <property name="sqlPrefix" value="SQL         :  "/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- SqlSession Bean 설정 -->
+    <bean id="sqlSessionFactory3" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource3"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+        <bean id="sqlSessionTemplate3" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory3"/>
+    </bean>
+    
+    <!-- portal(test)--> 
+    <bean id="dataSourceSpied4" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${db.oracle.driver}"/>
+        <property name="url" value="${db.test.osuIs.url}"/>
+        <property name="username" value="${db.test.portal.username}"/>
+        <property name="password" value="${db.test.portal.password}"/>
+    </bean>
+    <!-- portal(운영)
+    <bean id="dataSourceSpied4" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${db.oracle.driver}"/>
+        <property name="url" value="${db.real.osuIs.url}"/>
+        <property name="username" value="${db.real.portal.username}"/>
+        <property name="password" value="${db.real.portal.password}"/>
+    </bean>
+    -->
+    <bean id="dataSource4" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="dataSourceSpied4" />
+        <property name="logFormatter">
+            <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+                <property name="loggingType" value="MULTI_LINE" />
+                <property name="sqlPrefix" value="SQL         :  "/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- SqlSession Bean 설정 -->
+    <bean id="sqlSessionFactory4" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource4"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+    <bean id="sqlSessionTemplate4" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory4"/>
+    </bean>
+    
+    <!-- 채용--> 
+    <bean id="dataSourceSpied5" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${db.sqlserver.driver}"/>
+        <property name="url" value="${db.real.job.url}"/>
+        <property name="username" value="${db.real.job.username}"/>
+        <property name="password" value="${db.real.job.password}"/>
+    </bean>
+    <bean id="dataSource5" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="dataSourceSpied5" />
+        <property name="logFormatter">
+            <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+                <property name="loggingType" value="MULTI_LINE" />
+                <property name="sqlPrefix" value="SQL         :  "/>
+            </bean>
+        </property>
+    </bean>
+    <bean id="sqlSessionFactory5" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource5"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+    <bean id="sqlSessionTemplate5" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory5"/>
+    </bean>
+    
+    <!-- 도서관--> 
+    <bean id="dataSourceSpied6" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${db.sqlserver.driver}"/>
+        <property name="url" value="${db.real.lib.url}"/>
+        <property name="username" value="${db.real.lib.username}"/>
+        <property name="password" value="${db.real.lib.password}"/>
+    </bean>
+    <bean id="dataSource6" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="dataSourceSpied6" />
+        <property name="logFormatter">
+            <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+                <property name="loggingType" value="MULTI_LINE" />
+                <property name="sqlPrefix" value="SQL         :  "/>
+            </bean>
+        </property>
+    </bean>
+    <bean id="sqlSessionFactory6" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource6"></property>
+        <property name="mapperLocations" value="classpath:mappers/**"></property>
+    </bean>
+    <bean id="sqlSessionTemplate6" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory6"/>
+    </bean>
+</beans>

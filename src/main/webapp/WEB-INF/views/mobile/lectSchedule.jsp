@@ -1,0 +1,410 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="/WEB-INF/views/jstl.jsp"%>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" id="viewport-meta" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>수업시간표</title>
+
+    <!-- Custom fonts for this template -->
+    <link href="/resources/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/resources/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="/resources/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+<!-- left layout 작성 (기존 sidebar 분리작업)-->
+<%@ include file = "/resources/layout/leftmenu.jsp" %>
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+<!-- header layout 작성 (기존 Topbar 분리작업)-->
+<%@ include file = "/resources/layout/header.jsp" %>
+                
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-2 text-gray-800">강의시간표 (${lectInfo.lect_year}-${lectInfo.lect_shtm})</h1>
+                    <p class="mb-4">원활한 화면을 보고 싶으시면 'PC화면으로 보기'를 선택하고 '줌인'&'줌아웃' 기능을 사용하세요.</p>
+                    <p class="mb-4">'VR캠퍼스'를 통해 각 건물 위치를 확인 하실 수 있습니다.
+                            <button type="button" class="btn btn-primary btn-icon-split btn-sm" onclick="location.href='https://www.osan.ac.kr/vr/osanuniv/index.htm'">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                                <span class="text">VR캠퍼스</span>
+                            </button>
+                    </p>
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">학생 시간표</h6>
+                            <button type="button" class="btn btn-success btn-icon-split btn-sm" onclick="pc_view();">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                                <span class="text">PC화면으로 보기</span>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+
+                <div class="week">
+                    <a href="javascript:void(0)"> <img
+                        src="/resources/img/left.png" class="prevWeek" style="width: 40px">
+                    </a>
+                    <div class="weekIndex">
+                        <c:forEach varStatus="status" end="15" begin="1">
+                            <p data-num="${status.index}"
+                                class="week${status.index} <c:if test="${status.index == 1}">on</c:if>">${status.index}주차</p>
+                        </c:forEach>
+                    </div>
+                    <a href="javascript:void(0)"> <img
+                        src="/resources/img/right.png" class="nextWeek"
+                        style="width: 40px">
+                    </a>
+                </div>
+                <div class="scheduleAjaxList">
+                
+                    <p class="date">
+                        <c:forEach var="list" items="${scheduleList}" varStatus="status" begin="1" end="1">
+                            ${list.lect_week_date}
+                        </c:forEach>
+                    </p>
+                    <div class="schedule">
+                        <table class="table table-bordered" name="scheduleTable" style="text-align: center;" border="1">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>교시</th>
+                                    <th>시간</th>
+                                    <th>월요일</th>
+                                    <th>화요일</th>
+                                    <th>수요일</th>
+                                    <th>목요일</th>
+                                    <th>금요일</th>
+                                    <th>토요일</th>
+                                    <th>일요일</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="${scheduleInfoList}" var="schedule">
+                                    <tr>
+                                        <td class="table-light">${schedule.term_numb}</td>
+                                        <td>${schedule.lect_time}</td>
+                                        <td>${schedule.lect_mond.replace('/', '<br>')}</td>
+                                        <td>${schedule.lect_tued.replace('/', '<br>')}</td>
+                                        <td>${schedule.lect_wedd.replace('/', '<br>')}</td>
+                                        <td>${schedule.lect_thrd.replace('/', '<br>')}</td>
+                                        <td>${schedule.lect_frid.replace('/', '<br>')}</td>
+                                        <td>${schedule.lect_satd.replace('/', '<br>')}</td>
+                                        <td>${schedule.lect_sund.replace('/', '<br>')}</td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                        </div>
+                </div>
+
+
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2020</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="/logout.do">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/resources/vendor/jquery/jquery.min.js"></script>
+    <script src="/resources/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/resources/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/resources/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="/resources/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/resources/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="/resources/js/demo/datatables-demo.js"></script>
+
+    
+<script>
+    $(document).ready(function(){
+        //이전 주차 버튼 클릭 이벤트 
+        $('.prevWeek').on('click', function(){
+           //1주차 이전 넘김 예외처리
+            if($('.weekIndex > .on').attr('data-num') > 1){
+               var num = parseInt($('.weekIndex > .on').attr('data-num'))-1;
+               var className = ".week" + num;
+               $('.week'+parseInt($('.weekIndex > .on').attr('data-num'))).removeClass('on');
+               $('.week'+num).addClass('on');
+               
+               $.ajax({
+                  type : 'get',
+                  url : '/weeklectTime.do',
+                  data : {lectWeek: num},
+                  dataType : 'html',
+                  success : function(html){
+                     $('.scheduleAjaxList').html(html);
+                     $('.scheduleAjaxList').show();
+                     timetablecolor();                   
+                     //alert(data);
+                  },
+                  error: function(xhr, status, error){
+                     alert(error)
+                  }
+               })
+            }
+         })
+         
+        //다음 주차 버튼 클릭 이벤트 
+         $('.nextWeek').on('click', function(){
+           //15주차 이후 넘김 불가 예외처리 
+            if($('.weekIndex > .on').attr('data-num') < 15){
+               var num = parseInt($('.weekIndex > .on').attr('data-num'))+1;
+               $('.week'+parseInt($('.weekIndex > .on').attr('data-num'))).removeClass('on');
+               $('.week'+num).addClass('on');
+               
+               $.ajax({
+                  type : 'get',
+                  url : '/weeklectTime.do',
+                  data : {lectWeek: num},
+                  dataType : 'html',
+                  success : function(html){
+                     $('.scheduleAjaxList').html(html);
+                     $('.scheduleAjaxList').show();
+                     timetablecolor();
+                     //alert(data);
+                  },
+                  error: function(xhr, status, error){
+                     alert(error)
+                  }
+               })
+            }
+         })
+   })
+   
+</script>
+<script>
+
+    function pc_view(){
+        var viewportMeta = document.getElementById('viewport-meta');
+        if (viewportMeta) {
+            viewportMeta.setAttribute('content', 'width=device-width, initial-scale=' + 0.5 + ', shrink-to-fit=no');        
+        } 
+        alert("가로모드를 권장합니다.");
+    }
+    
+    //속성이 비슷한 화면이 열려있을때 left open 스크립트 - leftmenu.jsp에서 class="munu + n"으로 관리중..
+    if (navigator.userAgent.match(/Android/i) ||
+        navigator.userAgent.match(/webOS/i) ||
+        navigator.userAgent.match(/iPhone/i) ||
+        navigator.userAgent.match(/iPad/i) ||
+        navigator.userAgent.match(/iPod/i) ||
+        navigator.userAgent.match(/BlackBerry/i) ||
+        navigator.userAgent.match(/Windows Phone/i)) {
+        
+        console.log("MOBILE");
+        
+    } else {
+        window.onload = function(){
+            var myClassDiv = document.querySelector(".menu2");
+            myClassDiv.classList.add("show");
+        }
+        console.log("PC");
+    }
+
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    
+    var table = document.querySelector("table[name='scheduleTable']");
+    var rows = table.querySelector("tbody").querySelectorAll("tr");
+    var colorMapping = {};
+    var startColumnIndex = 3; // 월요일 열 인덱스
+    var dayColumnCount = 7; // 월요일부터 일요일까지 7일
+    function getRandomPastelColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 3; i++) {
+            var pastelValue = 128 + Math.floor(Math.random() * 128);
+            var pastelHex = pastelValue.toString(16);
+            color += pastelHex.length === 1 ? '0' + pastelHex : pastelHex;
+        }
+        return color;
+    }
+    rows.forEach(function(row) {
+        for (var i = startColumnIndex; i < startColumnIndex + dayColumnCount; i++) {
+            var dayCell = row.querySelector("td:nth-child(" + i + ")");
+            var dayValue = dayCell.textContent.trim();
+            if (dayValue !== "") {
+                if (colorMapping[dayValue]) {
+                    dayCell.style.backgroundColor = colorMapping[dayValue];
+                } else {
+                    var randomColor = getRandomPastelColor();
+                    colorMapping[dayValue] = randomColor;
+                    dayCell.style.backgroundColor = randomColor;
+                }
+            }
+        }
+    });
+});
+
+    function timetablecolor(){
+        // 테이블 요소 가져오기
+        var table = document.querySelector("table[name='scheduleTable']");
+        
+        // tbody 내의 모든 행(tr) 요소를 가져옵니다.
+        var rows = table.querySelector("tbody").querySelectorAll("tr");
+            
+        // 각 중복된 데이터에 대한 랜덤 색상을 저장하는 객체
+        var colorMapping = {};
+        
+        // 요일 열의 시작 인덱스
+        var startColumnIndex = 3; // 월요일 열 인덱스
+        
+        // 요일 열 수
+        var dayColumnCount = 7; // 월요일부터 일요일까지 7일
+        
+        // 랜덤 색상을 생성하는 함수
+        function getRandomPastelColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 3; i++) {
+                // 128부터 255 사이의 값을 랜덤으로 생성하여 밝은 색상을 만듭니다.
+                var pastelValue = 128 + Math.floor(Math.random() * 128);
+                var pastelHex = pastelValue.toString(16);
+                color += pastelHex.length === 1 ? '0' + pastelHex : pastelHex;
+            }
+            return color;
+        }
+        
+        // 각 행을 순회하며 요일 열 데이터 확인 및 랜덤 색상 설정
+        rows.forEach(function(row) {
+            
+            // 각 요일 열에 대한 처리
+            for (var i = startColumnIndex; i < startColumnIndex + dayColumnCount; i++) {
+                // 현재 행의 요일 열(td) 요소 가져오기
+                var dayCell = row.querySelector("td:nth-child(" + i + ")");
+                
+                // 요일 열 데이터 가져오기
+                var dayValue = dayCell.textContent.trim();
+                
+                // 요일 열 데이터가 비어있지 않은 경우에만 처리
+                if (dayValue !== "") {
+                    // 중복된 데이터가 이미 등록되어 있는 경우
+                    if (colorMapping[dayValue]) {
+                        // 해당 행의 요일 열(td)에 랜덤 색상을 적용
+                        dayCell.style.backgroundColor = colorMapping[dayValue];
+                    } else {
+                        // 중복된 데이터에 대한 랜덤 색상을 생성하고 매핑에 추가
+                        var randomColor = getRandomPastelColor();
+                        colorMapping[dayValue] = randomColor;
+                        
+                        // 해당 행의 요일 열(td)에 랜덤 색상을 적용
+                        dayCell.style.backgroundColor = randomColor;
+                    }
+                }
+            }
+        });
+    }
+</script>
+<style>
+
+.week{
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.week,
+.date{
+    text-align: center;
+}
+
+.weekIndex > p{
+    display: none;
+    padding: 15px 30px 0px 30px;
+}
+.weekIndex > p.on{
+    display: block;
+}
+    
+</style>
+
+</body>
+
+</html>

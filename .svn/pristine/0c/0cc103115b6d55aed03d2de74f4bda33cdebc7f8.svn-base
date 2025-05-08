@@ -1,0 +1,508 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="/WEB-INF/views/jstl.jsp"%>
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>테스트-정보시스템</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/resources/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/resources/css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+<!-- left layout 작성 (기존 sidebar 분리작업)-->
+<%@ include file = "/resources/layout/leftmenu.jsp" %>
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+<!-- header layout 작성 (기존 Topbar 분리작업)-->
+<%@ include file = "/resources/layout/header.jsp" %>
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h5 mb-0 text-gray-800"><B>${korn_name }</B> 님 안녕하세요.</br>오산대학교 학생정보시스템 입니다.</h1>
+
+                    <!-- 다국어 테스트  
+				    <% String userLanguage = (String) session.getAttribute("userLanguage"); %>
+				    <p>User Language: <%= userLanguage %></p>
+				    
+				    <p>Selected Language: ${sessionScope.userLanguage}</p>
+				
+				    <h3><spring:message code="greeting" /></h3>
+				    <h3><spring:message code="title" /></h3>
+				    <h3><spring:message code="farewell" /></h3>
+                    -->
+                    
+                        <a href="javascript:openMenu('/resources/sso/homepage_login.jsp?','homepage','')" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-home fa-sm text-white-50"></i> 오산대학교 홈페이지 바로가기</a>
+                    </div>
+
+                    
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <a href="javascript:boardMain('${stnt_numb }')" style="text-decoration: none;">
+	                            <div class="card border-left-primary shadow h-100 py-2">
+	                                <div class="card-body">
+	                                    <div class="row no-gutters align-items-center">
+	                                        <div class="col mr-2">
+	                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+	                                                                                                        게시판
+	                                            </div>
+	                                            <div class="h5 mb-0 font-weight-bold text-gray-800">게시판</div>
+	                                        </div>
+	                                        <div class="col-auto">
+	                                            <i class="fas fa-bars fa-2x text-gray-300"></i>
+	                                        </div>
+	                                    </div>
+	                                </div>
+	                            </div>
+                            </a>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <a href="javascript:openMenu('https://osanuniv.osan.ac.kr/osu/brower_check.jsp', 'univIsTest')" style="text-decoration: none;">
+	                            <div class="card border-left-success shadow h-100 py-2">
+	                                <div class="card-body">
+	                                    <div class="row no-gutters align-items-center">
+	                                        <div class="col mr-2">
+	                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+	                                                                                                    대학정보시스템</div>
+	                                            <div class="h5 mb-0 font-weight-bold text-gray-800">대학정보시스템</div>
+	                                        </div>
+	                                        <div class="col-auto">
+	                                            <i class="fas fa-cogs fa-2x text-gray-300"></i>
+	                                        </div>
+	                                    </div>
+	                                </div>
+	                            </div>
+                            </a>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <!-- <a href="https://www.osan.ac.kr/?menuno=167">  -->
+                            <a href="javascript:openMenu('https://lib.osan.ac.kr', 'lib')" style="text-decoration: none;">
+	                            <div class="card border-left-info shadow h-100 py-2">
+	                                <div class="card-body">
+	                                    <div class="row no-gutters align-items-center">
+	                                        <div class="col mr-2">
+	                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">도서관
+	                                            </div>
+	                                            <div class="row no-gutters align-items-center">
+	                                                <div class="col-auto">
+	                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">도서관</div>
+	                                                </div>
+	                                            </div>
+	                                        </div>
+	                                        <div class="col-auto">
+	                                            <i class="fas fa-book fa-2x text-gray-300"></i>
+	                                        </div>
+	                                    </div>
+	                                </div>
+	                            </div>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Content Row -->
+                    <div class="row">
+                        <!-- Pending Requests Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <a href="javascript:openMenu('https://lifeedu.osan.ac.kr/html/index', 'lib')" style="text-decoration: none;">
+	                            <div class="card border-left-warning shadow h-100 py-2">
+	                                <div class="card-body">
+	                                    <div class="row no-gutters align-items-center">
+	                                        <div class="col mr-2">
+	                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+	                                                                                                        평생교육원</div>
+	                                            <div class="h5 mb-0 font-weight-bold text-gray-800">평생교육원</div>
+	                                        </div>
+	                                        <div class="col-auto">
+	                                            <i class="fas fa-user-edit fa-2x text-gray-300"></i>
+	                                        </div>
+	                                    </div>
+	                                </div>
+	                            </div>
+                            </a>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <!-- <a href="https://www.osan.ac.kr/?menuno=239" style="text-decoration: none;">  -->
+                            <a href="javascript:openMenu('https://ostory.osan.ac.kr/common/user/ssoLogin.do', 'ostory')" style="text-decoration: none;">
+                                <div class="card border-left-primary shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1" onclick="redirectLink()">
+                                                                                                            학생이력관리시스템
+                                                </div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">학생이력관리시스템</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-id-card fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <a href="javascript:openMenu('https://lms.osan.ac.kr/osansso/login.php', 'lms')" style="text-decoration: none;">
+                                <div class="card border-left-success shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                    LMS</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">LMS</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-video fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Content Row -->
+                    <div class="row">
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <!-- <a href="https://www.osan.ac.kr/?menuno=167">  -->
+                            <a href="javascript:openMenu('UCMLite_Guide.jsp?fr=ptl&pmenu=sch&smenu=data1', 'office365')" style="text-decoration: none;">
+                                <div class="card border-left-info shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">OFFICE365
+                                                </div>
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col-auto">
+                                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">OFFICE365</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-info-circle fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Pending Requests Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <a href="javascript:openMenu('https://ctl.osan.ac.kr/osansso/login.php', 'ctl')" style="text-decoration: none;">
+                                <div class="card border-left-warning shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                                                                                교수학습지원센터</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">교수학습지원센터</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-seedling fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <a href="javascript:openMenu('https://ojt.osan.ac.kr/login.do', 'ojt')" style="text-decoration: none;">
+                                <div class="card border-left-primary shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1" onclick="redirectLink()">
+                                                                                                            현장실습
+                                                </div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">현장실습</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-hands-helping fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Content Row -->
+                    <div class="row">
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <a href="https://www.osan.ac.kr/?menuno=225" style="text-decoration: none;">
+                                <div class="card border-left-success shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                                                                        장학안내</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">장학안내</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <!-- <a href="https://www.osan.ac.kr/?menuno=167">  -->
+                            <a href="https://www.osan.ac.kr/vr/osanuniv/index.htm" style="text-decoration: none;">
+                                <div class="card border-left-info shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">캠퍼스안내
+                                                </div>
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col-auto">
+                                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">캠퍼스안내</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-map-signs fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Pending Requests Card Example -->
+                        <div class="col-xl-3 col-md-4 mb-4">
+                            <a href="https://www.osan.ac.kr/?menuno=259" style="text-decoration: none;">
+                                <div class="card border-left-warning shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                                                                            질문과답변</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">질문과답변</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    
+                    
+
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- Content Column -->
+                        <div class="col-lg-6 mb-4">
+
+                            <!-- Project Card Example 
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Projects</h6>
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="small font-weight-bold">Server Migration <span
+                                            class="float-right">20%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 20%"
+                                            aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <h4 class="small font-weight-bold">Sales Tracking <span
+                                            class="float-right">40%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 40%"
+                                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <h4 class="small font-weight-bold">Customer Database <span
+                                            class="float-right">60%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar" role="progressbar" style="width: 60%"
+                                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <h4 class="small font-weight-bold">Payout Details <span
+                                            class="float-right">80%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 80%"
+                                            aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <h4 class="small font-weight-bold">Account Setup <span
+                                            class="float-right">Complete!</span></h4>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%"
+                                            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            -->
+                            
+                            <!-- Color System 
+                            <div class="row">
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-primary text-white shadow">
+                                        <div class="card-body">
+                                            Primary
+                                            <div class="text-white-50 small">#4e73df</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-success text-white shadow">
+                                        <div class="card-body">
+                                            Success
+                                            <div class="text-white-50 small">#1cc88a</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-info text-white shadow">
+                                        <div class="card-body">
+                                            Info
+                                            <div class="text-white-50 small">#36b9cc</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-warning text-white shadow">
+                                        <div class="card-body">
+                                            Warning
+                                            <div class="text-white-50 small">#f6c23e</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-danger text-white shadow">
+                                        <div class="card-body">
+                                            Danger
+                                            <div class="text-white-50 small">#e74a3b</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-secondary text-white shadow">
+                                        <div class="card-body">
+                                            Secondary
+                                            <div class="text-white-50 small">#858796</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-light text-black shadow">
+                                        <div class="card-body">
+                                            Light
+                                            <div class="text-black-50 small">#f8f9fc</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-dark text-white shadow">
+                                        <div class="card-body">
+                                            Dark
+                                            <div class="text-white-50 small">#5a5c69</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            -->
+                        </div>
+
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2021</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+    
+    <!-- 포탈 기본 JavaScript-->
+    <script type="text/javascript" src="/resources/js/common.js"></script>
+    <script type="text/javascript" src="/resources/js/aes.js"></script>
+    
+    <!-- Bootstrap core JavaScript-->
+    <script src="/resources/vendor/jquery/jquery.min.js"></script>
+    <script src="/resources/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/resources/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/resources/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="/resources/vendor/chart.js/Chart.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="/resources/js/demo/chart-area-demo.js"></script>
+    <script src="/resources/js/demo/chart-pie-demo.js"></script>
+
+</body>
+
+</html>

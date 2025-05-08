@@ -1,0 +1,196 @@
+package com.osan.portal.service.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.osan.portal.service.MainService;
+import com.osan.portal.utils.PagingUtil;
+import com.osan.portal.vo.HomePageInfo;
+import com.osan.portal.vo.LoginInfo;
+
+@Repository
+public class MainServiceImpl implements MainService{
+    
+	/*��Ż, ���������ý��� oracle ����*/
+	@Autowired
+    @Resource(name="sqlSession1")
+    private SqlSession osanPortalSql;
+	
+	/*Ȩ������ sqlserver ����*/
+    @Autowired
+    @Resource(name="sqlSession2")
+    private SqlSession osanHomePageSql;
+    
+	/*ä�� sqlserver ����*/
+    @Autowired
+    @Resource(name="sqlSession5")
+    private SqlSession jobSql;
+
+    /*������ sqlserver ����*/
+    @Autowired
+    @Resource(name="sqlSession6")
+    private SqlSession libSql;
+    
+    /*게시판접속*/
+    @Autowired
+    @Resource(name="sqlSession7")
+    private SqlSession boardSql;
+    
+    public List<HomePageInfo> selectListHomepageUniNotice(LoginInfo loginInfo){
+        return osanHomePageSql.selectList("selectListHomepageUniNotice", loginInfo);
+    }
+    public List<HomePageInfo> selectListHomepageIphakNotice(LoginInfo loginInfo){
+        return osanHomePageSql.selectList("selectListHomepageIphakNotice", loginInfo);
+    }
+    public List<HomePageInfo> selectListHomepageBidNotice(LoginInfo loginInfo){
+    	return osanHomePageSql.selectList("selectListHomepageBidNotice", loginInfo);
+    }
+    public List<HomePageInfo> selectListOsanUniNews(LoginInfo loginInfo){
+    	return osanHomePageSql.selectList("selectListOsanUniNews", loginInfo);
+    }
+    public List<HomePageInfo> selectListOsanUniQnA(LoginInfo loginInfo){
+    	return osanHomePageSql.selectList("selectListOsanUniQnA", loginInfo);
+    }
+    public int selectBoardArticleCnt(LoginInfo loginInfo){
+    	return boardSql.selectOne("selectBoardArticleCnt", loginInfo);
+    }
+    public int selectSignDocCnt(LoginInfo loginInfo){
+    	return osanPortalSql.selectOne("selectSignDocCnt", loginInfo);
+    }
+    public int selectPublicDocCnt(LoginInfo loginInfo){
+    	return osanPortalSql.selectOne("selectPublicDocCnt", loginInfo);
+    }
+    public int selectInboxDocCnt(LoginInfo loginInfo){
+    	return osanPortalSql.selectOne("selectInboxDocCnt", loginInfo);
+    }
+    public Map selectListBoardArticle(LoginInfo loginInfo, HttpServletRequest request){
+    	Map resultObject = new HashMap();
+    	List list = new ArrayList();
+    	int totalCnt = this.selectBoardArticleCnt(loginInfo);
+    	int searchNo = Integer.parseInt(loginInfo.getPageNo());
+    	int searchCntPerPage = 8;
+    	int searchUnitPage = 5;
+    	if(totalCnt > 0) {
+    		loginInfo = PagingUtil.setPageInfo(loginInfo, 8);
+    		list = boardSql.selectList("selectListBoardArticle", loginInfo);
+    		resultObject.put("result", list);
+    		resultObject.put("page", PagingUtil.getPageObject(totalCnt, searchNo, searchCntPerPage, searchUnitPage ));
+    	}else {
+    		resultObject.put("result", list); 
+    		resultObject.put("page", PagingUtil.getPageObject(totalCnt, 0));
+    	}
+    	return resultObject;
+    }
+    public Map selectListAcademicSchedule(LoginInfo loginInfo){
+    	Map resultObject = new HashMap();
+    	List list = new ArrayList();
+    	list = osanHomePageSql.selectList("selectListAcademicSchedule", loginInfo);
+    	resultObject.put("resultSchedule", list);
+    	return resultObject;
+    }
+    public int updateUserInfo(LoginInfo loginInfo) {
+    	return osanPortalSql.update("updateUserInfo",loginInfo);
+    }
+    public int updateStntUserInfo(LoginInfo loginInfo) {
+    	return osanPortalSql.update("updateStntUserInfo",loginInfo);
+    }
+    public int updateUserPassword(LoginInfo loginInfo) {
+    	return osanPortalSql.update("updateUserPassword",loginInfo);
+    }
+    public int updateStntUserPassword(LoginInfo loginInfo) {
+    	return osanPortalSql.update("updateStntUserPassword",loginInfo);
+    }
+    public int selectSearchWorkerCnt(LoginInfo loginInfo){
+    	return osanPortalSql.selectOne("selectSearchWorkerCnt", loginInfo);
+    }
+    public Map selectListSearchWorker(LoginInfo loginInfo, HttpServletRequest request){
+    	Map resultObject = new HashMap();
+    	List list = new ArrayList();
+    	int totalCnt = this.selectSearchWorkerCnt(loginInfo);
+    	int searchNo = Integer.parseInt(loginInfo.getPageNo());
+    	int searchCntPerPage = 8;
+    	int searchUnitPage = 5;
+    	if(totalCnt > 0) {
+    		loginInfo = PagingUtil.setPageInfo(loginInfo, 8);
+    		list = osanPortalSql.selectList("selectListSearchWorker", loginInfo);
+    		resultObject.put("result", list);
+    		resultObject.put("page", PagingUtil.getPageObject(totalCnt, searchNo, searchCntPerPage, searchUnitPage ));
+    	}else {
+    		resultObject.put("result", list); 
+    		resultObject.put("page", PagingUtil.getPageObject(totalCnt, 0));
+    	}
+    	return resultObject;
+    }
+    public HomePageInfo selectSchpYearShtm(){
+    	return osanPortalSql.selectOne("selectSchpYearShtm");
+    }
+    public List<HomePageInfo> selectListLectTimetable(LoginInfo loginInfo){
+    	HomePageInfo homePageInfo = selectSchpYearShtm();
+    	loginInfo.setLectYear(homePageInfo.getLectYear());
+    	loginInfo.setLectShtm(homePageInfo.getLectShtm());
+    	return osanPortalSql.selectList("selectListLectTimetable", loginInfo);
+    }
+    public List<HomePageInfo> selectListLectPlan(LoginInfo loginInfo){
+    	HomePageInfo homePageInfo = selectSchpYearShtm();
+    	loginInfo.setLectYear(homePageInfo.getLectYear());
+    	loginInfo.setLectShtm(homePageInfo.getLectShtm());
+    	return osanPortalSql.selectList("selectListLectPlan", loginInfo);
+    }
+    public List<HomePageInfo> selectListLectPlanForStnt(LoginInfo loginInfo){
+    	HomePageInfo homePageInfo = selectSchpYearShtm();
+    	loginInfo.setLectYear(homePageInfo.getLectYear());
+    	loginInfo.setLectShtm(homePageInfo.getLectShtm());
+    	return osanPortalSql.selectList("selectListLectPlanForStnt", loginInfo);
+    }
+    public List<HomePageInfo> selectListLectTimetableForStnt(LoginInfo loginInfo){
+    	HomePageInfo homePageInfo = selectSchpYearShtm();
+    	loginInfo.setLectYear(homePageInfo.getLectYear());
+    	loginInfo.setLectShtm(homePageInfo.getLectShtm());
+    	return osanPortalSql.selectList("selectListLectTimetableForStnt", loginInfo);
+    }
+    public Map selectStntPhoto(LoginInfo loginInfo) {
+    	return osanPortalSql.selectOne("selectStntPhoto",loginInfo);
+    }
+    public HomePageInfo selectStntInfo(LoginInfo loginInfo) {
+    	return osanPortalSql.selectOne("selectStntInfo",loginInfo);
+    }
+    public  List<HomePageInfo> selectListLesnAmnt(LoginInfo loginInfo){
+    	return osanPortalSql.selectList("selectListLesnAmnt", loginInfo);
+    }
+    public  List<HomePageInfo> selectListShshAmnt(LoginInfo loginInfo){
+    	return osanPortalSql.selectList("selectListShshAmnt", loginInfo);
+    }
+    public HomePageInfo selectTotalGrad(LoginInfo loginInfo) {
+    	return osanPortalSql.selectOne("selectTotalGrad",loginInfo);
+    }
+    public  List<HomePageInfo> selectListShtmGrad(LoginInfo loginInfo){
+    	return osanPortalSql.selectList("selectListShtmGrad", loginInfo);
+    }
+    public Map selectListSubjectGrad(LoginInfo loginInfo){
+    	Map resultObject = new HashMap();
+    	List list = osanPortalSql.selectList("selectListSubjectGrad", loginInfo);
+    	resultObject.put("result", list);
+    	return resultObject;
+    }
+    public  List<HomePageInfo> selectListGradYear(LoginInfo loginInfo){
+    	return osanPortalSql.selectList("selectListGradYear", loginInfo);
+    }
+    public  List<HomePageInfo> selectListJob(){
+    	return jobSql.selectList("selectListJob");
+    }
+    public  List<HomePageInfo> selectListParttimeJob(){
+    	return jobSql.selectList("selectListParttimeJob");
+    }
+    public  List<HomePageInfo> selectListRentBook(LoginInfo loginInfo){
+    	return libSql.selectList("selectListRentBook", loginInfo);
+    }
+}

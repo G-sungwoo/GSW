@@ -1,0 +1,261 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>테스트-정보시스템</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/resources/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/resources/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/resources/css/custom.css" rel="stylesheet">
+
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+<!-- left layout 작성 (기존 sidebar 분리작업)-->
+<%@ include file = "/resources/layout/leftmenu.jsp" %>
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+<!-- header layout 작성 (기존 Topbar 분리작업)-->
+<%@ include file = "/resources/layout/header.jsp" %>
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-4 text-gray-800">${surveyInfo.lect_year}-${surveyInfo.lect_shtm}학기 만족도조사</h1>
+                    <form  action="" method="post" name="surveyForm" id="surveyForm"  onsubmit="return validateForm();">
+				        <table class="table table-bordered" style="text-align: center;" border="1">
+				        <input name="lect_year" id="lect_year" type="hidden" value="${surveyInfo.lect_year}" />
+				        <input name="lect_shtm" id="lect_shtm" type="hidden" value="${surveyInfo.lect_shtm}" />
+				            <thead class="table-light">
+				                <tr>
+				                    <th>순번</th>
+				                    <th>문항명</th>
+				                </tr>
+				            </thead>
+				            <tbody>
+				                <c:forEach items="${questionList}" var="list">
+                                        <tr><td rowspan="2" id="question[${list.prbl_numb}]"> ${list.prbl_numb}</td><td> ${list.prbl_ctnt}</td></tr>
+                                        <tr><td>
+                                        <div class="mydict">
+                                            <div>
+		                                        <c:forEach items="${answerList}" var="Alist">
+		                                            <c:if test="${Alist.prbl_numb eq list.prbl_numb }">
+		                                                 <label>
+		                                                 <input type="radio" name="answers${Alist.prbl_numb}" id="answers${Alist.prbl_numb}" value="${Alist.prbl_scor }"/><span style="font-size:9pt;">${Alist.prbl_ctnt}</span>
+		                                                 </label>
+		                                            </c:if>
+		                                        </c:forEach>
+                                            </div>
+                                        </div>
+                                        </td></tr>
+				                </c:forEach>
+				                    <tr>
+				                        <td>의견</td><td><input type="text" name="ansr_txt1" id="ansr_txt1" /></td>
+				                    </tr>
+				            </tbody>
+				        </table>
+				    </form>
+				    <div class="container-div" style="text-align:center; padding-bottom:15px;">
+				    <a href="javascript:void(0);" onclick="validateForm();" class="btn btn-info btn-icon-split btn-la">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
+                        <span class="text">만족도 조사 제출
+                        </span>
+                    </a>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2021</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/resources/vendor/jquery/jquery.min.js"></script>
+    <script src="/resources/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/resources/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/resources/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <!-- 
+    <script src="/resources/vendor/chart.js/Chart.min.js"></script>
+     -->
+    <!-- Page level custom scripts -->
+    <!-- 
+    <script src="/resources/js/demo/chart-area-demo.js"></script>
+    <script src="/resources/js/demo/chart-pie-demo.js"></script>
+     -->
+
+    
+    <script type="text/javascript">
+    
+    //속성이 비슷한 화면이 열려있을때 left open 스크립트 - leftmenu.jsp에서 class="munu + n"으로 관리중..
+    if (navigator.userAgent.match(/Android/i) ||
+        navigator.userAgent.match(/webOS/i) ||
+        navigator.userAgent.match(/iPhone/i) ||
+        navigator.userAgent.match(/iPad/i) ||
+        navigator.userAgent.match(/iPod/i) ||
+        navigator.userAgent.match(/BlackBerry/i) ||
+        navigator.userAgent.match(/Windows Phone/i)) {
+        
+        console.log("MOBILE");
+
+    } else {
+        window.onload = function(){
+            var myClassDiv = document.querySelector(".menu2");
+            myClassDiv.classList.add("show");
+        }
+        console.log("PC");
+    }    
+    
+    function validateForm() {
+        var allQuestionsAnswered = true;
+
+        var selectedPrblNumbValues = [];
+
+        <c:forEach items="${questionList}" var="list" varStatus="loop">
+            <c:choose>
+                <c:when test="${list.prbl_type eq 'B11001' || list.prbl_type eq 'B11002'}">
+                    var radioName = "answers${list.prbl_numb}";
+                    var radios = document.getElementsByName(radioName);
+                    var radioChecked = false;
+                    for (var i = 0; i < radios.length; i++) {
+                    	
+                        if (radios[i].checked) {
+                            radioChecked = true;
+                            if ("${list.prbl_type} === 'B11002'" && radios[i].value === '2') {
+                                selectedPrblNumbValues.push(${list.prbl_numb});
+                            }
+                            break;
+                        }
+                    }
+
+                    if(selectedPrblNumbValues.includes(${list.prtn_numb})){
+                    	radioChecked = true;
+                    	radios[0].checked  = false;
+                    	radios[1].checked  = false;
+                    	radios[2].checked  = false;
+                    	radios[3].checked  = false;
+                    	radios[4].checked  = false;
+                    }
+                    if (!radioChecked) {
+                        allQuestionsAnswered = false;
+                        //alert("질문 " + ${list.prbl_numb} + "에 답을 선택해주세요. (" + "${list.prbl_ctnt}" + ")");
+                        alert("[" + "${list.prbl_ctnt}" + "] 의 답을 선택해주세요.");
+                        
+                        const questionElement = document.getElementById("question[${list.prbl_numb}]");
+                        if (questionElement) {
+                        	
+                        	const nextElement = questionElement.nextElementSibling;
+                        	
+                        	nextElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        	
+                        	nextElement.classList.add('highlighted'); // 강조 클래스 추가
+                            setTimeout(() => {
+                            	nextElement.classList.remove('highlighted'); // 몇 초 후에 강조 클래스 제거
+                            }, 3000); // 1초 후에 제거 (원하는 시간으로 변경 가능)
+                        }
+                        return false;
+                    }
+
+                </c:when>
+            </c:choose>
+        </c:forEach>
+
+        if (!allQuestionsAnswered) {
+            return false;
+        }
+
+        //return true;
+        saveSurvey();
+    }
+		    /*만족도 조사 저장*/    
+		    function saveSurvey(obj){
+		    	
+		        $('input[type=radio]').each(function() {
+		            var radioName = $(this).attr('name');
+		            if (!$('input[name=' + radioName + ']:checked').length) {
+		                // 선택되지 않은 경우에는 value를 ''로 설정
+		                $(this).prop('checked', true).val('');
+		            }
+		        });
+
+	        var formData = $("#surveyForm").serialize();
+
+	        $.ajax({
+	            type : "POST",
+	            async : false,
+	            url : "/surveySave",
+	            data : formData,
+	            dataType : "text",
+	            success : updateStntInfoOk
+	        });
+	    
+	        /*개인정보 수정 callback*/
+	        function updateStntInfoOk(data, status){
+	            if(data == "UPDATE_OK"){
+	                alert("만족도 조사 제출이 완료되었습니다.");
+	                location.href = "student_main";
+	            }else{
+	                alert("정상적으로 처리되지 않았습니다.");
+	                return;
+	            }
+	        }
+	    }
+		    
+    </script>
+    
+</body>
+
+</html>

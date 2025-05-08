@@ -1,0 +1,214 @@
+package com.osan.portal.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.osan.portal.service.StudentService;
+import com.osan.portal.vo.DualResearchInfo;
+import com.osan.portal.vo.StudentSearchInfo;
+import com.osan.portal.vo.SurveyInfo;
+
+@Repository
+public class StudentServiceImpl implements StudentService{
+	
+	@Autowired
+    @Resource(name="sqlSession1")
+    private SqlSession osanPortalSql;
+	
+	
+	public StudentSearchInfo selectStudentInfo(StudentSearchInfo studentSearchInfo) {
+		StudentSearchInfo resultStudentInfo = osanPortalSql.selectOne("selectStudentInfo", studentSearchInfo);
+		return resultStudentInfo;
+	}
+	
+	public StudentSearchInfo selectStudentChange(StudentSearchInfo studentSearchInfo) {
+		StudentSearchInfo resultStudentChange = osanPortalSql.selectOne("selectStudentChange", studentSearchInfo);
+		return resultStudentChange;
+	}
+
+	@Override
+	public StudentSearchInfo getStudentInfo(StudentSearchInfo studentSearchInfo) {
+		StudentSearchInfo resultgetStudentInfo = osanPortalSql.selectOne("getStudentInfo", studentSearchInfo);
+		return resultgetStudentInfo;
+	}
+
+	@Override
+	public StudentSearchInfo getHakgi() {
+		StudentSearchInfo resultgetHakgi = osanPortalSql.selectOne("getHakgi");
+		return resultgetHakgi;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getSchedule(StudentSearchInfo lectInfo) {
+		List<StudentSearchInfo> resultgetSchedule = osanPortalSql.selectList("getSchedule", lectInfo);
+		return resultgetSchedule;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getScheduleInfo(StudentSearchInfo lectInfo) {
+		List<StudentSearchInfo> resultgetScheduleInfo = osanPortalSql.selectList("getScheduleInfo", lectInfo);
+		return resultgetScheduleInfo;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getCourInfo(StudentSearchInfo gradeInfo) {
+		List<StudentSearchInfo> resultgetCourInfo = osanPortalSql.selectList("getCourInfo", gradeInfo);
+		return resultgetCourInfo;
+	}
+
+	@Override
+	public StudentSearchInfo getTotalGrade(StudentSearchInfo gradeInfo) {
+		StudentSearchInfo resultgetTotalGrade = osanPortalSql.selectOne("getTotalGrade", gradeInfo);
+		return resultgetTotalGrade;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getGradeList(StudentSearchInfo gradeInfo) {
+		List<StudentSearchInfo> resultgetGradeList = osanPortalSql.selectList("getGradeList", gradeInfo);
+		return resultgetGradeList;
+	}
+
+	@Override
+	public StudentSearchInfo getTuitHakgi() {
+		StudentSearchInfo resultgetTuitHakgi = osanPortalSql.selectOne("getTuitHakgi");
+		return resultgetTuitHakgi;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getSchoInfo(StudentSearchInfo tuitInfo) {
+		List<StudentSearchInfo> resultgetSchoInfo = osanPortalSql.selectList("getSchoInfo", tuitInfo);
+		return resultgetSchoInfo;
+	}
+
+	@Override
+	public StudentSearchInfo getTuitInfo(StudentSearchInfo tuitInfo) {
+		StudentSearchInfo resultgetTuitInfo = osanPortalSql.selectOne("getTuitInfo", tuitInfo);
+		return resultgetTuitInfo;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getTuitList(StudentSearchInfo tuitInfo) {
+		List<StudentSearchInfo> resultgetTuitList = osanPortalSql.selectList("getTuitList", tuitInfo);
+		return resultgetTuitList;
+	}
+
+	@Override
+	public int updateStntInfo(StudentSearchInfo studentSearchInfo) {
+    	return osanPortalSql.update("updateStntInfo",studentSearchInfo);
+	}
+
+	@Override
+	public StudentSearchInfo getOffInfo(StudentSearchInfo studentInfo) {
+		StudentSearchInfo resultgetOffInfo = osanPortalSql.selectOne("getOffInfo", studentInfo);
+		return resultgetOffInfo;
+	}
+
+	@Override
+	public StudentSearchInfo getApplySchedule() {
+		   
+		StudentSearchInfo resultgetApplySchedule = osanPortalSql.selectOne("getApplySchedule");
+		
+		return resultgetApplySchedule;
+	}
+
+	@Override
+	public List<StudentSearchInfo> getSurveyQInfo(StudentSearchInfo surveyInfo) {
+		List<StudentSearchInfo> resultgetSurveyQInfo = osanPortalSql.selectList("getSurveyQInfo", surveyInfo);
+		return resultgetSurveyQInfo;
+	}
+	
+	@Override
+	public List<StudentSearchInfo> getSurveyAInfo(StudentSearchInfo surveyInfo) {
+		List<StudentSearchInfo> resultgetSurveyAInfo = osanPortalSql.selectList("getSurveyAInfo", surveyInfo);
+		return resultgetSurveyAInfo;
+	}	
+
+	@Override
+	public int SaveSurveyData_B02049(SurveyInfo surveyInfo) {
+		return osanPortalSql.update("SaveSurveyData_B02049",surveyInfo);
+	}
+	
+	@Override
+	public int SaveSurveyData_B02050(SurveyInfo surveyInfo) {
+		return osanPortalSql.update("SaveSurveyData_B02050",surveyInfo);
+	}	
+
+	@Override
+	public SurveyInfo getCourAppr() {
+		SurveyInfo resultgetCourAppr = osanPortalSql.selectOne("getCourAppr");
+		
+		return resultgetCourAppr;
+	}
+
+	@Override
+	public List<SurveyInfo> getCourApprList(SurveyInfo courInfo) {
+		List<SurveyInfo> resultgetCourApprList = osanPortalSql.selectList("getCourApprList", courInfo);
+		return resultgetCourApprList;
+	}
+
+	@Override
+	public int SaveCourAppryData(SurveyInfo surveyInfo) {
+		return osanPortalSql.update("SaveCourAppryData",surveyInfo);
+	}
+
+	@Override
+	public SurveyInfo getGradeSchedule() {
+		SurveyInfo resultgetGradeSchedule = osanPortalSql.selectOne("getGradeSchedule");
+		
+		return resultgetGradeSchedule;
+	}
+
+	@Override
+	public List<SurveyInfo> getGradeCheck_survey(SurveyInfo gradeInfo) {
+		List<SurveyInfo> resultgetGradeCheck_survey = osanPortalSql.selectList("getGradeCheck_survey", gradeInfo);
+		return resultgetGradeCheck_survey;
+	}
+
+	@Override
+	public List<SurveyInfo> getGradeCheck(SurveyInfo gradeInfo) {
+		List<SurveyInfo> resultgetGradeCheck = osanPortalSql.selectList("getGradeCheck", gradeInfo);
+		return resultgetGradeCheck;
+	}
+
+	@Override
+	public SurveyInfo getCheckAnswer(SurveyInfo gradeInfo) {
+		SurveyInfo resultgetCheckAnswer = osanPortalSql.selectOne("getCheckAnswer", gradeInfo);
+		
+		return resultgetCheckAnswer;
+	}
+
+	@Override
+	public DualResearchInfo getStudInfo(DualResearchInfo dualInfo) {
+		DualResearchInfo resultgetStudInfo = osanPortalSql.selectOne("getStudInfo", dualInfo);
+		
+		return resultgetStudInfo;
+	}
+
+	@Override
+	public int SaveDualData(DualResearchInfo dualResearchInfo) {
+		return osanPortalSql.update("SaveDualData",dualResearchInfo);
+	}
+
+	@Override
+	public SurveyInfo getMidTerm() {
+		SurveyInfo resultgetMidTerm = osanPortalSql.selectOne("getMidTerm");
+		
+		return resultgetMidTerm;
+	}
+
+	@Override
+	public int SaveMidData(SurveyInfo surveyInfo) {
+		return osanPortalSql.update("SaveMidData",surveyInfo);
+	}
+
+	@Override
+	public List<SurveyInfo> getMidTermList(SurveyInfo courInfo) {
+		List<SurveyInfo> resultgetMidTermList = osanPortalSql.selectList("getMidTermList", courInfo);
+		return resultgetMidTermList;
+	}
+}

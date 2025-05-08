@@ -1,0 +1,171 @@
+package com.osan.portal.vo;
+
+public class DualResearchInfo {
+
+	//듀얼지도교수제상담조사
+	private String  lect_year;
+	private String  lect_shtm;
+	private String  stnt_numb;
+	private String  dept_name;
+	private String  prbl_an01;
+	private String  prbl_an02;
+	private String  prbl_an03;
+	private String  prbl_an04;
+	private String  prbl_an05;
+	private String  prbl_an06;
+	private String  prbl_an07;
+	private String  prbl_an08;
+	private String  prbl_an09;
+	private String  prbl_an10;
+	private String  dscp_ansr;
+	private String  dscp_ansr2;
+	private String  dscp_ansr3;
+	private String  inpt_usid;
+	private String  inpt_date;
+	private String  inpt_addr;
+	
+	private String  psnl_name1;
+	private String  psnl_name2;
+	
+	private String  inpt_ysno;
+	
+	public String getLect_year() {
+		return lect_year;
+	}
+	public void setLect_year(String lect_year) {
+		this.lect_year = lect_year;
+	}
+	public String getLect_shtm() {
+		return lect_shtm;
+	}
+	public void setLect_shtm(String lect_shtm) {
+		this.lect_shtm = lect_shtm;
+	}
+	public String getStnt_numb() {
+		return stnt_numb;
+	}
+	public void setStnt_numb(String stnt_numb) {
+		this.stnt_numb = stnt_numb;
+	}
+	public String getPrbl_an01() {
+		return prbl_an01;
+	}
+	public void setPrbl_an01(String prbl_an01) {
+		this.prbl_an01 = prbl_an01;
+	}
+	public String getPrbl_an02() {
+		return prbl_an02;
+	}
+	public void setPrbl_an02(String prbl_an02) {
+		this.prbl_an02 = prbl_an02;
+	}
+	public String getPrbl_an03() {
+		return prbl_an03;
+	}
+	public void setPrbl_an03(String prbl_an03) {
+		this.prbl_an03 = prbl_an03;
+	}
+	public String getPrbl_an04() {
+		return prbl_an04;
+	}
+	public void setPrbl_an04(String prbl_an04) {
+		this.prbl_an04 = prbl_an04;
+	}
+	public String getPrbl_an05() {
+		return prbl_an05;
+	}
+	public void setPrbl_an05(String prbl_an05) {
+		this.prbl_an05 = prbl_an05;
+	}
+	public String getPrbl_an06() {
+		return prbl_an06;
+	}
+	public void setPrbl_an06(String prbl_an06) {
+		this.prbl_an06 = prbl_an06;
+	}
+	public String getPrbl_an07() {
+		return prbl_an07;
+	}
+	public void setPrbl_an07(String prbl_an07) {
+		this.prbl_an07 = prbl_an07;
+	}
+	public String getPrbl_an08() {
+		return prbl_an08;
+	}
+	public void setPrbl_an08(String prbl_an08) {
+		this.prbl_an08 = prbl_an08;
+	}
+	public String getPrbl_an09() {
+		return prbl_an09;
+	}
+	public void setPrbl_an09(String prbl_an09) {
+		this.prbl_an09 = prbl_an09;
+	}
+	public String getPrbl_an10() {
+		return prbl_an10;
+	}
+	public void setPrbl_an10(String prbl_an10) {
+		this.prbl_an10 = prbl_an10;
+	}
+	public String getDscp_ansr() {
+		return dscp_ansr;
+	}
+	public void setDscp_ansr(String dscp_ansr) {
+		this.dscp_ansr = dscp_ansr;
+	}
+	public String getDscp_ansr2() {
+		return dscp_ansr2;
+	}
+	public void setDscp_ansr2(String dscp_ansr2) {
+		this.dscp_ansr2 = dscp_ansr2;
+	}
+	public String getDscp_ansr3() {
+		return dscp_ansr3;
+	}
+	public void setDscp_ansr3(String dscp_ansr3) {
+		this.dscp_ansr3 = dscp_ansr3;
+	}
+	public String getInpt_usid() {
+		return inpt_usid;
+	}
+	public void setInpt_usid(String inpt_usid) {
+		this.inpt_usid = inpt_usid;
+	}
+	public String getInpt_date() {
+		return inpt_date;
+	}
+	public void setInpt_date(String inpt_date) {
+		this.inpt_date = inpt_date;
+	}
+	public String getInpt_addr() {
+		return inpt_addr;
+	}
+	public void setInpt_addr(String inpt_addr) {
+		this.inpt_addr = inpt_addr;
+	}
+	public String getPsnl_name1() {
+		return psnl_name1;
+	}
+	public void setPsnl_name1(String psnl_name1) {
+		this.psnl_name1 = psnl_name1;
+	}
+	public String getPsnl_name2() {
+		return psnl_name2;
+	}
+	public void setPsnl_name2(String psnl_name2) {
+		this.psnl_name2 = psnl_name2;
+	}
+	public String getDept_name() {
+		return dept_name;
+	}
+	public void setDept_name(String dept_name) {
+		this.dept_name = dept_name;
+	}
+	public String getInpt_ysno() {
+		return inpt_ysno;
+	}
+	public void setInpt_ysno(String inpt_ysno) {
+		this.inpt_ysno = inpt_ysno;
+	}
+	
+}

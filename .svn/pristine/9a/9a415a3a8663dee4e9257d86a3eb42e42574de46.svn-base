@@ -1,0 +1,51 @@
+#### db driver #### 
+db.oracle.driver=oracle.jdbc.driver.OracleDriver
+db.sqlserver.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+#\ub300\ud559\uc815\ubcf4\uc2dc\uc2a4\ud15c(test)
+db.test.osuIs.url=jdbc:oracle:thin:@211.221.231.188:1521/ORA10 
+db.test.osuIs.username=OSANUNIV 
+db.test.osuIs.password=developer
+
+#\ub300\ud559\uc815\ubcf4\uc2dc\uc2a4\ud15c\u0085\u009c(\uc6b4\uc601\u0081)
+db.real.osuIs.url=jdbc:oracle:thin:@211.221.231.11:1521/ORA10 
+db.real.osuIs.username=OSANUNIV 
+db.real.osuIs.password=cjdgkr
+
+#sms(\uc6b4\uc601)
+db.real.sms.username=SMS 
+db.real.sms.password=sms
+
+#portal(\uc6b4\uc601\u0081)
+db.real.portal.username=PORTAL 
+db.real.portal.password=portal
+
+#portal(test)
+db.test.portal.username=PORTAL 
+db.test.portal.password=portal
+
+#\ud648\ud398\uc774\uc9c0(\uc6b4\uc601\u0081)
+db.real.hp.url=jdbc:sqlserver://211.221.231.7:1433;databaseName=osan 
+db.real.hp.username=osan_web 
+db.real.hp.password=dhtkseogkrry
+
+#\ucc44\uc6a9(\uc6b4\uc601\u0081)
+db.real.job.url=jdbc:sqlserver://211.221.231.193:1433;DatabaseName=db_job 
+db.real.job.username=usr_job 
+db.real.job.password=job@1234
+
+#\ub3c4\uc11c\uad00
+db.real.lib.url=jdbc:sqlserver://211.221.234.21:1433;databaseName=dlidb3
+db.real.lib.username=potal 
+db.real.lib.password=tjdur,,$%
+
+#sms \uc778\uc99d\uc815\ubcf4
+sms.subject=\uc624\uc0b0\ub300\ud559\uad50 \ud3ec\ud0c8 \ub85c\uadf8\uc778 \uc778\uc99d
+sms.callback.number=0313702624
+sms.body.first=\ub85c\uadf8\uc778 \uc778\uc99d\ubc88\ud638\ub294
+sms.body.last=\uc785\ub2c8\ub2e4.
+
+#sms \uc784\uc2dc\ube44\ubc00\ubc88\ud638
+sms.pw.subject=\uc624\uc0b0\ub300\ud559\uad50 \ud3ec\ud0c8 \uc784\uc2dc\ube44\ubc00\ubc88\ud638 \ubc1c\uae09
+sms.pw.body.first=\uc784\uc2dc \ube44\ubc00\ubc88\ud638\ub294
+sms.pw.body.last=\uc785\ub2c8\ub2e4. \ub300\uc18c\ubb38\uc790 \uad6c\ubd84\ud558\uc5ec \uc785\ub825\ubc14\ub78d\ub2c8\ub2e4. 

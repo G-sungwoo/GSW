@@ -1,0 +1,374 @@
+package com.osan.portal.vo;
+
+public class LoginInfo {
+
+    private String userNo;
+    private String password;
+    private String name;
+    private String userAuth;
+    private String regNo;
+    private String email;
+    private String hTell;
+    private String org;
+    private String status;
+    private String tel;  
+    private String role;
+    private String hp;
+    private String fax;
+    private String chgePwAt;
+    private String workFlag;
+    private int wrpwCont;
+    private String menuId;
+    private String shAt;
+    private String pkAt;
+    private String hjAt;
+    private String cuAt;
+    
+    /****************sms ���� ����****************/
+    /*������ȣ*/
+    private int verifyNumber;
+    private String cellPhone;
+    private String verifiedAt;
+    /*�̸�+�ڵ�����ȣ*/
+    private String destInfo;
+    /*sms ����*/
+    private String smsMsg;
+    /*sms ����*/
+    private String subject;
+    /*call back*/
+    private String callback;
+    /*sms key value*/
+    private int msgId;
+    /*����ڰ� �Է��� ������ȣ*/
+    private String userVerifyNumber;
+	private String countPerPage;
+	private String first;
+	private String last;
+    
+    /*page*/
+    private String pageNo;
+    
+    /*�л��(��ȸ���)*/
+    private String searchYm;
+    
+    /*��й�ȣ����*/
+    private String currentPassword;
+    private String newPassword;
+    private String confirmPassword;
+    private String tempPasswordAt;
+    
+    /*������ ã��*/
+    private String searchName;
+    
+    /*���� ����*/
+    private String lectYear;
+    private String lectShtm;
+    
+	private String errorCode;
+	
+	private String userIp;
+	
+	private String confirmOtp;
+	
+	/* 0원 등록 */
+	private String regi_year;
+	private String regi_shtm;
+	private String stnt_numb;
+	private String regi_flag;
+    
+	
+	public String getUserNo() {
+		return userNo;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public void setUserNo(String userNo) {
+		this.userNo = userNo;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getUserAuth() {
+		return userAuth;
+	}
+	public void setUserAuth(String userAuth) {
+		this.userAuth = userAuth;
+	}
+	public String getRegNo() {
+		return regNo;
+	}
+	public void setRegNo(String regNo) {
+		this.regNo = regNo;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String gethTell() {
+		return hTell;
+	}
+	public void sethTell(String hTell) {
+		this.hTell = hTell;
+	}
+	public String getOrg() {
+		return org;
+	}
+	public void setOrg(String org) {
+		this.org = org;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getTel() {
+		return tel;
+	}
+	public void setTel(String tel) {
+		this.tel = tel;
+	}
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
+	public String getErrorCode() {
+		return errorCode;
+	}
+	public void setErrorCode(String errorCode) {
+		this.errorCode = errorCode;
+	}
+	public String getCellPhone() {
+		return cellPhone;
+	}
+	public void setCellPhone(String cellPhone) {
+		this.cellPhone = cellPhone;
+	}
+	public String getHp() {
+		return hp;
+	}
+	public void setHp(String hp) {
+		this.hp = hp;
+	}
+	public int getVerifyNumber() {
+		return verifyNumber;
+	}
+	public void setVerifyNumber(int verifyNumber) {
+		this.verifyNumber = verifyNumber;
+	}
+	public String getDestInfo() {
+		return destInfo;
+	}
+	public void setDestInfo(String destInfo) {
+		this.destInfo = destInfo;
+	}
+	public String getSmsMsg() {
+		return smsMsg;
+	}
+	public void setSmsMsg(String smsMsg) {
+		this.smsMsg = smsMsg;
+	}
+	public String getSubject() {
+		return subject;
+	}
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+	public String getCallback() {
+		return callback;
+	}
+	public void setCallback(String callback) {
+		this.callback = callback;
+	}
+	public int getMsgId() {
+		return msgId;
+	}
+	public void setMsgId(int msgId) {
+		this.msgId = msgId;
+	}
+	public String getUserVerifyNumber() {
+		return userVerifyNumber;
+	}
+	public void setUserVerifyNumber(String userVerifyNumber) {
+		this.userVerifyNumber = userVerifyNumber;
+	}
+	public String getPageNo() {
+		return pageNo;
+	}
+	public void setPageNo(String pageNo) {
+		this.pageNo = pageNo;
+	}
+	public String getCountPerPage() {
+		return countPerPage;
+	}
+	public void setCountPerPage(String countPerPage) {
+		this.countPerPage = countPerPage;
+	}
+	public String getFirst() {
+		return first;
+	}
+	public void setFirst(String first) {
+		this.first = first;
+	}
+	public String getLast() {
+		return last;
+	}
+	public void setLast(String last) {
+		this.last = last;
+	}
+	public String getSearchYm() {
+		return searchYm;
+	}
+	public void setSearchYm(String searchYm) {
+		this.searchYm = searchYm;
+	}
+	public String getFax() {
+		return fax;
+	}
+	public void setFax(String fax) {
+		this.fax = fax;
+	}
+	public String getCurrentPassword() {
+		return currentPassword;
+	}
+	public void setCurrentPassword(String currentPassword) {
+		this.currentPassword = currentPassword;
+	}
+	public String getNewPassword() {
+		return newPassword;
+	}
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
+	}
+	public String getUserIp() {
+		return userIp;
+	}
+	public void setUserIp(String userIp) {
+		this.userIp = userIp;
+	}
+	public String getSearchName() {
+		return searchName;
+	}
+	public void setSearchName(String searchName) {
+		this.searchName = searchName;
+	}
+	public String getLectYear() {
+		return lectYear;
+	}
+	public void setLectYear(String lectYear) {
+		this.lectYear = lectYear;
+	}
+	public String getLectShtm() {
+		return lectShtm;
+	}
+	public void setLectShtm(String lectShtm) {
+		this.lectShtm = lectShtm;
+	}
+	public String getChgePwAt() {
+		return chgePwAt;
+	}
+	public void setChgePwAt(String chgePwAt) {
+		this.chgePwAt = chgePwAt;
+	}
+	public String getTempPasswordAt() {
+		return tempPasswordAt;
+	}
+	public void setTempPasswordAt(String tempPasswordAt) {
+		this.tempPasswordAt = tempPasswordAt;
+	}
+	public String getWorkFlag() {
+		return workFlag;
+	}
+	public void setWorkFlag(String workFlag) {
+		this.workFlag = workFlag;
+	}
+	public int getWrpwCont() {
+		return wrpwCont;
+	}
+	public void setWrpwCont(int wrpwCont) {
+		this.wrpwCont = wrpwCont;
+	}
+	public String getVerifiedAt() {
+		return verifiedAt;
+	}
+	public void setVerifiedAt(String verifiedAt) {
+		this.verifiedAt = verifiedAt;
+	}
+	public String getMenuId() {
+		return menuId;
+	}
+	public void setMenuId(String menuId) {
+		this.menuId = menuId;
+	}
+	public String getShAt() {
+		return shAt;
+	}
+	public void setShAt(String shAt) {
+		this.shAt = shAt;
+	}
+	public String getPkAt() {
+		return pkAt;
+	}
+	public void setPkAt(String pkAt) {
+		this.pkAt = pkAt;
+	}
+	public String getHjAt() {
+		return hjAt;
+	}
+	public void setHjAt(String hjAt) {
+		this.hjAt = hjAt;
+	}
+	public String getCuAt() {
+		return cuAt;
+	}
+	public void setCuAt(String cuAt) {
+		this.cuAt = cuAt;
+	}
+	public String getConfirmOtp() {
+		return confirmOtp;
+	}
+	public void setConfirmOtp(String confirmOtp) {
+		this.confirmOtp = confirmOtp;
+	}
+	public String getRegi_year() {
+		return regi_year;
+	}
+	public void setRegi_year(String regi_year) {
+		this.regi_year = regi_year;
+	}
+	public String getRegi_shtm() {
+		return regi_shtm;
+	}
+	public void setRegi_shtm(String regi_shtm) {
+		this.regi_shtm = regi_shtm;
+	}
+	public String getStnt_numb() {
+		return stnt_numb;
+	}
+	public void setStnt_numb(String stnt_numb) {
+		this.stnt_numb = stnt_numb;
+	}
+	public String getRegi_flag() {
+		return regi_flag;
+	}
+	public void setRegi_flag(String regi_flag) {
+		this.regi_flag = regi_flag;
+	}
+}

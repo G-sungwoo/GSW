@@ -1,0 +1,62 @@
+greeting=Hello
+farewell=Goodbye
+title=Page Title
+
+left.menu1=student Info
+
+left.menu1.sub1=Academic Profile:
+left.menu1.sub1.name1=Academic Records
+
+left.menu1.sub2=Academic Changes:
+left.menu1.sub2.name1=Return to school
+
+left.menu2=class Info
+left.menu3=grade Info
+left.menu4=scholarship
+left.menu5=regist Info
+
+
+
+
+
+
+
+
+
+
+page.title1=Studnet Info
+
+page.form1.name1=Studnet ID
+page.form1.name2=Name
+page.form1.name3=Department
+page.form1.name4=Major
+page.form1.name5=Grade
+page.form1.name6=Status
+page.form1.name7=Mobile Phone
+page.form1.name8=Email
+page.form1.name9=Postal
+page.form1.name10=Address1
+page.form1.name11=Address2
+
+page.title2=Guardian Info
+
+page.form2.name1=Name
+page.form2.name2=Occupation
+page.form2.name3=Relationship
+page.form2.name4=Postal
+page.form2.name5=Address1
+page.form2.name6=Address2
+page.form2.name7=Phone
+page.form2.name8=Mobile Phone
+
+
+
+
+
+
+
+
+
+
+page.button1=SAVE
+page.button2=SEARCH

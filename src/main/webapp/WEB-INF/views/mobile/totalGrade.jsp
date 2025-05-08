@@ -1,0 +1,265 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>전체 성적 정보</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/resources/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/resources/css/sb-admin-2.min.css" rel="stylesheet">
+    
+    <!-- 
+    <script>
+    var msg = "${msg}";
+    
+    if(msg == "데이터없음"){
+        alert("현재 성적 데이터가 없습니다. 메인 페이지로 이동 합니다.");
+        location.href = "/student_main";
+    }
+    </script>
+    -->
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+<!-- left layout 작성 (기존 sidebar 분리작업)-->
+<%@ include file = "/resources/layout/leftmenu.jsp" %>
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+<!-- header layout 작성 (기존 Topbar 분리작업)-->
+<%@ include file = "/resources/layout/header.jsp" %>
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-4 text-gray-800">전체 성적 정보</h1>
+                    
+                    
+                    <div class="row">
+                    
+                        <!-- Pie Chart -->
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">졸업기준학점</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="chart-pie pt-4 pb-2">
+                                        <canvas id="myPieChart1"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">교양기준학점</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="chart-pie pt-4 pb-2">
+                                        <canvas id="myPieChart2"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">전공기준학점</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="chart-pie pt-4 pb-2">
+                                        <canvas id="myPieChart3"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Area Chart -->
+                        <div class="col-xl-6 col-lg-7">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">학기별 학점</h6>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="chart-area">
+                                        <canvas id="myAreaChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Area Chart -->
+                        <div class="col-xl-6 col-lg-7">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">학기별 성적</h6>
+                                        <select name="lectHaks" class="lectHaks" onchange="hakgiSelect()">
+                                            <option value="0">선택</option>
+                                                  <c:forEach var="list" items="${courInfo}"  varStatus="loop">
+                                                      <option value="${list.lect_year}${list.lect_shtm}" <c:if test="${loop.last}">selected</c:if>>${list.lect_haks}</option>
+                                                  </c:forEach>
+                                        </select>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <div class = "gradeListGrid">
+                                    
+                                        </div>  
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2021</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+    
+
+
+    <script type="text/javascript">
+    
+    //속성이 비슷한 화면이 열려있을때 left open 스크립트 - leftmenu.jsp에서 class="munu + n"으로 관리중..
+    if (navigator.userAgent.match(/Android/i) ||
+        navigator.userAgent.match(/webOS/i) ||
+        navigator.userAgent.match(/iPhone/i) ||
+        navigator.userAgent.match(/iPad/i) ||
+        navigator.userAgent.match(/iPod/i) ||
+        navigator.userAgent.match(/BlackBerry/i) ||
+        navigator.userAgent.match(/Windows Phone/i)) {
+          
+    } else {
+        window.onload = function(){
+            var myClassDiv = document.querySelector(".menu3");
+            myClassDiv.classList.add("show");
+        }
+        console.log("PC");
+    }
+    
+    //취득학점
+    var acqtPont = "${totalGrade.acqt_pont}";
+    var joedPont = "${totalGrade.joed_pont}";
+    var gyotPont = "${totalGrade.gyot_pont}";
+    var gyedPont = "${totalGrade.gyed_pont}";
+    var juntPont = "${totalGrade.junt_pont}";
+    var juedPont = "${totalGrade.jued_pont}";
+
+    //학기별학점
+    var hakgi = [];
+    var score = [];
+    <c:forEach var="list" items="${courInfo}" varStatus="status">
+        var data1 = "${list.lect_year}-${list.lect_shtm}";
+	    var data2 = "${list.avrg_mrks}";
+	    hakgi.push(data1);
+	    score.push(data2);
+    </c:forEach>
+
+    
+    // 학기별 성적
+    function hakgiSelect(){
+    	
+        var lectYesh = $(".lectHaks option:selected").val();
+        
+        $.ajax({
+            type : 'get',
+            url : '/gradeList.do?',
+            data : {hakgiData : lectYesh},
+            dataType : 'html',
+            success : function(html){
+                $('.gradeListGrid').html(html);
+                $('.gradeListGrid').show();
+            },
+            error: function(xhr, status, error){
+                alert(error)
+            }
+        })
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        hakgiSelect(); // 페이지 로드 후 최초 한 번 실행
+    });
+    
+    </script>
+    <!-- Bootstrap core JavaScript-->
+    <script src="/resources/vendor/jquery/jquery.min.js"></script>
+    <script src="/resources/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/resources/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/resources/js/sb-admin-2.min.js"></script>    
+    
+    <!-- Page level plugins -->
+    <script src="/resources/vendor/chart.js/Chart.min.js"></script>
+    <!-- Page level custom scripts -->    
+    <script src="/resources/js/demo/chart-area-demo.js"></script>
+    <script src="/resources/js/demo/chart-pie-demo.js"></script>
+    <script src="/resources/js/demo/chartjs-plugin-doughnutlabel.js"></script>
+    
+</body>
+</html>

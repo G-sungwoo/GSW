@@ -1,0 +1,18 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page session="false" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<html>
+<head>
+    <link rel="icon" type="image/png"  href="resources/img/favicon.ico"/>
+<title>error page</title>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="page-wrapper">
+            <div align="center">
+                <c:out value='${msg}'/>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

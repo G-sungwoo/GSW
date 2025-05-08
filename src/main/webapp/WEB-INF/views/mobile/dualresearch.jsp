@@ -1,0 +1,403 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>테스트-정보시스템</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/resources/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/resources/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/resources/css/custom.css" rel="stylesheet">
+
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+<!-- left layout 작성 (기존 sidebar 분리작업)-->
+<%@ include file = "/resources/layout/leftmenu.jsp" %>
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+<!-- header layout 작성 (기존 Topbar 분리작업)-->
+<%@ include file = "/resources/layout/header.jsp" %>
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    
+                    <!-- Basic Card Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">듀얼지도교수제 상담조사</h6>
+                        </div>
+                        <div class="card-body">
+                                                        본 설문의 목적은 우리대학 듀얼지도교수제 지도교수 상담 진행시 학생들이 적절한 상담을 받고 있는지에 관한 내용 파악과 학생들이 느끼고 있는 문제점을 파악하여 보다 발전적인 체계를 구축하는데 그 목적이 있습니다. 문항을 읽고 가장 적합한 곳에 표시하여 주시기 바랍니다.
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+	                        <form  action="" method="post" name="dualresearch" id="dualresearch">
+	                        <table class="table table-bordered" style="text-align: center;" border="1">
+	                        <input name="lect_year" id="lect_year" type="hidden" value="${DualInfo.lect_year}" />
+	                        <input name="lect_shtm" id="lect_shtm" type="hidden" value="${DualInfo.lect_shtm}" />
+	                            <thead class="table-default">
+	                                <tr>
+	                                    <th>순번</th>
+	                                    <th>문항명</th>
+	                                </tr>
+	                            </thead>
+	                            <tbody>
+	                                <tr><td rowspan="2" id="question1">1</td><td>학생의 소속 학과는?</td></tr>
+	                                <tr><td>
+	                                    <div class="mydict">
+	                                        <div>
+	                                            <input type="text" class="form-control_custom1 bg-gray-200 border-1 small"  id="prbl_an01" name="prbl_an01" aria-label="Search" aria-describedby="basic-addon2" value="${DualInfo.dept_name }">
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                                <tr><td rowspan="2" id="question2">2</td><td>학생의 현재 재학 학년은?</td></tr>
+	                                <tr><td>
+	                                    <div class="mydict">
+	                                        <div>
+	                                            <label><input type="radio" id="prbl_an02" name="prbl_an02" value="1"><span style="font-size:9pt;">1학년</span></label>
+	                                            <label><input type="radio" id="prbl_an02" name="prbl_an02" value="2"><span style="font-size:9pt;">2학년</span></label>
+	                                            <label><input type="radio" id="prbl_an02" name="prbl_an02" value="3"><span style="font-size:9pt;">3학년(3년제 및 전공심화)</span></label>
+	                                            <label><input type="radio" id="prbl_an02" name="prbl_an02" value="4"><span style="font-size:9pt;">4학년(전공심화)</span></label>
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                                <tr><td rowspan="2" id="question3">3</td><td>현재 지도교수님을 잘 알고 있습니까?</td></tr>
+	                                <tr><td>
+	                                    <div class="mydict">
+	                                        <div>
+	                                            <label><input type="radio" id="prbl_an03" name="prbl_an03" value="1"><span style="font-size:9pt;">알고있다</span></label>
+	                                            <input type="text" class="form-control_custom2 bg-gray-200 border-1 small" id="prbl_an03" name="prbl_an03" aria-label="Search" aria-describedby="basic-addon2" value="${DualInfo.psnl_name1 }" disabled>
+	                                            <label><input type="radio" id="prbl_an03" name="prbl_an03" value="2"><span style="font-size:9pt;">모른다</span></label>
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                                <tr><td rowspan="2" id="question4">4</td><td>상담횟수(한학기2회)는 적합하다고 생각하십니까?</td></tr>
+	                                <tr><td>
+	                                    <div class="mydict">
+	                                        <div>
+	                                            <label><input type="radio" id="prbl_an04" name="prbl_an04" value="1"><span style="font-size:9pt;">매우그렇다</span></label>
+	                                            <label><input type="radio" id="prbl_an04" name="prbl_an04" value="2"><span style="font-size:9pt;">그렇다</span></label>
+	                                            <label><input type="radio" id="prbl_an04" name="prbl_an04" value="3"><span style="font-size:9pt;">보통</span></label>
+	                                            <label><input type="radio" id="prbl_an04" name="prbl_an04" value="4"><span style="font-size:9pt;">그렇지않다</span></label>
+	                                            <label><input type="radio" id="prbl_an04" name="prbl_an04" value="5"><span style="font-size:9pt;">매우그렇지않다</span></label>
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                                <tr><td rowspan="2" id="question5">5</td><td>지도교수께 상담지도 받은 주요 분야는 무엇입니까?</td></tr>
+	                                <tr><td>
+	                                    <div class="mydict">
+	                                        <div>
+	                                            <label><input type="radio" id="prbl_an05" name="prbl_an05" value="1"><span style="font-size:9pt;">학교생활 적응</span></label>
+	                                            <label><input type="radio" id="prbl_an05" name="prbl_an05" value="2"><span style="font-size:9pt;">진로, 취업, 창업</span></label>
+	                                            <label><input type="radio" id="prbl_an05" name="prbl_an05" value="3"><span style="font-size:9pt;">학업, 학습, 성적관리</span></label>
+	                                            <label><input type="radio" id="prbl_an05" name="prbl_an05" value="4"><span style="font-size:9pt;">가정환경(이성문제,경제적고민)</span></label>
+	                                            <label><input type="radio" id="prbl_an05" name="prbl_an05" value="5" onclick="focusTextInput_jido()"><span style="font-size:9pt;">기타</span></label>
+	                                            <input type="text" class="form-control_custom1 bg-gray-200 border-1 small" id="dscp_ansr2" name="dscp_ansr2" aria-label="Search" aria-describedby="basic-addon2" onclick="selectRadio_jido()">
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                                <tr><td rowspan="2" id="question6">6</td><td>지도교수님께 받은 상담이 도움이 되었습니까? </td></tr>
+	                                <tr><td>
+	                                    <div class="mydict">
+	                                        <div>
+	                                            <label><input type="radio" id="prbl_an06" name="prbl_an06" value="1"><span style="font-size:9pt;">매우그렇다</span></label>
+	                                            <label><input type="radio" id="prbl_an06" name="prbl_an06" value="2"><span style="font-size:9pt;">그렇다</span></label>
+	                                            <label><input type="radio" id="prbl_an06" name="prbl_an06" value="3"><span style="font-size:9pt;">보통</span></label>
+	                                            <label><input type="radio" id="prbl_an06" name="prbl_an06" value="4"><span style="font-size:9pt;">그렇지않다</span></label>
+	                                            <label><input type="radio" id="prbl_an06" name="prbl_an06" value="5"><span style="font-size:9pt;">매우그렇지않다</span></label>
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                                <tr class="hidden"><td rowspan="2" id="question7">7</td><td>현재 산업체인사 상담지도 교수님을 잘 알고 있습니까?</td></tr>
+	                                <tr class="hidden"><td>
+	                                    <div class="mydict">
+	                                        <div>
+	                                            <label><input type="radio" id="prbl_an07" name="prbl_an07" value="1"><span style="font-size:9pt;">알고있다</span></label>
+	                                            <input type="text" class="form-control_custom2 bg-gray-200 border-1 small" id="prbl_an07" name="prbl_an07" aria-label="Search" aria-describedby="basic-addon2" value="${DualInfo.psnl_name2 }" disabled>
+	                                            <label><input type="radio" id="prbl_an07" name="prbl_an07" value="2"><span style="font-size:9pt;">모른다</span></label>
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                                <tr class="hidden"><td rowspan="2" id="question8">8</td><td>산업체인사 상담지도 상담횟수(한학기2회)는 적합하다고 생각하십니까?</td></tr>
+	                                <tr class="hidden"><td>
+	                                    <div class="mydict">
+	                                        <div>
+	                                            <label><input type="radio" id="prbl_an08" name="prbl_an08" value="1"><span style="font-size:9pt;">매우그렇다</span></label>
+	                                            <label><input type="radio" id="prbl_an08" name="prbl_an08" value="2"><span style="font-size:9pt;">그렇다</span></label>
+	                                            <label><input type="radio" id="prbl_an08" name="prbl_an08" value="3"><span style="font-size:9pt;">보통</span></label>
+	                                            <label><input type="radio" id="prbl_an08" name="prbl_an08" value="4"><span style="font-size:9pt;">그렇지않다</span></label>
+	                                            <label><input type="radio" id="prbl_an08" name="prbl_an08" value="5"><span style="font-size:9pt;">매우그렇지않다</span></label>
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                                <tr class="hidden"><td rowspan="2" id="question9">9</td><td>산업체인사 교수님께 상담지도 받은 주요 분야는 무엇입니까?</td></tr>
+	                                <tr class="hidden"><td>
+	                                    <div class="mydict">
+	                                        <div>
+	                                            <label><input type="radio" id="prbl_an09" name="prbl_an09" value="1"><span style="font-size:9pt;">학교생활 적응</span></label>
+	                                            <label><input type="radio" id="prbl_an09" name="prbl_an09" value="2"><span style="font-size:9pt;">진로, 취업, 창업</span></label>
+	                                            <label><input type="radio" id="prbl_an09" name="prbl_an09" value="3"><span style="font-size:9pt;">학업, 학습, 성적관리</span></label>
+	                                            <label><input type="radio" id="prbl_an09" name="prbl_an09" value="4"><span style="font-size:9pt;">가정환경(이성문제,경제적고민)</span></label>
+	                                            <label><input type="radio" id="prbl_an09" name="prbl_an09" value="5" onclick="focusTextInput_san()"><span style="font-size:9pt;">기타</span></label>
+	                                            <input type="text" class="form-control_custom1 bg-gray-200 border-1 small" id="dscp_ansr3" name="dscp_ansr3" aria-label="Search" aria-describedby="basic-addon2" onclick="selectRadio_san()">
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                                <tr class="hidden"><td rowspan="2" id="question10">10</td><td>산업체 인사 교수님께 받은 상담이 도움이 되었습니까?</td></tr>
+	                                <tr class="hidden"><td>
+	                                    <div class="mydict">
+	                                        <div>
+	                                            <label><input type="radio" id="prbl_an10" name="prbl_an10" value="1"><span style="font-size:9pt;">매우그렇다</span></label>
+	                                            <label><input type="radio" id="prbl_an10" name="prbl_an10" value="2"><span style="font-size:9pt;">그렇다</span></label>
+	                                            <label><input type="radio" id="prbl_an10" name="prbl_an10" value="3"><span style="font-size:9pt;">보통</span></label>
+	                                            <label><input type="radio" id="prbl_an10" name="prbl_an10" value="4"><span style="font-size:9pt;">그렇지않다</span></label>
+	                                            <label><input type="radio" id="prbl_an10" name="prbl_an10" value="5"><span style="font-size:9pt;">매우그렇지않다</span></label>
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                                <tr><td rowspan="2" id="question11">11</td><td>상담지도에 바라는 점과 개선하였으면 하는 사항이 있다면 자유롭게 작성해 주세요.</td></tr>
+	                                <tr><td>
+	                                    <div class="mydict">
+	                                        <div>
+                                                <input type="text" class="form-control_custom1 bg-gray-200 border-1 small"  id="dscp_ansr" name="dscp_ansr" aria-label="Search" aria-describedby="basic-addon2" >
+	                                        </div>
+	                                    </div>
+	                                </td></tr>
+	                            </tbody>
+	                        </table>
+	                    </form>
+                        </div>
+                    </div>
+
+
+				    <div class="container-div" style="text-align:center; padding-bottom:15px;">
+				    <a href="javascript:void(0);" onclick="validateForm();" class="btn btn-info btn-icon-split btn-la">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
+                        <span class="text">설문 조사 제출
+                        </span>
+                    </a>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2021</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/resources/vendor/jquery/jquery.min.js"></script>
+    <script src="/resources/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/resources/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/resources/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <!-- 
+    <script src="/resources/vendor/chart.js/Chart.min.js"></script>
+     -->
+    <!-- Page level custom scripts -->
+    <!-- 
+    <script src="/resources/js/demo/chart-area-demo.js"></script>
+    <script src="/resources/js/demo/chart-pie-demo.js"></script>
+     -->
+
+	<script>
+	
+	// 페이지 로드 시 실행되는 함수
+	    window.onload = function() {
+		    // psnl_name2 값이 비어있거나 null이면 해당 클래스를 가진 요소들을 숨김
+	        var psnl_name2Value = "${DualInfo.psnl_name2}";
+	        if (psnl_name2Value === null || psnl_name2Value.trim() === "") {
+	            hideElements("hidden");
+	        }
+	        
+	        //속성이 비슷한 화면이 열려있을때 left open 스크립트 - leftmenu.jsp에서 class="munu + n"으로 관리중..
+	        if (navigator.userAgent.match(/Android/i) ||
+	            navigator.userAgent.match(/webOS/i) ||
+	            navigator.userAgent.match(/iPhone/i) ||
+	            navigator.userAgent.match(/iPad/i) ||
+	            navigator.userAgent.match(/iPod/i) ||
+	            navigator.userAgent.match(/BlackBerry/i) ||
+	            navigator.userAgent.match(/Windows Phone/i)) {
+	            
+	            console.log("MOBILE");
+	            
+	        } else {
+	                var myClassDiv = document.querySelector(".menu2");
+	                myClassDiv.classList.add("show");
+	                console.log("PC");
+	        }
+	    }
+	
+	    // 클래스를 가진 모든 요소를 숨기는 함수
+	    function hideElements(className) {
+	        var elements = document.getElementsByClassName(className);
+	        for (var i = 0; i < elements.length; i++) {
+	            elements[i].style.display = "none";
+	        }
+	    }
+
+	    function focusTextInput_jido() {
+	        var radioElement = document.querySelector('input[name="prbl_an05"][value="5"]');
+	        radioElement.checked = true;
+	        document.getElementById('dscp_ansr2').focus();
+	    }
+	
+	    function selectRadio_jido() {
+	        var radioElement = document.querySelector('input[name="prbl_an05"][value="5"]');
+	        radioElement.checked = true;
+	    }
+	    
+        function focusTextInput_san() {
+            var radioElement = document.querySelector('input[name="prbl_an09"][value="5"]');
+            radioElement.checked = true;
+            document.getElementById('dscp_ansr3').focus();
+        }
+    
+        function selectRadio_san() {
+            var radioElement = document.querySelector('input[name="prbl_an09"][value="5"]');
+            radioElement.checked = true;
+        }	    
+	</script>
+        
+    <script type="text/javascript">
+    
+    function validateForm() {
+        // 각 항목에 대한 선택 여부 확인
+        var questions = document.querySelectorAll('.mydict');
+
+        for (var i = 0; i < questions.length; i++) {
+        	
+            var psnl_name2Value = "${DualInfo.psnl_name2}";
+            
+            if (psnl_name2Value.trim() === "") {
+            	
+                var parentTR = questions[i].closest('tr');
+                
+                // 부모 요소가 hidden 클래스를 가진 경우 해당 요소의 하위 요소를 validate에서 제외
+                if (parentTR && parentTR.classList.contains('hidden')) {
+                    continue; // validate에서 제외하고 다음 항목으로 넘어감
+                }
+            }
+        	
+            var radioButtons = questions[i].querySelectorAll('input[type="radio"]');
+            
+            if (radioButtons.length === 0) {
+                continue; // 다음 질문으로 넘어감
+            }
+            
+            var radioChecked = false;
+            
+            // 라디오 버튼 중 하나가 선택되었는지 확인
+            for (var j = 0; j < radioButtons.length; j++) {
+                if (radioButtons[j].checked) {
+                    radioChecked = true;
+                    break;
+                }
+            }
+            
+            // 라디오 버튼이 선택되지 않은 경우 알림 메시지 출력 후 제출 방지
+            if (!radioChecked) {
+                alert('항목을 선택하거나 입력해주세요.');
+                return false;
+            }
+        }
+        // 폼이 유효하면 true 반환하여 제출 진행
+        saveDual();
+    }
+
+		    /*만족도 조사 저장*/    
+		    function saveDual(obj){
+
+	        var formData = $("#dualresearch").serialize();
+	        
+	        var psnl_name2Value = "${DualInfo.psnl_name2}";
+	        
+	        if (psnl_name2Value.trim() === "") {
+	        	
+	        	formData += "&prbl_an07=0";
+	        	formData += "&prbl_an08=0";
+	        	formData += "&prbl_an09=0";
+	        	formData += "&prbl_an10=0";
+	        }
+	        
+	        $.ajax({
+	            type : "POST",
+	            async : false,
+	            url : "/dualSave",
+	            data : formData,
+	            dataType : "text",
+	            success : updateStntInfoOk
+	        });
+	    
+	        /*개인정보 수정 callback*/
+	        function updateStntInfoOk(data, status){
+	            if(data == "UPDATE_OK"){
+	                alert("상담조사 저장이 완료되었습니다.");
+	                location.href = "student_main";
+	            }else{
+	                alert("정상적으로 처리되지 않았습니다.");
+	                return;
+	            }
+	        }
+	    }
+    </script>
+
+</body>
+
+</html>

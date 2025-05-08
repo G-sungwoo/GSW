@@ -1,0 +1,989 @@
+package com.osan.portal.vo;
+
+public class SurveyInfo {
+	
+	/**/
+	private String  action;
+	
+	/* 일정 관리 */
+	private String  adpt_year;	//적용년도
+    private String  adpt_shtm;	//적용학기
+    private String  appr_flag;  //적용구분
+    private String  adpt_strt;  //적용일자
+    
+    private String appr_used;	//사용구
+
+    /* 1.강의평가 / 2.듀얼지도 / 3.만족도 체크 / 4.중간강의평가 */
+    private String  result1;
+    private String  result2;
+    private String  result3;
+    
+    /* 성적조회  */
+    private String  sbjt_name;
+    private String  staf_name;
+    private String  pobt_flag;
+    private String  totl_scor;
+    private String  lect_maks;
+    private String  lect_grad;
+    private String  cvmj_ysno;
+    private String  chkk_rult;
+    private String  exng_scor;
+	  
+	/* 강의 평가 */
+	private String  prbl_numb;
+	private String  prbl_type;
+	private String  prbl_ctnt;
+	
+	private String  sbjt_krnm;
+	private String  sprf_numb;
+	private String  sprf_krnm;
+	private String  pobt_name;
+	private String  ptyn_flag;
+	private String  ptyn_text;
+	private String  haks_numb;
+	private String  clss_numb;
+	private String  lect_pont;
+	private String  lect_type;
+	private String  lect_type_code;
+	
+	private String lect_year;
+	private String lect_shtm;
+	private String inpt_usid;
+	private String inpt_date;
+	
+	private String stnt_numb;
+	private String inpt_addr;
+	
+	private String  answers1;
+	private String  answers2;
+	private String  answers3;
+	private String  answers4;
+	private String  answers5;
+	private String  answers6;
+	private String  answers7;
+	private String  answers8;
+	private String  answers9;
+	private String  answers10;
+	private String  answers11;
+	private String  answers12;
+	private String  answers13;
+	private String  answers14;
+	private String  answers15;
+	private String  answers16;
+	private String  answers17;
+	private String  answers18;
+	private String  answers19;
+	private String  answers20;
+	private String  answers21;
+	private String  answers22;
+	private String  answers23;
+	private String  answers24;
+	private String  answers25;
+	private String  answers26;
+	private String  answers27;
+	private String  answers28;
+	private String  answers29;
+	private String  answers30;
+	private String  answers31;
+	private String  answers32;
+	private String  answers33;
+	private String  answers34;
+	private String  answers35;
+	private String  answers36;
+	private String  answers37;
+	private String  answers38;
+	private String  answers39;
+	private String  answers40;
+	private String  answers41;
+	private String  answers42;
+	private String  answers43;
+	private String  answers44;
+	private String  answers45;
+	private String  answers46;
+	private String  answers47;
+	private String  answers48;
+	private String  answers49;
+	private String  answers50;
+	private String  answers51;
+	private String  answers52;
+	private String  answers53;
+	private String  answers54;
+	private String  answers55;
+	private String  answers56;
+	private String  answers57;
+	private String  answers58;
+	private String  answers59;
+	private String  answers60;
+	private String  answers61;
+	private String  answers62;
+	private String  answers63;
+	private String  answers64;
+	private String  answers65;
+	private String  answers66;
+	private String  answers67;
+	private String  answers68;
+	private String  answers69;
+	private String  answers70;
+	private String  answers71;
+	private String  answers72;
+	private String  answers73;
+	private String  answers74;
+	private String  answers75;
+	private String  answers76;
+	private String  answers77;
+	private String  answers78;
+	private String  answers79;
+	private String  answers80;
+	private String  answers81;
+	private String  answers82;
+	private String  answers83;
+	private String  answers84;
+	private String  answers85;
+	private String  answers86;
+	private String  answers87;
+	private String  answers88;
+	private String  answers89;
+	private String  answers90;
+	private String  ansr_txt1;
+	private String  ansr_txt8;
+	private String  ansr_txt9;
+	private String  dscp_ansr;
+	
+	/* 중간강의평가 */
+	private String prbl_an01;
+	private String prbl_an02;
+	private String dscp_ansr1;
+	private String dscp_ansr2;
+	private String dscp_ansr3;
+	
+	private String inpt_ysno;
+	  
+	public String getLect_type() {
+		return lect_type;
+	}
+	public void setLect_type(String lect_type) {
+		this.lect_type = lect_type;
+	}
+	public String getPrbl_numb() {
+		return prbl_numb;
+	}
+	public void setPrbl_numb(String prbl_numb) {
+		this.prbl_numb = prbl_numb;
+	}
+	public String getPrbl_type() {
+		return prbl_type;
+	}
+	public void setPrbl_type(String prbl_type) {
+		this.prbl_type = prbl_type;
+	}
+	public String getPrbl_ctnt() {
+		return prbl_ctnt;
+	}
+	public void setPrbl_ctnt(String prbl_ctnt) {
+		this.prbl_ctnt = prbl_ctnt;
+	}
+	public String getAnswers2() {
+		return answers2;
+	}
+	public void setAnswers2(String answers2) {
+		this.answers2 = answers2;
+	}
+	public String getAnswers3() {
+		return answers3;
+	}
+	public void setAnswers3(String answers3) {
+		this.answers3 = answers3;
+	}
+	public String getAnswers4() {
+		return answers4;
+	}
+	public void setAnswers4(String answers4) {
+		this.answers4 = answers4;
+	}
+	public String getAnswers5() {
+		return answers5;
+	}
+	public void setAnswers5(String answers5) {
+		this.answers5 = answers5;
+	}
+	public String getAnswers6() {
+		return answers6;
+	}
+	public void setAnswers6(String answers6) {
+		this.answers6 = answers6;
+	}
+	public String getAnswers7() {
+		return answers7;
+	}
+	public void setAnswers7(String answers7) {
+		this.answers7 = answers7;
+	}
+	public String getAnswers8() {
+		return answers8;
+	}
+	public void setAnswers8(String answers8) {
+		this.answers8 = answers8;
+	}
+	public String getAnswers9() {
+		return answers9;
+	}
+	public void setAnswers9(String answers9) {
+		this.answers9 = answers9;
+	}
+	public String getAnswers10() {
+		return answers10;
+	}
+	public void setAnswers10(String answers10) {
+		this.answers10 = answers10;
+	}
+	public String getAnswers11() {
+		return answers11;
+	}
+	public void setAnswers11(String answers11) {
+		this.answers11 = answers11;
+	}
+	public String getAnswers12() {
+		return answers12;
+	}
+	public void setAnswers12(String answers12) {
+		this.answers12 = answers12;
+	}
+	public String getAnswers13() {
+		return answers13;
+	}
+	public void setAnswers13(String answers13) {
+		this.answers13 = answers13;
+	}
+	public String getAnswers14() {
+		return answers14;
+	}
+	public void setAnswers14(String answers14) {
+		this.answers14 = answers14;
+	}
+	public String getAnswers15() {
+		return answers15;
+	}
+	public void setAnswers15(String answers15) {
+		this.answers15 = answers15;
+	}
+	public String getAnswers16() {
+		return answers16;
+	}
+	public void setAnswers16(String answers16) {
+		this.answers16 = answers16;
+	}
+	public String getAnswers17() {
+		return answers17;
+	}
+	public void setAnswers17(String answers17) {
+		this.answers17 = answers17;
+	}
+	public String getAnswers18() {
+		return answers18;
+	}
+	public void setAnswers18(String answers18) {
+		this.answers18 = answers18;
+	}
+	public String getAnswers19() {
+		return answers19;
+	}
+	public void setAnswers19(String answers19) {
+		this.answers19 = answers19;
+	}
+	public String getAnswers20() {
+		return answers20;
+	}
+	public void setAnswers20(String answers20) {
+		this.answers20 = answers20;
+	}
+	public String getAnswers21() {
+		return answers21;
+	}
+	public void setAnswers21(String answers21) {
+		this.answers21 = answers21;
+	}
+	public String getAnswers22() {
+		return answers22;
+	}
+	public void setAnswers22(String answers22) {
+		this.answers22 = answers22;
+	}
+	public String getAnswers23() {
+		return answers23;
+	}
+	public void setAnswers23(String answers23) {
+		this.answers23 = answers23;
+	}
+	public String getAnswers24() {
+		return answers24;
+	}
+	public void setAnswers24(String answers24) {
+		this.answers24 = answers24;
+	}
+	public String getAnswers25() {
+		return answers25;
+	}
+	public void setAnswers25(String answers25) {
+		this.answers25 = answers25;
+	}
+	public String getAnswers26() {
+		return answers26;
+	}
+	public void setAnswers26(String answers26) {
+		this.answers26 = answers26;
+	}
+	public String getAnswers27() {
+		return answers27;
+	}
+	public void setAnswers27(String answers27) {
+		this.answers27 = answers27;
+	}
+	public String getAnswers28() {
+		return answers28;
+	}
+	public void setAnswers28(String answers28) {
+		this.answers28 = answers28;
+	}
+	public String getAnswers29() {
+		return answers29;
+	}
+	public void setAnswers29(String answers29) {
+		this.answers29 = answers29;
+	}
+	public String getAnswers30() {
+		return answers30;
+	}
+	public void setAnswers30(String answers30) {
+		this.answers30 = answers30;
+	}
+	public String getAnswers31() {
+		return answers31;
+	}
+	public void setAnswers31(String answers31) {
+		this.answers31 = answers31;
+	}
+	public String getAnswers32() {
+		return answers32;
+	}
+	public void setAnswers32(String answers32) {
+		this.answers32 = answers32;
+	}
+	public String getAnswers33() {
+		return answers33;
+	}
+	public void setAnswers33(String answers33) {
+		this.answers33 = answers33;
+	}
+	public String getAnswers34() {
+		return answers34;
+	}
+	public void setAnswers34(String answers34) {
+		this.answers34 = answers34;
+	}
+	public String getAnswers35() {
+		return answers35;
+	}
+	public void setAnswers35(String answers35) {
+		this.answers35 = answers35;
+	}
+	public String getAnswers36() {
+		return answers36;
+	}
+	public void setAnswers36(String answers36) {
+		this.answers36 = answers36;
+	}
+	public String getAnswers37() {
+		return answers37;
+	}
+	public void setAnswers37(String answers37) {
+		this.answers37 = answers37;
+	}
+	public String getAnswers38() {
+		return answers38;
+	}
+	public void setAnswers38(String answers38) {
+		this.answers38 = answers38;
+	}
+	public String getAnswers39() {
+		return answers39;
+	}
+	public void setAnswers39(String answers39) {
+		this.answers39 = answers39;
+	}
+	public String getAnswers40() {
+		return answers40;
+	}
+	public void setAnswers40(String answers40) {
+		this.answers40 = answers40;
+	}
+	public String getAnswers41() {
+		return answers41;
+	}
+	public void setAnswers41(String answers41) {
+		this.answers41 = answers41;
+	}
+	public String getAnswers42() {
+		return answers42;
+	}
+	public void setAnswers42(String answers42) {
+		this.answers42 = answers42;
+	}
+	public String getAnswers43() {
+		return answers43;
+	}
+	public void setAnswers43(String answers43) {
+		this.answers43 = answers43;
+	}
+	public String getAnswers44() {
+		return answers44;
+	}
+	public void setAnswers44(String answers44) {
+		this.answers44 = answers44;
+	}
+	public String getAnswers45() {
+		return answers45;
+	}
+	public void setAnswers45(String answers45) {
+		this.answers45 = answers45;
+	}
+	public String getAnswers46() {
+		return answers46;
+	}
+	public void setAnswers46(String answers46) {
+		this.answers46 = answers46;
+	}
+	public String getAnswers47() {
+		return answers47;
+	}
+	public void setAnswers47(String answers47) {
+		this.answers47 = answers47;
+	}
+	public String getAnswers48() {
+		return answers48;
+	}
+	public void setAnswers48(String answers48) {
+		this.answers48 = answers48;
+	}
+	public String getAnswers49() {
+		return answers49;
+	}
+	public void setAnswers49(String answers49) {
+		this.answers49 = answers49;
+	}
+	public String getAnswers50() {
+		return answers50;
+	}
+	public void setAnswers50(String answers50) {
+		this.answers50 = answers50;
+	}
+	public String getAnswers51() {
+		return answers51;
+	}
+	public void setAnswers51(String answers51) {
+		this.answers51 = answers51;
+	}
+	public String getAnswers52() {
+		return answers52;
+	}
+	public void setAnswers52(String answers52) {
+		this.answers52 = answers52;
+	}
+	public String getAnswers53() {
+		return answers53;
+	}
+	public void setAnswers53(String answers53) {
+		this.answers53 = answers53;
+	}
+	public String getAnswers54() {
+		return answers54;
+	}
+	public void setAnswers54(String answers54) {
+		this.answers54 = answers54;
+	}
+	public String getAnswers55() {
+		return answers55;
+	}
+	public void setAnswers55(String answers55) {
+		this.answers55 = answers55;
+	}
+	public String getAnswers56() {
+		return answers56;
+	}
+	public void setAnswers56(String answers56) {
+		this.answers56 = answers56;
+	}
+	public String getAnswers57() {
+		return answers57;
+	}
+	public void setAnswers57(String answers57) {
+		this.answers57 = answers57;
+	}
+	public String getAnswers58() {
+		return answers58;
+	}
+	public void setAnswers58(String answers58) {
+		this.answers58 = answers58;
+	}
+	public String getAnswers59() {
+		return answers59;
+	}
+	public void setAnswers59(String answers59) {
+		this.answers59 = answers59;
+	}
+	public String getAnswers60() {
+		return answers60;
+	}
+	public void setAnswers60(String answers60) {
+		this.answers60 = answers60;
+	}
+	public String getAnswers61() {
+		return answers61;
+	}
+	public void setAnswers61(String answers61) {
+		this.answers61 = answers61;
+	}
+	public String getAnswers62() {
+		return answers62;
+	}
+	public void setAnswers62(String answers62) {
+		this.answers62 = answers62;
+	}
+	public String getAnswers63() {
+		return answers63;
+	}
+	public void setAnswers63(String answers63) {
+		this.answers63 = answers63;
+	}
+	public String getAnswers64() {
+		return answers64;
+	}
+	public void setAnswers64(String answers64) {
+		this.answers64 = answers64;
+	}
+	public String getAnswers65() {
+		return answers65;
+	}
+	public void setAnswers65(String answers65) {
+		this.answers65 = answers65;
+	}
+	public String getAnswers66() {
+		return answers66;
+	}
+	public void setAnswers66(String answers66) {
+		this.answers66 = answers66;
+	}
+	public String getAnswers67() {
+		return answers67;
+	}
+	public void setAnswers67(String answers67) {
+		this.answers67 = answers67;
+	}
+	public String getAnswers68() {
+		return answers68;
+	}
+	public void setAnswers68(String answers68) {
+		this.answers68 = answers68;
+	}
+	public String getAnswers69() {
+		return answers69;
+	}
+	public void setAnswers69(String answers69) {
+		this.answers69 = answers69;
+	}
+	public String getAnswers70() {
+		return answers70;
+	}
+	public void setAnswers70(String answers70) {
+		this.answers70 = answers70;
+	}
+	public String getAnswers71() {
+		return answers71;
+	}
+	public void setAnswers71(String answers71) {
+		this.answers71 = answers71;
+	}
+	public String getAnswers72() {
+		return answers72;
+	}
+	public void setAnswers72(String answers72) {
+		this.answers72 = answers72;
+	}
+	public String getAnswers73() {
+		return answers73;
+	}
+	public void setAnswers73(String answers73) {
+		this.answers73 = answers73;
+	}
+	public String getAnswers74() {
+		return answers74;
+	}
+	public void setAnswers74(String answers74) {
+		this.answers74 = answers74;
+	}
+	public String getAnswers75() {
+		return answers75;
+	}
+	public void setAnswers75(String answers75) {
+		this.answers75 = answers75;
+	}
+	public String getAnswers76() {
+		return answers76;
+	}
+	public void setAnswers76(String answers76) {
+		this.answers76 = answers76;
+	}
+	public String getAnswers77() {
+		return answers77;
+	}
+	public void setAnswers77(String answers77) {
+		this.answers77 = answers77;
+	}
+	public String getAnswers78() {
+		return answers78;
+	}
+	public void setAnswers78(String answers78) {
+		this.answers78 = answers78;
+	}
+	public String getAnswers79() {
+		return answers79;
+	}
+	public void setAnswers79(String answers79) {
+		this.answers79 = answers79;
+	}
+	public String getAnswers80() {
+		return answers80;
+	}
+	public void setAnswers80(String answers80) {
+		this.answers80 = answers80;
+	}
+	public String getAnswers81() {
+		return answers81;
+	}
+	public void setAnswers81(String answers81) {
+		this.answers81 = answers81;
+	}
+	public String getInpt_addr() {
+		return inpt_addr;
+	}
+	public void setInpt_addr(String inpt_addr) {
+		this.inpt_addr = inpt_addr;
+	}
+	public String getStnt_numb() {
+		return stnt_numb;
+	}
+	public void setStnt_numb(String stnt_numb) {
+		this.stnt_numb = stnt_numb;
+	}
+	public String getAnsr_txt1() {
+		return ansr_txt1;
+	}
+	public void setAnsr_txt1(String ansr_txt1) {
+		this.ansr_txt1 = ansr_txt1;
+	}
+	public String getLect_year() {
+		return lect_year;
+	}
+	public void setLect_year(String lect_year) {
+		this.lect_year = lect_year;
+	}
+	public String getLect_shtm() {
+		return lect_shtm;
+	}
+	public void setLect_shtm(String lect_shtm) {
+		this.lect_shtm = lect_shtm;
+	}
+	public String getInpt_usid() {
+		return inpt_usid;
+	}
+	public void setInpt_usid(String inpt_usid) {
+		this.inpt_usid = inpt_usid;
+	}
+	public String getInpt_date() {
+		return inpt_date;
+	}
+	public void setInpt_date(String inpt_date) {
+		this.inpt_date = inpt_date;
+	}
+	public String getAnswers82() {
+		return answers82;
+	}
+	public void setAnswers82(String answers82) {
+		this.answers82 = answers82;
+	}
+	public String getAnswers83() {
+		return answers83;
+	}
+	public void setAnswers83(String answers83) {
+		this.answers83 = answers83;
+	}
+	public String getAnswers84() {
+		return answers84;
+	}
+	public void setAnswers84(String answers84) {
+		this.answers84 = answers84;
+	}
+	public String getAnswers85() {
+		return answers85;
+	}
+	public void setAnswers85(String answers85) {
+		this.answers85 = answers85;
+	}
+	public String getSbjt_krnm() {
+		return sbjt_krnm;
+	}
+	public void setSbjt_krnm(String sbjt_krnm) {
+		this.sbjt_krnm = sbjt_krnm;
+	}
+	public String getSprf_numb() {
+		return sprf_numb;
+	}
+	public void setSprf_numb(String sprf_numb) {
+		this.sprf_numb = sprf_numb;
+	}
+	public String getSprf_krnm() {
+		return sprf_krnm;
+	}
+	public void setSprf_krnm(String sprf_krnm) {
+		this.sprf_krnm = sprf_krnm;
+	}
+	public String getPobt_name() {
+		return pobt_name;
+	}
+	public void setPobt_name(String pobt_name) {
+		this.pobt_name = pobt_name;
+	}
+	public String getPtyn_flag() {
+		return ptyn_flag;
+	}
+	public void setPtyn_flag(String ptyn_flag) {
+		this.ptyn_flag = ptyn_flag;
+	}
+	public String getHaks_numb() {
+		return haks_numb;
+	}
+	public void setHaks_numb(String haks_numb) {
+		this.haks_numb = haks_numb;
+	}
+	public String getClss_numb() {
+		return clss_numb;
+	}
+	public void setClss_numb(String clss_numb) {
+		this.clss_numb = clss_numb;
+	}
+	public String getLect_pont() {
+		return lect_pont;
+	}
+	public void setLect_pont(String lect_pont) {
+		this.lect_pont = lect_pont;
+	}
+	public String getAdpt_year() {
+		return adpt_year;
+	}
+	public void setAdpt_year(String adpt_year) {
+		this.adpt_year = adpt_year;
+	}
+	public String getAdpt_shtm() {
+		return adpt_shtm;
+	}
+	public void setAdpt_shtm(String adpt_shtm) {
+		this.adpt_shtm = adpt_shtm;
+	}
+	public String getAppr_flag() {
+		return appr_flag;
+	}
+	public void setAppr_flag(String appr_flag) {
+		this.appr_flag = appr_flag;
+	}
+	public String getLect_type_code() {
+		return lect_type_code;
+	}
+	public void setLect_type_code(String lect_type_code) {
+		this.lect_type_code = lect_type_code;
+	}
+	public String getAction() {
+		return action;
+	}
+	public void setAction(String action) {
+		this.action = action;
+	}
+	public String getDscp_ansr() {
+		return dscp_ansr;
+	}
+	public void setDscp_ansr(String dscp_ansr) {
+		this.dscp_ansr = dscp_ansr;
+	}
+	public String getAnswers1() {
+		return answers1;
+	}
+	public void setAnswers1(String answers1) {
+		this.answers1 = answers1;
+	}
+	public String getPtyn_text() {
+		return ptyn_text;
+	}
+	public void setPtyn_text(String ptyn_text) {
+		this.ptyn_text = ptyn_text;
+	}
+	public String getSbjt_name() {
+		return sbjt_name;
+	}
+	public void setSbjt_name(String sbjt_name) {
+		this.sbjt_name = sbjt_name;
+	}
+	public String getStaf_name() {
+		return staf_name;
+	}
+	public void setStaf_name(String staf_name) {
+		this.staf_name = staf_name;
+	}
+	public String getPobt_flag() {
+		return pobt_flag;
+	}
+	public void setPobt_flag(String pobt_flag) {
+		this.pobt_flag = pobt_flag;
+	}
+	public String getTotl_scor() {
+		return totl_scor;
+	}
+	public void setTotl_scor(String totl_scor) {
+		this.totl_scor = totl_scor;
+	}
+	public String getLect_maks() {
+		return lect_maks;
+	}
+	public void setLect_maks(String lect_maks) {
+		this.lect_maks = lect_maks;
+	}
+	public String getLect_grad() {
+		return lect_grad;
+	}
+	public void setLect_grad(String lect_grad) {
+		this.lect_grad = lect_grad;
+	}
+	public String getChkk_rult() {
+		return chkk_rult;
+	}
+	public void setChkk_rult(String chkk_rult) {
+		this.chkk_rult = chkk_rult;
+	}
+	public String getExng_scor() {
+		return exng_scor;
+	}
+	public void setExng_scor(String exng_scor) {
+		this.exng_scor = exng_scor;
+	}
+	public String getCvmj_ysno() {
+		return cvmj_ysno;
+	}
+	public void setCvmj_ysno(String cvmj_ysno) {
+		this.cvmj_ysno = cvmj_ysno;
+	}
+	public String getAdpt_strt() {
+		return adpt_strt;
+	}
+	public void setAdpt_strt(String adpt_strt) {
+		this.adpt_strt = adpt_strt;
+	}
+	public String getResult1() {
+		return result1;
+	}
+	public void setResult1(String result1) {
+		this.result1 = result1;
+	}
+	public String getResult2() {
+		return result2;
+	}
+	public void setResult2(String result2) {
+		this.result2 = result2;
+	}
+	public String getResult3() {
+		return result3;
+	}
+	public void setResult3(String result3) {
+		this.result3 = result3;
+	}
+	public String getAppr_used() {
+		return appr_used;
+	}
+	public void setAppr_used(String appr_used) {
+		this.appr_used = appr_used;
+	}
+	public String getDscp_ansr1() {
+		return dscp_ansr1;
+	}
+	public void setDscp_ansr1(String dscp_ansr1) {
+		this.dscp_ansr1 = dscp_ansr1;
+	}
+	public String getDscp_ansr3() {
+		return dscp_ansr3;
+	}
+	public void setDscp_ansr3(String dscp_ansr3) {
+		this.dscp_ansr3 = dscp_ansr3;
+	}
+	public String getDscp_ansr2() {
+		return dscp_ansr2;
+	}
+	public void setDscp_ansr2(String dscp_ansr2) {
+		this.dscp_ansr2 = dscp_ansr2;
+	}
+	public String getPrbl_an01() {
+		return prbl_an01;
+	}
+	public void setPrbl_an01(String prbl_an01) {
+		this.prbl_an01 = prbl_an01;
+	}
+	public String getPrbl_an02() {
+		return prbl_an02;
+	}
+	public void setPrbl_an02(String prbl_an02) {
+		this.prbl_an02 = prbl_an02;
+	}
+	public String getAnswers86() {
+		return answers86;
+	}
+	public void setAnswers86(String answers86) {
+		this.answers86 = answers86;
+	}
+	public String getAnswers87() {
+		return answers87;
+	}
+	public void setAnswers87(String answers87) {
+		this.answers87 = answers87;
+	}
+	public String getAnswers88() {
+		return answers88;
+	}
+	public void setAnswers88(String answers88) {
+		this.answers88 = answers88;
+	}
+	public String getAnswers89() {
+		return answers89;
+	}
+	public void setAnswers89(String answers89) {
+		this.answers89 = answers89;
+	}
+	public String getAnswers90() {
+		return answers90;
+	}
+	public void setAnswers90(String answers90) {
+		this.answers90 = answers90;
+	}
+	public String getAnsr_txt8() {
+		return ansr_txt8;
+	}
+	public void setAnsr_txt8(String ansr_txt8) {
+		this.ansr_txt8 = ansr_txt8;
+	}
+	public String getAnsr_txt9() {
+		return ansr_txt9;
+	}
+	public void setAnsr_txt9(String ansr_txt9) {
+		this.ansr_txt9 = ansr_txt9;
+	}
+	public String getInpt_ysno() {
+		return inpt_ysno;
+	}
+	public void setInpt_ysno(String inpt_ysno) {
+		this.inpt_ysno = inpt_ysno;
+	}
+}

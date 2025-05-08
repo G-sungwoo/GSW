@@ -1,0 +1,89 @@
+package com.osan.portal.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.osan.portal.vo.DualResearchInfo;
+import com.osan.portal.vo.LoginInfo;
+import com.osan.portal.vo.StudentSearchInfo;
+import com.osan.portal.vo.SurveyInfo;
+
+public interface StudentService {
+
+	public StudentSearchInfo selectStudentInfo(StudentSearchInfo studentSearchInfo);
+	
+	public StudentSearchInfo selectStudentChange(StudentSearchInfo studentSearchInfo);
+
+	public StudentSearchInfo getStudentInfo(StudentSearchInfo studentSearchInfo);
+
+	public StudentSearchInfo getHakgi();
+
+	public List<StudentSearchInfo> getSchedule(StudentSearchInfo lectInfo);
+
+	public List<StudentSearchInfo> getScheduleInfo(StudentSearchInfo lectInfo);
+
+	public List<StudentSearchInfo> getCourInfo(StudentSearchInfo gradeInfo);
+
+	public StudentSearchInfo getTotalGrade(StudentSearchInfo gradeInfo);
+
+	public List<StudentSearchInfo> getGradeList(StudentSearchInfo gradeInfo);
+
+	public StudentSearchInfo getTuitHakgi();
+
+	public List<StudentSearchInfo> getSchoInfo(StudentSearchInfo tuitInfo);
+
+	public StudentSearchInfo getTuitInfo(StudentSearchInfo tuitInfo);
+
+	public List<StudentSearchInfo> getTuitList(StudentSearchInfo tuitInfo);
+
+	public int updateStntInfo(StudentSearchInfo studentSearchInfo);
+
+	public StudentSearchInfo getOffInfo(StudentSearchInfo studentInfo);
+
+	public StudentSearchInfo getApplySchedule();
+
+	public int SaveSurveyData_B02049(SurveyInfo surveyInfo);
+	
+	public int SaveSurveyData_B02050(SurveyInfo surveyInfo);
+
+	public List<StudentSearchInfo> getSurveyQInfo(StudentSearchInfo surveyInfo);
+	
+	public List<StudentSearchInfo> getSurveyAInfo(StudentSearchInfo surveyInfo);
+
+	public SurveyInfo getCourAppr();
+
+	public List<SurveyInfo> getCourApprList(SurveyInfo courInfo);
+
+	public int SaveCourAppryData(SurveyInfo surveyInfo);
+
+	public SurveyInfo getGradeSchedule();
+
+	public List<SurveyInfo> getGradeCheck_survey(SurveyInfo gradeInfo);
+
+	public List<SurveyInfo> getGradeCheck(SurveyInfo gradeInfo);
+
+	public SurveyInfo getCheckAnswer(SurveyInfo gradeInfo);
+
+	public DualResearchInfo getStudInfo(DualResearchInfo dualInfo);
+
+	public int SaveDualData(DualResearchInfo dualResearchInfo);
+
+	public SurveyInfo getMidTerm();
+
+	public int SaveMidData(SurveyInfo surveyInfo);
+
+	public List<SurveyInfo> getMidTermList(SurveyInfo courInfo);
+	
+	public Map selectListAcademicSchedule(LoginInfo loginInfo);
+	
+	public LoginInfo selectUser(LoginInfo loginInfo);
+	
+	public String selectEncPassword(LoginInfo loginInfo);
+	
+	public LoginInfo selectUserForFindPassword(LoginInfo loginInfo);
+	
+	public int updateUserPassword(LoginInfo loginInfo);
+	
+	public int updateStntUserPassword(LoginInfo loginInfo);
+}
+

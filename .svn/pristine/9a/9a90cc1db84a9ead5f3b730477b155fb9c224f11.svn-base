@@ -1,0 +1,86 @@
+/* common */
+html ,body {min-height:100%; }
+body {font:14px "nanum";}
+a {text-decoration:none; color: rgb(80, 80, 80);}
+a:hover {}
+.auto {width:1278px; margin:auto;}
+.auto_sub { }
+.sub_con {margin: 0 auto; display: table;}
+.common_sub {height: 500px; min-width:1278px; }
+
+/* header */
+.header_wrap {position:absolute; z-index:999;  /* transform: translateX(-50%); left: 50%;  */ margin: 0px auto; left:0; right : 0; padding-top: 20px; width: 1278px;}
+.header {background: #FFF; border-top:1px solid #8E8E8E; border-bottom:1px solid #8E8E8E;}
+.header .logo {text-align: center;}
+.header .logo img {width: 250px; height: 60px;}
+.header .logo a {}
+.header > .gnb  {overflow:hidden;}
+.header > .gnb > li  {float:left; width:115px; height:70px; overflow:hidden; line-height:40px; background: #fff;}
+.header > .gnb > li:nth-child(1)  {float:left; width:250px; height:70px;  overflow:hidden; padding-left: 92px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16), 0 2px 10px rgba(0, 0, 0, 0.12);}
+.header > .gnb > li:last-child {/* padding-right: 100px; */}
+.header > .gnb > li > a   {display:block; font-size:16px; color: rgb(80, 80, 80); font-family:"nanumB"; text-align:center; padding-top:15px;
+	-webkit-transition: all .3s ease .15s;
+	-moz-transition: all .3s ease .15s;
+	-o-transition: all .3s ease .15s;
+	-ms-transition: all .3s ease .15s;
+	transition: all .3s ease .15s;}
+.header > .gnb > li ul { opacity:0; visibility: hidden; overflow:hidden; /* 평상시에는 서브메뉴가 안보이게 하기 */ padding:0px; margin-top:15px; border:0px; position:absolute;  z-index:999;
+	-webkit-transition: opacity .25s ease .1s;
+	-moz-transition: opacity .25s ease .1s;
+	-o-transition: opacity .25s ease .1s;
+	-ms-transition: opacity .25s ease .1s;
+	transition: opacity .25s ease .1s;}
+.header > .gnb > li ul li {text-align: center; width:90px; height: 35px; border-bottom:1px solid #1b478b; border-top:1px solid #1b478b; background: rgba(255, 255, 255,1); padding: 10px;
+	-webkit-transition: all .2s ease 15s;
+	-moz-transition: all .2s ease .15s;
+	-o-transition: all .2s ease .15s;
+	-ms-transition: all .2s ease .15s;
+	transition: all .2s ease .15s;}
+.header > .gnb > li ul li a {font-size:16px; color: rgb(255, 255, 255); font-family:"nanumB"; padding-top:15px; color: rgb(80,80,80);}
+.header > .gnb > li:hover ul {opacity:1; visibility: visible; overflow: visible;}
+.header > .gnb > li:hover > a,.header #gnb > li.on > a   {color:#fff; }
+.header > .gnb > li:hover ,.header #gnb > li.on    {background-color: rgba(27, 71, 139,0.7);}
+.header > .gnb > li:nth-child(1):hover{background: #fff;}
+.header > .gnb > li .sub  {display:none;}
+
+/* social_menu */
+.header_top .social_menu { top:0; right:0; float: right; margin-bottom: 20px;}
+.header_top .social_menu li {float:left; margin-left:5px;}
+.header_top .info > a { 
+	color: #FFF; 
+	font-size: 17px; 
+	line-height: 45px; 
+	background-color: rgba(27, 71, 139,0.7);
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16), 0 2px 10px rgba(0, 0, 0, 0.12); }
+.header_top .info > span { color: #FFF; font-size: 17px; line-height: 45px; padding-right: 10px; }
+
+
+/* footer */
+.footer_wrap {/* overflow:hidden; */}
+.footer  {text-align:center; font-size:15px; line-height:150%; color:#fff; opacity:0.7; background: #666666; min-width: 1278px; width: 100%; height: 170px;}
+.footer_sub {color:#9fa6af;}
+.footer_sub .copy {color:#abb1ba; font-size:14px; opacity:0.35; margin-top:5px;}
+.footer_sub .f_logo {padding-left:310px;}
+.footer ul li {width: 250px; height:180px;  float: left; padding: 10px; margin: 0px 24px;}
+.footer ul li a {color: #fff;}
+.footer_new {
+	width: 500px;
+	margin: 0px auto;
+	padding: 30px;
+}
+.footer_top {background:#E8E8E8; text-align: center; padding: 15px; }
+.footer_top_sub { display: inline-block; margin: 0px auto;}
+.footer_top_sub ul li{
+	float: left;
+	padding: 10px 40px;
+	border-right: 1px solid #505050;
+	color: #505050;
+}
+.footer_top_sub ul li:last-child{
+	border-right: 0px;
+}
+
+/*  black_cover */
+
+.black_cover {width:100%; height:100%; top:0; background:#000; opacity:0.5; position:fixed;}

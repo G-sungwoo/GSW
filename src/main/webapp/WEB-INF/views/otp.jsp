@@ -1,0 +1,116 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page session="false" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<html>
+<head>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;">
+    <meta name="viewport" content="width=device-width,user-scalable=yes">
+    <meta name="keywords" content="오산대학교, 오산대 포탈, 오산대, 포탈" />
+    <meta name="description" content="오산대학교 포탈" />
+    <meta name="author" content="오산대학교" />
+    <link rel="icon" type="image/png"  href="resources/img/favicon.ico"/>
+    <title>오산대학교 포탈</title>
+    <script src="resources/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+    <script src="resources/js/jquery-ui.min.js" type="text/javascript"></script>
+    <link type="text/css" href="resources/css/layout.css" rel="stylesheet" />
+    <script type="text/javascript" src="resources/js/login.js"></script>
+    <script type="text/javascript" src="resources/js/common.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+    	$('#confirmOtp').focus();
+        $("#confirmOtp").keydown(function(key) {
+            if(key.keyCode == 13){
+            	checkOtp();
+            }
+        });
+    });
+    /*otp 확인*/
+    function checkOtp(){
+        var confirmOtp = $("#confirmOtp").val();
+                var formData = $("#userPasswordForm").serialize() + '&api_type=verify';
+                $.ajax({
+                    type : "POST",
+                    async : false,
+                    url : "/checkOtpNew",
+                    data : formData,
+                    dataType : "json",
+                    success : checkOtpOk,
+                    error : checkOtpError
+                });
+    }
+    /*Pin 코드 확인*/
+    function getPinCode(){
+        var confirmOtp = $("#confirmOtp").val();
+                var formData = $("#userPasswordForm").serialize() + '&api_type=otp_pin';
+                $.ajax({
+                    type : "POST",
+                    async : false,
+                    url : "/checkOtpNew",
+                    data : formData,
+                    dataType : "json",
+                    success : getPinCodeOK,
+                    error : getPinCodeError
+                });
+    }
+    /*otp확인 callback*/
+    function checkOtpOk(response){
+        alert("인증되었습니다.");
+        opener.parent.login();
+        window.self.close();
+    }
+    /*otp확인 callback*/
+    function checkOtpError(response){
+         alert("OTP인증에 실패했습니다. 문의: 정보전산원 031-370-2624");
+         return;
+    }
+    /*pin code확인 callback*/
+    function getPinCodeOK(response){
+        alert("생성된 Pin Code는 [" + response.dataMap.otp_pin + "] 입니다. OTP앱에 입력해주세요.");
+    }
+    /*pin code확인 callback*/
+    function getPinCodeError(response){
+        alert("Pin Code 생성에 실패했습니다. 문의: 정보전산원 031-370-2624");
+        return;
+    }
+    </script>
+</head>
+<body>
+    <div class="login_img">
+        <ul>
+            <li style="background-image:url('resources/img/login_bg.jpg')"></li>
+            <li style="background-image:url('resources/img/login_bg2.jpg')"></li>
+        </ul>
+        <ol>
+            <li><a href="javascript:;" class="on">1</a></li>
+            <li><a href="javascript:;" >2</a></li>
+        </ol>
+    </div>
+    <div class="login_box">
+        <div style="background:url('resources/img/opred.png') repeat">
+            <img src="resources/img/osanlogo.png" ><br/><br/>
+            <form action="" method="post" name="userPasswordForm" id="userPasswordForm">
+                <p>OTP 코드를 입력해주십시오.</p>
+                <ul>
+                    <li><input type="input" name="confirmOtp" id="confirmOtp" value="" placeholder= "OTP 코드 입력" class="pw" /></li>
+                </ul>
+                <ol>
+                    <li><button type="button" onclick="checkOtp();" style="background:#ed2370;color:#fff;">확인</button></li>
+                    <li><a href="resources/img/OTP사용자매뉴얼.pdf" target="_blank" style="background:#ed2370;color:#fff;">OTP 사용자 매뉴얼</a></li>
+                </ol>
+                <br/>
+                <ul>
+                <li style="margin-top: 60px;">
+                <p><font color="red">OTP 앱 설치 및 사용방법: 상단의 [OTP 사용자 매뉴얼] 참조해주세요</font></p>
+                <button type="button" onclick="getPinCode();" style="background:#ed2370;color:#fff;margin-bottom: 0px;padding: 10px">Pin Code 등록</button></li>
+                <p>Pin Code는 OTP앱 설치후 최초 1회만 등록하시면 됩니다.</p>
+                </ul>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

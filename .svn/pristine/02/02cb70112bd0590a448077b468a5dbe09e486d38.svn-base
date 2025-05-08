@@ -1,0 +1,56 @@
+<%@ page contentType="text/html; charset=euc-kr" %>
+<%@ page import="com.ksign.access.api.*" %>
+<%
+	String uid = request.getParameter("uid");
+    	String passwd = request.getParameter("password");
+//	String mac_add = request.getParameter("mac");
+	String mac_add = "";
+
+
+	/**
+	 * 1. 아이디/패스워드 검증
+	 */
+	if(uid != null && passwd != null){
+		out.println("Login Success.");
+	}else{
+		out.println("Login Failure.");
+	}
+
+	SSORspData rspData = null;
+
+	session.setAttribute("uid", uid);
+	session.setAttribute("ip", request.getRemoteAddr());
+
+	/**
+	 * 2. SSO 서비스 객체를 얻어 온다.
+	 */
+	SSOService ssoService = SSOService.getInstance();
+
+	String clientIP = request.getRemoteAddr();
+
+	/**
+	 * 3. 인증 토큰 생성을 요청한다.
+	 */
+	rspData = ssoService.ssoReqIssueToken(request,	                        // 서블릿 요청 객체
+        				      response,				// 서블릿 응답 객체
+                                              "form-based",			// 인증 방법
+                                              uid,				// 아이디
+                                              "",			// 이름 (optional, "")
+                                              "",		// 주민번호
+                                              "http://portal.osan.ac.kr/osansso/index.jsp", // return url
+                                              request.getRemoteAddr(),		// client ip
+                                              "211.221.231.13");			// agent ip
+
+//response.sendRedirect("test.jsp");
+
+%>
+<html>
+<head>
+<title>
+login_proc
+</title>
+</head>
+<body bgcolor="#ffffff">
+
+</body>
+</html>

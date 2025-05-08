@@ -1,0 +1,223 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="/WEB-INF/views/jstl.jsp"%>
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/student_main">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">학생정보시스템</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="/student_main">
+                    <i class="fas fa-fw fa-home"></i>
+                    <span>메인화면</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                학생정보
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseStudent"
+                    aria-expanded="true" aria-controls="collapseStudent">
+                    <i class="fas fa-fw fa-user"></i>
+                    <span><spring:message code="left.menu1" /></span>
+                </a>
+                <div id="collapseStudent" class="collapse menu1" aria-labelledby="headingStudent" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header"><spring:message code="left.menu1.sub1" /></h6>
+                        <a class="collapse-item" href="/regiBase"><spring:message code="left.menu1.sub1.name1" /></a>
+                        <h6 class="collapse-header"><spring:message code="left.menu1.sub2" /></h6>
+                        <a class="collapse-item" href="/regiApply"><spring:message code="left.menu1.sub2.name1" /></a>
+                    </div>
+                </div>
+            </li>
+
+            
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                수업정보
+            </div>
+
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCours"
+                    aria-expanded="true" aria-controls="collapseCours">
+                    <i class="fas fa-fw fa-th-list"></i>
+                    <span><spring:message code="left.menu2" /></span>
+                </a>
+                <div id="collapseCours" class="collapse menu2" aria-labelledby="headingCours"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">수강내역:</h6>
+                        <a class="collapse-item" href="/lectSchedule">개인수업시간표조회</a>
+                        <h6 class="collapse-header">강의평가:</h6>
+                        <a class="collapse-item" href="/courAppr">강의평가</a>
+                        <a class="collapse-item" href="/dualresearch">듀얼지도상담조사</a>
+                        <a class="collapse-item" href="/survey">만족도조사(2학기)</a>
+                        <a class="collapse-item" href="/midTerm">중간강의평가(의견수렴)</a>
+                        <!--
+                        <h6 class="collapse-header">수강신청:</h6>
+                        <a class="collapse-item" href="utilities-color.html">수강신청</a>
+                        <h6 class="collapse-header">특별강좌:</h6>
+                        <a class="collapse-item" href="utilities-color.html">특별강좌 수강신청</a>
+                         -->
+                    </div>
+                </div>
+            </li>
+            
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                성적정보
+            </div>            
+
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseScore"
+                    aria-expanded="true" aria-controls="collapseScore">
+                    <i class="fas fa-fw fa-clipboard"></i>
+                    <span><spring:message code="left.menu3" /></span>
+                </a>
+                <div id="collapseScore" class="collapse menu3" aria-labelledby="headingScore"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">성적조회:</h6>
+                        <a class="collapse-item" href="gradeCheck">금학기성적조회</a>
+                        <a class="collapse-item" href="utilities-border.html">성적이의신청</a>
+                        <h6 class="collapse-header">전체성적:</h6>
+                        <a class="collapse-item" href="/totalGrade.do">누적성적조회</a>
+                        <h6 class="collapse-header">성적변경 및 삭제:</h6>
+                        <a class="collapse-item" href="utilities-color.html">학기포기처리</a>
+                        <a class="collapse-item" href="utilities-color.html">학기포기원출력</a>
+                    </div>
+                </div>
+            </li>
+<%--
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                            장학정보(미사용)
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseJanghak"
+                    aria-expanded="true" aria-controls="collapseJanghak">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span><spring:message code="left.menu4" /></span>
+                </a>
+                <div id="collapseJanghak" class="collapse menu4" aria-labelledby="headingJanghak" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">일반공로관리:</h6>
+                        <a class="collapse-item" href="buttons.html">일반공로출근부</a>
+                        <h6 class="collapse-header">기초정보관리:</h6>
+                        <a class="collapse-item" href="cards.html">학생계좌등록</a>
+                    </div>
+                </div>
+            </li>      
+ --%>
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                등록정보
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRegist"
+                    aria-expanded="true" aria-controls="collapseRegist">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span><spring:message code="left.menu5" /></span>
+                </a>
+                <div id="collapseRegist" class="collapse menu5" aria-labelledby="headingRegist" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">등록대상자관리:</h6>
+                        <a class="collapse-item" href="/tuitInfo.do">등록금고지서</a>
+                    </div>
+                </div>
+            </li>
+<%--
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Addons
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
+                    aria-expanded="true" aria-controls="collapsePages">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>Pages</span>
+                </a>
+                <div id="collapsePages" class="collapse menu6" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Login Screens:</h6>
+                        <a class="collapse-item" href="login.html">Login</a>
+                        <a class="collapse-item" href="register.html">Register</a>
+                        <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
+                        <div class="collapse-divider"></div>
+                        <h6 class="collapse-header">Other Pages:</h6>
+                        <a class="collapse-item" href="404.html">404 Page</a>
+                        <a class="collapse-item" href="blank.html">Blank Page</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Charts -->
+            <li class="nav-item">
+                <a class="nav-link" href="charts.html">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Charts</span></a>
+            </li>
+
+            <!-- Nav Item - Tables -->
+            <li class="nav-item">
+                <a class="nav-link" href="tables.html">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Tables</span></a>
+            </li>
+ --%>
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+            <!-- Sidebar Message -->
+            <div class="sidebar-card d-none d-lg-flex">
+                <img class="sidebar-card-illustration mb-2" src="/resources/img/undraw_rocket.svg" alt="...">
+                <p class="text-center mb-2"><strong>SB Admin Pro</strong> is packed with premium features, components, and more!</p>
+                <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">Upgrade to Pro!</a>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->

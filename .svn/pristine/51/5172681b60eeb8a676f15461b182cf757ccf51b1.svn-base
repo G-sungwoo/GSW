@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Cache-Control" content="no-store"/>
+	<meta http-equiv="Pragma" content="no-cache"/>
+	<meta http-equiv="Expires" content="0"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge;">
+	<meta name="viewport" content="width=device-width,user-scalable=yes">
+
+	<meta name="keywords" content="오산대학교, 오산대 포탈, 오산대, 포탈" />
+	<meta name="description" content="오산대학교 포탈" />
+	<meta name="author" content="오산대학교" />
+
+	<title>오산대학교 포탈</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js" type="text/javascript"></script>
+
+	<link type="text/css" href="./css/layout.css" rel="stylesheet" />
+
+	<script type="text/javascript" src="./js/login.js"></script>
+
+</head>
+<body>
+	<div class="login_img">
+		<ul>
+			<li style="background-image:url('./img/login_bg.jpg')"></li>
+			<li style="background-image:url('./img/login_bg2.jpg')"></li>
+		</ul>
+		<ol>
+			<li><a href="javascript:;" class="on">1</a></li>
+			<li><a href="javascript:;" >2</a></li>
+		</ol>
+	</div>
+	<div class="login_box">
+		<div style="background:url('./img/opred.png') repeat">
+			<img src="/img/osanlogo.png" ><br/><br/>
+			<form action="./index2.html" method="" name=""><font color="white">
+				<ul>
+					<li><input type="text" fontcolor="yellow" name="" value="" placeholder="아이디입력" class="id" /></li>
+					<li><input type="password" name="" value="" placeholder= "비밀번호" class="pw" /></li>
+				</ul>
+				</font>
+				<button type="submit">Login</button>
+				<p>아이디 : 학생-학번 / 교직원-교직원번호<br />비밀번호 : 초기비밀번호는 주민번호 뒤 7자리</p>
+			</form>
+			<ol>
+				<li><button type="button" style="border:1px solid #d3d3d3; " onclick="">+ ID / PW 찾기</button></li>
+				<li><button type="button" style="border:1px solid #d3d3d3; " onclick="">+ 고지서 출력</button></li>	
+				</ol>
+		</div>
+	</div>
+
+</body>
+</html>

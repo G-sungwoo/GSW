@@ -1,0 +1,255 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>등록금 고지서</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/resources/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/resources/css/sb-admin-2.min.css" rel="stylesheet">
+
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+<!-- left layout 작성 (기존 sidebar 분리작업)-->
+<%@ include file = "/resources/layout/leftmenu.jsp" %>
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+<!-- header layout 작성 (기존 Topbar 분리작업)-->
+<%@ include file = "/resources/layout/header.jsp" %>
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-4 text-gray-800">나의 등록 정보</h1>
+                    
+                    <div class="row">
+                        <!-- Area Chart -->
+                        <c:choose>
+                            <c:when test="${empty tuitInfo}">
+                                    <div class="col-xl-6 col-lg-5">
+                                    <div class="card shadow mb-4">
+                                        <!-- Card Header - Dropdown -->
+                                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 class="m-0 font-weight-bold text-primary">현재 학기 등록 정보는 없습니다.</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+		                        <div class="col-xl-6 col-lg-5">
+		                            <div class="card shadow mb-4">
+		                                <!-- Card Header - Dropdown -->
+		                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+		                                    <h6 class="m-0 font-weight-bold text-primary">등록 정보</h6>
+		                                    <a href="javascript:void(0);" onclick="printCall(this);" attr-a="tuit" class="btn btn-success btn-icon-split btn-sm">
+		                                        <span class="icon text-white-50">
+		                                            <i class="fas fa-arrow-right"></i>
+		                                        </span>
+		                                        <span class="text">등록금 고지서</span>
+		                                    </a>
+		                                </div>
+		                                <!-- Card Body -->
+		                                <div class="card-body">
+											<strong>년도</strong> : ${tuitInfo.adpt_year }<br/>
+											<strong>학기</strong> : ${tuitInfo.adpt_shtm }<br/>
+											<strong>입학금</strong> : ${tuitInfo.entr_amnt }<br/>
+											<strong>수업료</strong> : ${tuitInfo.lesn_amnt }<br/>
+											<strong>등록금</strong> : ${tuitInfo.regi_amnt }<br/>
+											<strong>장학금</strong> : ${tuitInfo.shsh_amnt }<br/>
+											<strong>장학명</strong> : ${tuitInfo.shsh_krnm }<br/>
+											<strong>실납부금</strong> : ${tuitInfo.rlpd_amnt }<br/>
+											<strong>등록상태</strong> : ${tuitInfo.paid_stat }<br/>
+											<strong>등록일자</strong> : ${tuitInfo.paid_date }
+		                                </div>
+		                            </div>
+		                        </div>
+                            </c:otherwise>
+                        </c:choose>
+
+                        <!-- Pie Chart -->
+                        <%--
+                        <c:choose>
+                            <c:when test="${empty schoList}">
+                            
+                            </c:when>
+                            <c:otherwise>
+                                <div class="col-xl-6 col-lg-7">
+                                <div class="card shadow mb-4">
+                                    <!-- Card Header - Dropdown -->
+                                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                        <h6 class="m-0 font-weight-bold text-primary">장학금 정보</h6>
+                                    </div>
+                                    <!-- Card Body -->
+                                    <div class="card-body">
+                                        <table class="table table-bordered" name="scheduleTable" style="text-align: center;" border="1">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>장학금명</th>
+                                                    <th>금액</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach items="${schoList}" var="scho">
+                                                    <tr>
+                                                        <td class="table-light">${scho.scho_name}</td>
+                                                        <td>${scho.scho_amnt}</td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            </c:otherwise>
+                        </c:choose>
+                         --%>
+                    </div>
+                    
+                    <div class="row">
+                    
+                        <div class="col-xl-6 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">교육비 납입 증명서</h6>
+                                    <a href="javascript:void(0);" onclick="printCall(this);" attr-a="edu" class="btn btn-info btn-icon-split btn-sm">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-arrow-right"></i>
+                                        </span>
+                                        <span class="text">교육비 납입증명서</span>
+                                    </a>
+                                </div>
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-secondary">년도학기:</h6>
+                                        
+                                        <select name="lectHaks" class="lectHaks">
+                                            <option value="0">선택</option>
+                                                  <c:forEach var="list" items="${tuitList}" >
+                                                      <option value="${list.regi_year}-${list.regi_shtm}">${list.regi_yesh}학기</option>
+                                                  </c:forEach>
+                                        </select>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    -* 안내사항 
+                                </div>
+                            </div>
+                        </div> 
+                        
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2021</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/resources/vendor/jquery/jquery.min.js"></script>
+    <script src="/resources/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/resources/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/resources/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <!-- 
+    <script src="/resources/vendor/chart.js/Chart.min.js"></script>
+     -->
+    <!-- Page level custom scripts -->
+    <!-- 
+    <script src="/resources/js/demo/chart-area-demo.js"></script>
+    <script src="/resources/js/demo/chart-pie-demo.js"></script>
+     -->
+
+    <script type="text/javascript">
+
+    //등록금 고지서 및 교육비 납입증명서 출력 스크립트
+    function printCall(obj){
+
+        var flag = $(obj).attr('attr-a');
+
+        if(flag =="tuit"){
+            window.open("https://osanuniv.osan.ac.kr/osanuniv/TUIT_CHECK_ZERO.jsp?stntnumb=${stnt_numb}");
+
+        }else if(flag = "edu"){
+            
+            var regi_yesh = $(".lectHaks option:selected").val();
+            
+            var regi_data = regi_yesh.split("-");
+            
+            window.open("https://osanuniv.osan.ac.kr/osanuniv/STUD_REPORT_MOBILE.jsp?stntnumb=${stnt_numb}&regiyear="+regi_data[0]+"&regishtm="+regi_data[1]);
+
+        }
+    }
+
+    //속성이 비슷한 화면이 열려있을때 left open 스크립트 - leftmenu.jsp에서 class="munu + n"으로 관리중..
+    if (navigator.userAgent.match(/Android/i) ||
+        navigator.userAgent.match(/webOS/i) ||
+        navigator.userAgent.match(/iPhone/i) ||
+        navigator.userAgent.match(/iPad/i) ||
+        navigator.userAgent.match(/iPod/i) ||
+        navigator.userAgent.match(/BlackBerry/i) ||
+        navigator.userAgent.match(/Windows Phone/i)) {
+          
+    } else {
+        window.onload = function(){
+            var myClassDiv = document.querySelector(".menu5");
+            myClassDiv.classList.add("show");
+        }
+        console.log("PC");
+    }    
+    </script>
+    
+</body>
+
+</html>

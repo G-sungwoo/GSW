@@ -1,0 +1,78 @@
+package com.osan.portal.service;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.osan.portal.vo.HomePageInfo;
+import com.osan.portal.vo.LoginInfo;
+
+public interface MainService {
+	/*홈페이지 공지*/
+    public List<HomePageInfo> selectListHomepageUniNotice(LoginInfo loginInfo);
+    /*홈페이지 공지(입학)*/
+    public List<HomePageInfo> selectListHomepageIphakNotice(LoginInfo loginInfo);
+    /*홈페이지 공지(입찰)*/
+    public List<HomePageInfo> selectListHomepageBidNotice(LoginInfo loginInfo);
+    /*오산대소식*/
+    public List<HomePageInfo> selectListOsanUniNews(LoginInfo loginInfo);
+    /*qna*/
+    public List<HomePageInfo> selectListOsanUniQnA(LoginInfo loginInfo);
+    /*개인 요약정보(결재)*/
+    public int selectSignDocCnt(LoginInfo loginInfo);
+    /*개인 요약정보(공람)*/
+    public int selectPublicDocCnt(LoginInfo loginInfo);
+    /*개인 요약정보(수신)*/
+    public int selectInboxDocCnt(LoginInfo loginInfo);
+    /*교직원학생 게시판 총 게시글 수*/
+    public int selectBoardArticleCnt(LoginInfo loginInfo);
+    /*교직원학생 게시판 게시글 리스트*/
+    public Map selectListBoardArticle(LoginInfo loginInfo, HttpServletRequest request);
+    /*학사력*/
+    public Map selectListAcademicSchedule(LoginInfo loginInfo);
+    /*개인정보 수정*/
+    public int updateUserInfo(LoginInfo loginInfo);
+    /*개인정보 수정(학생)*/
+    public int updateStntUserInfo(LoginInfo loginInfo);
+    /*비밀번호 변경*/
+    public int updateUserPassword(LoginInfo loginInfo);
+    /*비밀번호 변경(학생)*/
+    public int updateStntUserPassword(LoginInfo loginInfo);
+    /*교직원 검색 총 결과수*/
+    public int selectSearchWorkerCnt(LoginInfo loginInfo);
+    /*교직원 검색 리스트*/
+    public Map selectListSearchWorker(LoginInfo loginInfo, HttpServletRequest request);
+    /*현재 연도 학기 조회*/
+    public HomePageInfo selectSchpYearShtm();
+    /*강의시간표(교원)*/
+    public List<HomePageInfo> selectListLectTimetable(LoginInfo loginInfo);
+    /*강의시간표(학생)*/
+    public List<HomePageInfo> selectListLectTimetableForStnt(LoginInfo loginInfo);
+    /*강의계획서*/
+    public List<HomePageInfo> selectListLectPlan(LoginInfo loginInfo);
+    /*강의계획서(학생)*/
+    public List<HomePageInfo> selectListLectPlanForStnt(LoginInfo loginInfo);
+    /*학생정보(사진)*/
+    public Map selectStntPhoto(LoginInfo loginInfo);
+    /*학생정보*/
+    public HomePageInfo selectStntInfo(LoginInfo loginInfo);
+    /*등록금 현황*/
+    public List<HomePageInfo> selectListLesnAmnt(LoginInfo loginInfo);
+    /*장학금 현황*/
+    public List<HomePageInfo> selectListShshAmnt(LoginInfo loginInfo);
+    /*성적조회(전체)*/
+    public HomePageInfo selectTotalGrad(LoginInfo loginInfo);
+    /*성적조회(학기)*/
+    public List<HomePageInfo> selectListShtmGrad(LoginInfo loginInfo);
+    /*성적조회(과목)*/
+    public Map selectListSubjectGrad(LoginInfo loginInfo);
+    /*성적조회(성적이 있는 연도 조회)*/
+    public List<HomePageInfo> selectListGradYear(LoginInfo loginInfo);
+    /*채용공고(교내채용정보)*/
+    public List<HomePageInfo> selectListJob();
+    /*채용공고(아르바이트)*/
+    public List<HomePageInfo> selectListParttimeJob();
+    /*도서대출목록*/
+    public List<HomePageInfo> selectListRentBook(LoginInfo loginInfo);
+}

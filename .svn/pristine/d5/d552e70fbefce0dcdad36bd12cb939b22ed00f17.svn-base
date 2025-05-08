@@ -1,0 +1,576 @@
+package com.osan.portal;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.ksign.access.api.SSORspData;
+import com.ksign.access.api.SSOService;
+import com.osan.portal.service.LoginService;
+import com.osan.portal.service.MainService;
+import com.osan.portal.vo.HomePageInfo;
+import com.osan.portal.vo.LoginInfo;
+
+@Controller
+public class MainController {
+    private static Logger logger = LoggerFactory.getLogger(MainController.class);
+	
+    @Autowired
+    LoginService loginService;
+    
+    @Autowired
+    MainService mainService;
+    
+    @Value("${sms.subject}") 
+    private String smsSubject;
+    
+    @Value("${sms.callback.number}") 
+    private String smsCallbackNumber;
+    
+    @Value("${sms.body.first}") 
+    private String smsBodyFirst;
+    
+    @Value("${sms.body.last}") 
+    private String smsBodyLast;
+    
+    @Value("${sms.pw.subject}") 
+    private String smsPwSubject;
+
+    @Value("${sms.pw.body.first}") 
+    private String smsPwBodyFirst;
+    
+    @Value("${sms.pw.body.last}") 
+    private String smsPwBodyLast;
+    
+    /*로그인 페이지 이동*/
+    @RequestMapping(value="/")
+    public ModelAndView mainView(ModelAndView mv) {
+        String page = "/index";
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    /*로그인(인증) 페이지 이동*/
+    @RequestMapping(value="/login")
+    public ModelAndView lgoinView(ModelAndView mv) {
+        String page = "/login";
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    /*아이디 찾기 페이지 이동*/
+    @RequestMapping(value="/findIdView")
+    public ModelAndView findIdView(ModelAndView mv) {
+        String page = "/find_id";
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    /*비밀번호 찾기 페이지 이동*/
+    @RequestMapping(value="/findPwView")
+    public ModelAndView findPwView(ModelAndView mv) {
+        String page = "/find_pw";
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    /*비밀번호 변경 페이지 이동*/
+    @RequestMapping(value="/changePw")
+    public ModelAndView changeView(ModelAndView mv) {
+    	String page = "/change_pw";
+    	mv.setViewName(page);
+    	return mv;
+    }
+    
+    /*ajax 로그인(사용자 인증) 체크*/
+    @RequestMapping(value="/loginCheck")
+    public void loginCheck(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	LoginInfo resultLoginInfo = new LoginInfo();
+        String encPassword = loginService.selectEncPassword(loginInfo);
+        //String encPassword = loginInfo.getPassword();
+        resultLoginInfo = loginService.selectUser(loginInfo);
+        if(resultLoginInfo != null) {
+        	resultLoginInfo.setUserIp(request.getRemoteAddr());
+            if(resultLoginInfo.getWrpwCont() > 4) {
+            	response.getWriter().write("5TIMES_WRONG_PASSWORD");
+            }else if(!resultLoginInfo.getPassword().equals(encPassword)) {
+            	/*비밀번호 오류시 오류횟수 저장*/
+            	resultLoginInfo.setWrpwCont(resultLoginInfo.getWrpwCont() + 1);
+            	if(resultLoginInfo.getUserAuth().equals("1")||resultLoginInfo.getUserAuth().equals("2")||resultLoginInfo.getUserAuth().equals("3")||resultLoginInfo.getUserAuth().equals("4")){
+                    loginService.updateUserWrongPasswordCnt(resultLoginInfo);
+            	}else if(resultLoginInfo.getUserAuth().equals("5")||resultLoginInfo.getUserAuth().equals("6")) {
+            		loginService.updateStntUserWrongPasswordCnt(resultLoginInfo);
+            	}
+                response.getWriter().write("WRONG_PASSWORD");
+            }else if(resultLoginInfo.getWorkFlag().equals("N")) {
+            	//수,금 6시 이후 로그인 금지
+            	response.getWriter().write("GO_HOME");
+            }else if(resultLoginInfo.getChgePwAt().equals("N")) {
+            	//패스워드 변경 6개월 이상인 경우
+            	HttpSession session = request.getSession(true);
+            	session.setAttribute("sessionUserInfo", resultLoginInfo);
+            	response.getWriter().write("CHANGE_PASSWORD");
+            }else if((resultLoginInfo.getUserAuth().equals("1")||resultLoginInfo.getUserAuth().equals("4")) && !loginInfo.getVerifiedAt().equals("Y")) {
+            	//교원의 경우 SMS인증 필요
+            	response.getWriter().write("NEED_FOR_SMS");
+            }else {
+            	if(resultLoginInfo.getWrpwCont() > 0) {
+            	    /*로그인 성공시 비밀번호 오류횟수 초기화*/
+            	    resultLoginInfo.setWrpwCont(0);
+            	    if(resultLoginInfo.getUserAuth().equals("1")||resultLoginInfo.getUserAuth().equals("2")||resultLoginInfo.getUserAuth().equals("3")||resultLoginInfo.getUserAuth().equals("4")){
+                        loginService.updateUserWrongPasswordCnt(resultLoginInfo);
+            	    }else if(resultLoginInfo.getUserAuth().equals("5")||resultLoginInfo.getUserAuth().equals("6")) {
+            	    	loginService.updateStntUserWrongPasswordCnt(resultLoginInfo);
+            	    }
+            	}
+                response.getWriter().write("LOGIN_SUCCESS");
+            }
+        }else {
+            response.getWriter().write("NOT_EXIST_USER");
+        }
+    }
+    @RequestMapping(value="/main")
+    public void ssoLogin(ModelAndView mv, LoginInfo loginInfo, HttpServletRequest request, Model model, HttpServletResponse response) throws Exception {
+        LoginInfo resultLoginInfo = new LoginInfo();
+        String page = "main_sso";
+        /*********************사용자 정보 세션 처리*******************/
+        HttpSession httpSession = request.getSession(false);
+        //세션존재하면 세션 정보로 사용자 정보 세팅
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            resultLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        } else {
+            //사용자 정보 조회
+            resultLoginInfo = loginService.selectUser(loginInfo);
+            if(resultLoginInfo == null) {
+                page = "/index";
+            }else {
+                //세션 생성
+                HttpSession session = request.getSession(true);
+                session.setAttribute("sessionUserInfo", resultLoginInfo);
+            }
+        }
+    	/*sso 처리 */
+        SSORspData rspData = null;
+        SSOService ssoService = SSOService.getInstance();
+        String clientIP = request.getRemoteAddr();
+        String returl = "https://info.osan.ac.kr/" + page;
+        rspData = ssoService.ssoReqIssueToken( request
+                                             , response
+                                             , "form-based"
+                                             , resultLoginInfo.getUserNo()
+                                             , resultLoginInfo.getName()
+                                             , resultLoginInfo.getRegNo()
+                                             , ""
+                                             , "11111"
+                                             , returl
+                                             , clientIP
+                                             , "211.221.231.13");
+    }
+    //사용자 인증 후 실제 로그인 처리 및 메인 화면 데이터 조회
+    @RequestMapping(value="/main_sso")
+    public ModelAndView login(ModelAndView mv, LoginInfo loginInfo, HttpServletRequest request, Model model, HttpServletResponse response) throws Exception {
+        LoginInfo resultLoginInfo = new LoginInfo();
+        String page = "main";
+        /*********************사용자 정보 세션 처리*******************/
+        HttpSession httpSession = request.getSession(false);
+        //세션존재하면 세션 정보로 사용자 정보 세팅
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            resultLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        } else {
+        	if(loginInfo == null) {
+        		page = "/index";
+        		mv.setViewName(page);
+        		return mv;
+        	}
+        	if(loginInfo.getUserNo() == null) {
+        		page = "/index";
+        		mv.setViewName(page);
+        		return mv;
+        	}
+            //사용자 정보 조회
+            resultLoginInfo = loginService.selectUser(loginInfo);
+            if(resultLoginInfo == null) {
+        		page = "/index";
+        		mv.setViewName(page);
+        		return mv;
+            }else {
+                //세션 생성
+                HttpSession session = request.getSession(true);
+                session.setAttribute("sessionUserInfo", resultLoginInfo);
+            }
+        }
+        resultLoginInfo.setUserIp(request.getRemoteAddr());
+        resultLoginInfo.setMenuId("login");
+        loginService.insertLoginInfo(resultLoginInfo);
+        //직원 조교
+        if(resultLoginInfo.getUserAuth().equals("2") || resultLoginInfo.getUserAuth().equals("3")) {
+        	/*********************QnA        *********************/
+        	List<HomePageInfo> osanUniQnAList = mainService.selectListOsanUniQnA(resultLoginInfo) ;
+        	model.addAttribute("osanUniQnAList", osanUniQnAList);
+        	/*********************홈페이지 공지사항*********************/
+        	//대학공지
+        	List<HomePageInfo> uniNoticeList = mainService.selectListHomepageUniNotice(resultLoginInfo) ;
+        	model.addAttribute("uniNoticeList", uniNoticeList);
+        	//입시공지
+        	List<HomePageInfo> iphakNoticeList = mainService.selectListHomepageIphakNotice(resultLoginInfo) ;
+        	model.addAttribute("iphakNoticeList", iphakNoticeList);
+        	//입찰공지
+        	List<HomePageInfo> bidNoticeList = mainService.selectListHomepageBidNotice(resultLoginInfo) ;
+        	model.addAttribute("bidNoticeList", bidNoticeList);
+        	page = "main_w";
+        //교수(시간강사)	
+        }else if(resultLoginInfo.getUserAuth().equals("1") || resultLoginInfo.getUserAuth().equals("4")) {
+        	/*********************홈페이지 공지사항*********************/
+        	//대학공지
+        	List<HomePageInfo> uniNoticeList = mainService.selectListHomepageUniNotice(resultLoginInfo) ;
+        	model.addAttribute("uniNoticeList", uniNoticeList);
+        	//입시공지
+        	List<HomePageInfo> iphakNoticeList = mainService.selectListHomepageIphakNotice(resultLoginInfo) ;
+        	model.addAttribute("iphakNoticeList", iphakNoticeList);
+        	//입찰공지
+        	List<HomePageInfo> bidNoticeList = mainService.selectListHomepageBidNotice(resultLoginInfo) ;
+        	model.addAttribute("bidNoticeList", bidNoticeList);
+        	/*********************강의 시간표**************************/
+        	List<HomePageInfo> lectTimetableList = mainService.selectListLectTimetable(resultLoginInfo) ;
+        	model.addAttribute("lectTimetableList", lectTimetableList);
+        	/*********************강의 계획서**************************/
+        	List<HomePageInfo> lectPlanList = mainService.selectListLectPlan(resultLoginInfo) ;
+        	model.addAttribute("lectPlanList", lectPlanList);
+        	page = "main_p";
+        //재학생
+        }else if(resultLoginInfo.getUserAuth().equals("5")) {
+        	/*********************강의 시간표*****************************/
+        	List<HomePageInfo> lectTimetableList = mainService.selectListLectTimetableForStnt(resultLoginInfo) ;
+        	model.addAttribute("lectTimetableList", lectTimetableList);
+        	HomePageInfo stntInfo = mainService.selectStntInfo(resultLoginInfo);
+        	model.addAttribute("stntInfo", stntInfo);
+        	/*********************강의 계획서*****************************/
+        	List<HomePageInfo> lectPlanList = mainService.selectListLectPlanForStnt(resultLoginInfo) ;
+        	model.addAttribute("lectPlanList", lectPlanList);
+        	/*********************등록금 현황*****************************/
+        	List<HomePageInfo> lesnAmntList = mainService.selectListLesnAmnt(resultLoginInfo) ;
+        	model.addAttribute("lesnAmntList", lesnAmntList);
+        	/*********************장학금 현황*****************************/
+        	List<HomePageInfo> shshAmntList = mainService.selectListShshAmnt(resultLoginInfo) ;
+        	model.addAttribute("shshAmntList", shshAmntList);
+        	/*********************성적 조회(전체)**************************/
+        	HomePageInfo totalGrad = mainService.selectTotalGrad(resultLoginInfo) ;
+        	model.addAttribute("totalGrad", totalGrad);
+        	/*********************성적 조회(학기)**************************/
+        	List<HomePageInfo> shtmGradList = mainService.selectListShtmGrad(resultLoginInfo) ;
+        	model.addAttribute("shtmGradList", shtmGradList);
+        	/*********************성적조회(성적이 있는 연도 조회)****************/
+        	List<HomePageInfo> gradYearList = mainService.selectListGradYear(resultLoginInfo) ;
+        	model.addAttribute("gradYearList", gradYearList);
+        	/*********************채용공고조회(교내채용정보)*******************/
+        	List<HomePageInfo> jobList = mainService.selectListJob() ;
+        	model.addAttribute("jobList", jobList);
+        	/*********************채용공고조회(아르바이트)********************/
+        	List<HomePageInfo> parttimeJobList = mainService.selectListParttimeJob() ;
+        	model.addAttribute("parttimeJobList", parttimeJobList);
+        	/*********************도서 대출 목록****************************/
+        	//List<HomePageInfo> rentBookList = mainService.selectListRentBook(resultLoginInfo) ;
+        	//model.addAttribute("rentBookList", rentBookList);
+        	page = "main_s";
+        //졸업생
+        }else if(resultLoginInfo.getUserAuth().equals("6")) {
+        	/*********************성적 조회(전체)**************************/
+        	HomePageInfo totalGrad = mainService.selectTotalGrad(resultLoginInfo) ;
+        	model.addAttribute("totalGrad", totalGrad);
+        	/*********************성적 조회(학기)**************************/
+        	List<HomePageInfo> shtmGradList = mainService.selectListShtmGrad(resultLoginInfo) ;
+        	model.addAttribute("shtmGradList", shtmGradList);
+        	/*********************성적조회(성적이 있는 연도 조회)****************/
+        	List<HomePageInfo> gradYearList = mainService.selectListGradYear(resultLoginInfo) ;
+        	model.addAttribute("gradYearList", gradYearList);
+        	/*********************채용공고조회(교내채용정보)*******************/
+        	List<HomePageInfo> jobList = mainService.selectListJob() ;
+        	model.addAttribute("jobList", jobList);
+        	/*********************채용공고조회(아르바이트)********************/
+        	List<HomePageInfo> parttimeJobList = mainService.selectListParttimeJob() ;
+        	model.addAttribute("parttimeJobList", parttimeJobList);
+        	page = "main_g";
+        }
+        /*********************오산대 소식         *********************/
+        List<HomePageInfo> osanUniNewsList = mainService.selectListOsanUniNews(resultLoginInfo) ;
+        model.addAttribute("osanUniNewsList", osanUniNewsList);
+        mv.setViewName(page);
+        return mv;
+    }
+    //로그아웃
+    @RequestMapping(value="/logout")
+    public ModelAndView logout(ModelAndView mv, HttpSession session, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        String page = "logout";
+        Cookie[] cookies = request.getCookies(); 
+        for(int i = 0 ; i<cookies.length; i++){  
+        	cookies[i].setMaxAge(0);                        // 특정 쿠키를 더 이상 사용하지 못하게 하기 위해서는 
+        	// 쿠키의 유효시간을 만료시킨다.
+        	response.addCookie(cookies[i]);            // 해당 쿠키를 응답에 추가(수정)한다.
+        	}
+        session.invalidate();
+        mv.setViewName(page);
+        return mv;
+    }
+    
+    //로그인 인증 SMS 전송
+    @RequestMapping(value="/sendSms")
+    public void sendSmsVerifyNumber(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        LoginInfo resultLoginInfo = new LoginInfo();
+        resultLoginInfo = loginService.selectUser(loginInfo);
+        String paramCellNum = loginInfo.getCellPhone();
+        paramCellNum = paramCellNum.replace("-", "");
+        if(resultLoginInfo != null) {
+        	String hp = "";
+        	hp = resultLoginInfo.getHp().replace("-", "");
+            if(!paramCellNum.equals(hp)) {
+                response.getWriter().write("NOT_MATCH_NUM");
+            }else {
+                //난수 6자리 인증번호 생성
+                int verifyNumber = loginService.selelctRandomNumber(6);
+                resultLoginInfo.setVerifyNumber(verifyNumber);
+                /*수신자 정보 세팅*/
+                resultLoginInfo.setDestInfo(resultLoginInfo.getName()+"^"+StringUtils.replace(paramCellNum, "-", ""));
+                /*sms 본문 내용 세팅*/
+                resultLoginInfo.setSmsMsg(smsBodyFirst + "[" + verifyNumber + "]" + smsBodyLast);
+                /*sms 제목*/
+                resultLoginInfo.setSubject(smsSubject);
+                /*sms callback*/
+                resultLoginInfo.setCallback(smsCallbackNumber);
+                int resultInt = loginService.insertVerifySms(resultLoginInfo);
+                if(resultInt == 1) {
+                	response.getWriter().write("SMS_SEND_OK");	
+                }
+            }
+        }
+    }
+    
+    //로그인 SMS 인증처리
+    @RequestMapping(value="/verifyUser")
+    public void verifyUser(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	loginInfo.setCellPhone(loginInfo.getCellPhone().replace("-", ""));
+        int resultInt = loginService.selectOneVerifyNumberCheck(loginInfo);
+        if(resultInt > 0) {
+            response.getWriter().write("VERIFY_OK");
+        }else {
+            response.getWriter().write("NOT_MATCH_NUM");
+        }
+    }
+    
+    //교직원 학생 게시판 조회
+    @RequestMapping(value="/boardArticle")
+    public @ResponseBody Map<String, Object> selectListBoardArticle(LoginInfo loginInfo, HttpServletRequest request) throws Exception{
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        ArrayList<Map<String, Object>> jsonList = new ArrayList<Map<String, Object>>();
+        jsonList.add(mainService.selectListBoardArticle(loginInfo, request));
+        jsonObject.put("jsonList", jsonList);
+        return jsonObject;
+    }
+    
+    //학사력 조회
+    @RequestMapping(value="/academicSchedule")
+    public @ResponseBody Map<String, Object> selectListAcademicSchedule(LoginInfo loginInfo, HttpServletRequest request) throws Exception{
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        ArrayList<Map<String, Object>> jsonList = new ArrayList<Map<String, Object>>();
+        jsonList.add(mainService.selectListAcademicSchedule(loginInfo));
+        jsonObject.put("jsonList", jsonList);
+        return jsonObject;
+    }
+    
+    //사용자 정보 수정
+    @RequestMapping(value="/updateUserInfo")
+    public void updateUserInfo(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws Exception{
+    	loginInfo.setUserIp(request.getRemoteAddr());
+    	int resultInt = 0;
+    	//교직원
+    	if(loginInfo.getUserAuth().equals("1") || loginInfo.getUserAuth().equals("2") || loginInfo.getUserAuth().equals("3") || loginInfo.getUserAuth().equals("4")) {
+    		resultInt = mainService.updateUserInfo(loginInfo);
+    	//학생
+    	}else {
+    		resultInt = mainService.updateStntUserInfo(loginInfo);
+    	}
+        if(resultInt > 0) {
+            /*수정된 정보로 세션 재설정*/
+            LoginInfo resultLoginInfo = new LoginInfo();
+            resultLoginInfo = loginService.selectUser(loginInfo);
+            HttpSession session = request.getSession(false);
+            session.setAttribute("sessionUserInfo", resultLoginInfo);
+            response.getWriter().write("UPDATE_OK");
+        }else {
+        	response.getWriter().write("UPDATE_FAIL");
+        }
+    }
+    
+    //비밀번호 수정
+    @RequestMapping(value="/updateUserPassword")
+    public void updateUserPassword(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        /*********************세션 정보 가져오기*******************/
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        //세션존재하면 세션 정보로 사용자 정보 세팅
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+    	loginInfo.setUserIp(request.getRemoteAddr());
+    	if(loginInfo.getUserNo() == null || loginInfo.getUserNo() == "") {
+    		loginInfo.setUserNo(sessionLoginInfo.getUserNo());
+    	}
+    	if(loginInfo.getUserAuth() == null || loginInfo.getUserAuth() == "") {
+    		loginInfo.setUserAuth(sessionLoginInfo.getUserAuth());
+    	}
+        String encPassword = loginService.selectEncPassword(loginInfo);
+        LoginInfo resultLoginInfo = new LoginInfo();
+        resultLoginInfo = loginService.selectUser(loginInfo);
+        int resultInt = 0;
+        if(resultLoginInfo != null) {
+            if(!resultLoginInfo.getPassword().equals(encPassword)) {
+                response.getWriter().write("WRONG_PASSWORD");
+            }else {
+            	//교직원
+                if(loginInfo.getUserAuth().equals("1") || loginInfo.getUserAuth().equals("2") || loginInfo.getUserAuth().equals("3") || loginInfo.getUserAuth().equals("4")) {
+                	resultInt = mainService.updateUserPassword(loginInfo);
+                //학생
+                }else {
+                    resultInt = mainService.updateStntUserPassword(loginInfo);
+                }
+                if(resultInt > 0) {
+                	response.getWriter().write("UPDATE_OK");
+                }else {
+                	response.getWriter().write("UPDATE_FAIL");
+                }
+            }
+        }
+    }
+    
+    //교직원 검색
+    @RequestMapping(value="/searchWorker")
+    public @ResponseBody Map<String, Object> selectListSearchWorker(LoginInfo loginInfo, HttpServletRequest request) throws Exception{
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        ArrayList<Map<String, Object>> jsonList = new ArrayList<Map<String, Object>>();
+        jsonList.add(mainService.selectListSearchWorker(loginInfo, request));
+        jsonObject.put("jsonList", jsonList);
+        return jsonObject;
+    }
+    
+    //학생 사진 조회
+    @RequestMapping(value="/getStudentImg")
+    public ResponseEntity<byte[]> getByteImage(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+    	LoginInfo resultLoginInfo = new LoginInfo();
+        HttpSession httpSession = request.getSession(false);
+        //세션존재하면 세션 정보로 사용자 정보 세팅
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            resultLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        Map<String, Object> map = mainService.selectStntPhoto(resultLoginInfo);
+        byte[] imageContent = (byte[]) map.get("pictFile");
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<byte[]>(imageContent, headers, HttpStatus.OK);
+    }
+    
+    //성적 조회
+    @RequestMapping(value="/searchGrad")
+    public @ResponseBody Map<String, Object> selectListSearchGrad(LoginInfo loginInfo) throws Exception{
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        ArrayList<Map<String, Object>> jsonList = new ArrayList<Map<String, Object>>();
+        jsonList.add(mainService.selectListSubjectGrad(loginInfo));
+        jsonObject.put("jsonList", jsonList);
+        return jsonObject;
+    }
+    
+    //ID 찾기
+    @RequestMapping(value="/findId")
+    public void selectOneUserNo(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	LoginInfo resultLoginInfo = new LoginInfo();
+    	resultLoginInfo = loginService.selectOneUserNo(loginInfo);
+    	if(resultLoginInfo != null) {
+    		if(resultLoginInfo.getUserNo() != null && resultLoginInfo.getUserNo() != "") {
+    			response.getWriter().write(resultLoginInfo.getUserNo());
+    		}
+    	}else {
+            response.getWriter().write("NO_MATCH_USER");
+        }
+    }
+    
+    //임시 비밀번호 발급
+    @RequestMapping(value="/sendTempPassword")
+    public void sendTempPassword(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        LoginInfo resultLoginInfo = new LoginInfo();
+        resultLoginInfo = loginService.selectUserForFindPassword(loginInfo);
+        if(resultLoginInfo != null) {
+            if(resultLoginInfo.getHp() == null || resultLoginInfo.getHp().equals("")) {
+                response.getWriter().write("NO_HP");
+            }else {
+            	resultLoginInfo.setUserIp(request.getRemoteAddr());
+                //임시비밀번호 생성
+                String tempPassword = loginService.selelctTempPassword();
+                /*수신자 정보 세팅*/
+                resultLoginInfo.setDestInfo(resultLoginInfo.getName()+"^"+StringUtils.replace(resultLoginInfo.getHp(), "-", ""));
+                /*sms 본문 내용 세팅*/
+                resultLoginInfo.setSmsMsg(smsPwBodyFirst + " " + tempPassword + " " + smsPwBodyLast);
+                /*sms 제목*/
+                resultLoginInfo.setSubject(smsPwSubject);
+                /*sms callback*/
+                resultLoginInfo.setCallback(smsCallbackNumber);
+                resultLoginInfo.setNewPassword(tempPassword);
+                int resultInt = loginService.insertTempPassword(resultLoginInfo);
+                if(resultInt == 1) {
+                	response.getWriter().write(resultLoginInfo.getHp());	
+                }
+            }
+        }else {
+        	response.getWriter().write("NO_USER");
+        }
+    }
+    //개인요약정보 조회
+    @RequestMapping(value="/psnlGwInfo")
+    public @ResponseBody Map<String, Object> selectPsnlGwInfo(LoginInfo loginInfo, HttpServletRequest request) throws Exception{
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        jsonObject.put("signDocCnt", mainService.selectSignDocCnt(loginInfo));
+        jsonObject.put("publicDocCnt", mainService.selectPublicDocCnt(loginInfo));
+        jsonObject.put("inboxDocCnt", mainService.selectInboxDocCnt(loginInfo));
+        return jsonObject;
+    }
+    //로그 저장
+    @RequestMapping(value="/insertMenuLog")
+    public void insertMenuLog(LoginInfo loginInfo, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        //세션존재하면 세션 정보로 사용자 정보 세팅
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+    	loginInfo.setUserIp(request.getRemoteAddr());
+    	loginInfo.setUserNo(sessionLoginInfo.getUserNo());
+    	loginService.insertLoginInfo(loginInfo);
+    }
+    /*출결관리*/
+    @RequestMapping(value="/attendanceView")
+    public ModelAndView attendanceView(ModelAndView mv) {
+        String page = "/attendance";
+        mv.setViewName(page);
+        return mv;
+    }
+}

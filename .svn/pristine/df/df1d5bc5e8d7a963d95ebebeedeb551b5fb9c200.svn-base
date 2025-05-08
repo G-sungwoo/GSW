@@ -1,0 +1,190 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page session="false" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="ksign.jce.util.*" %>
+<html>
+<head>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;">
+    <meta name="viewport" content="width=device-width,user-scalable=yes">
+
+    <meta name="keywords" content="오산대학교, 오산대 포탈, 오산대, 포탈" />
+    <meta name="description" content="오산대학교 포탈" />
+    <meta name="author" content="오산대학교" />
+
+    <title>오산대학교 포탈</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js" type="text/javascript"></script>
+
+    <link type="text/css" href="resources/css/layout.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="resources/js/login.js"></script>
+    <script type="text/javascript" src="resources/js/common.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#login").click(function() {
+                if($('#smsCertAt').val() == "Y"){
+                    
+                }
+                loginCheck();
+            });
+            $("#password").keydown(function(key) {
+                if(key.keyCode == 13){
+                    loginCheck();
+                }
+            });
+        });
+        function onSuccess(data, status){
+            if(data == "NOT_EXIST_USER"){
+                alert("사용자 정보가 존재하지 않습니다.");
+                return;
+            }else if(data == "WRONG_PASSWORD"){
+                alert("비밀번호가 일치 하지 않습니다.");
+                return;
+            }else{
+                login();
+            }
+        }
+        function login(){
+            $("#loginForm").submit();
+        }
+        function loginCheck(){
+            var formData = $("#loginForm").serialize();
+            $.ajax({
+                type : "POST",
+                url : "/loginCheck",
+                data : formData,
+                dataType : "text",
+                success : onSuccess,
+            });
+        }
+        function checkPassWord(str){
+            var pw = str;
+            var num = pw.search(/[0-9]/g);
+            var eng = pw.search(/[a-z]/ig);
+            var spe = pw.search(/[`~!@@#$%^&*|₩₩₩'₩";:₩/?]/gi);
+            if(pw.length < 8 || pw.length > 20){
+                alert("8자리 ~ 20자리 이내로 입력해주세요.");
+                return false;
+            }
+            if(pw.search(/₩s/) != -1){
+                alert("비밀번호는 공백업이 입력해주세요.");
+                return false;
+            } if(num < 0 || eng < 0 || spe < 0 ){
+                alert("영문,숫자, 특수문자를 혼합하여 입력해주세요.");
+                return false;
+            }
+            return true;
+        }
+        /*********************sso 관련 스크립트************************/
+        var contextPath = getContextPath();
+        
+        function getCookieVal (offset) {
+           var endstr = document.cookie.indexOf (";", offset);
+           if (endstr == -1) endstr = document.cookie.length;
+           return unescape(document.cookie.substring(offset, endstr));
+        }
+        
+        function getCookie (name) {
+           var arg = name + "=";
+           var alen = arg.length;
+           var clen = document.cookie.length;
+           var i = 0;
+           while (i < clen) { //while open
+              var j = i + alen;
+              if (document.cookie.substring(i, j) == arg)
+                 return getCookieVal (j);
+              i = document.cookie.indexOf(" ", i) + 1;
+              if (i == 0) break;
+           } //while close
+           return null;
+        }
+        
+        function setCookie(name, value) {
+           var argv = setCookie.arguments;
+           var argc = setCookie.arguments.length;
+           var expires = (2 < argc) ? argv[2] : null;
+           var path = (3 < argc) ? argv[3] : null;
+           var domain = (4 < argc) ? argv[4] : null;
+           var secure = (5 < argc) ? argv[5] : false;
+           document.cookie = name + "=" + escape (value) +
+              ((expires == null) ? "" :
+                 ("; expires=" + expires.toGMTString())) +
+              ((path == null) ? "" : ("; path=" + path)) +
+              ((domain == null) ? "" : ("; domain=" + domain)) +
+              ((secure == true) ? "; secure" : "");
+        }
+        
+        if(getCookie("GUEST_LANGUAGE_ID")==null) {
+            setCookie("GUEST_LANGUAGE_ID","ko_KR");
+        }
+        if(getCookie("COOKIE_SUPPORT")==null) {
+            setCookie("COOKIE_SUPPORT","true");
+        }
+    </script>
+    <!-- 세션체크해서 로그인 정보 있으면 메인화면으로 -->
+    <%
+    HttpSession session = request.getSession(false);
+    if(session != null && session.getAttribute("sessionUserInfo") != null){
+        RequestDispatcher rd = request.getRequestDispatcher("/main");
+        rd.forward(request, response);
+    }
+    %>
+</head>
+<body>
+    <div class="login_img">
+        <ul>
+            <li style="background-image:url('resources/img/login_bg.jpg')"></li>
+            <li style="background-image:url('resources/img/login_bg2.jpg')"></li>
+        </ul>
+        <ol>
+            <li><a href="javascript:;" class="on">1</a></li>
+            <li><a href="javascript:;" >2</a></li>
+        </ol>
+    </div>
+    <div class="login_box">
+        <div style="background:url('resources/img/opred.png') repeat">
+            <img src="resources/img/osanlogo.png" ><br/><br/>
+            <form action="/main" method="post" name="loginForm" id="loginForm"><font color="white">
+                <!-- PKI 인증서 추가 -->
+                <input name="signed_data" type="hidden" value="">
+                <input name="regNo" type="hidden" value="">
+                <input name="pki" type="hidden" value="true" />
+                <input name="sso" type="hidden" value="true" />
+                <input name="cmd" type="hidden" value="already-registered" />
+                <input name="login" type="hidden" value="" />
+                <input name="rememberMe" type="hidden" value="false" />
+                <input name="tabs1" type="hidden" value="already-registered" />
+                
+                <ul>
+                    <li><input type="text" fontcolor="yellow" name="userNo" value="" placeholder="아이디입력" class="id" /></li>
+                    <li><input type="password" name="password" value="" placeholder= "비밀번호" class="pw" id="password"/></li>
+                </ul>
+                </font>
+                <!-- sms인증 -->
+                <input name="smsCertAt" id="smsCertAt" type="hidden" value="Y" />
+                <div class="sms" style ="display:block">
+                    <p>SMS 인증</p>
+                    <input type="text" name="" value="" placeholder= "휴대전화 번호(-제외 입력)" /><button type="button">인증번호발송</button>
+                    <input type="password" name="" value="" placeholder= "인증번호 6자리 입력" /><span>(03:00)</span><button class="ok" type="button">확인</button>
+                </div>
+                <button type="button" id="login">Login</button>
+                <p>아이디 : 학생-학번 / 교직원-교직원번호<br />비밀번호 : 초기비밀번호는 주민번호 뒤 7자리</p>
+            </form>
+            <ol>
+                <li><button type="button" style="border:1px solid #d3d3d3; " onclick="">+ ID / PW 찾기</button></li>
+                <li><button type="button" style="border:1px solid #d3d3d3; " onclick="">+ 고지서 출력</button></li>  
+                </ol>
+        </div>
+    </div>
+
+</body>
+<!-- PKI 인증서 -->
+<object id="AxKCASE"  classid="CLSID:D5312F68-6EBB-485f-922D-76E4D668CCA9"
+    codebase="https:/portal.osan.ac.kr/osansso/VID/AxOSAN(2.5.0.1).cab#Version=2,5,0,1" width="0" height="0">
+</object>
+</html>

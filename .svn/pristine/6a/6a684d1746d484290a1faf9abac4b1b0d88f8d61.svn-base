@@ -1,0 +1,111 @@
+package com.osan.portal.service.impl;
+
+import java.util.Random;
+
+import javax.annotation.Resource;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.osan.portal.service.LoginService;
+import com.osan.portal.service.MainService;
+import com.osan.portal.vo.LoginInfo;
+
+@Repository
+public class LoginServiceImpl implements LoginService{
+    @Autowired
+    @Resource(name="sqlSession1")
+    private SqlSession osanIsSql;
+    
+    @Autowired
+    @Resource(name="sqlSession3")
+    private SqlSession osanSmsSql;
+   
+    @Autowired
+    @Resource(name="sqlSession4")
+    private SqlSession osanPortalSql;
+    
+    @Autowired
+    private MainService mainService;
+    
+    public LoginInfo selectUser(LoginInfo loginInfo){
+        return osanIsSql.selectOne("selectUser", loginInfo);
+    }
+    
+    public LoginInfo selectUserWithPassword(LoginInfo loginInfo){
+        return osanIsSql.selectOne("selectUserWithPassword", loginInfo);
+    }
+    
+    public String selectEncPassword(LoginInfo loginInfo){
+        return osanIsSql.selectOne("selectEncPassword", loginInfo);
+    }
+    public int selelctRandomNumber(int length) {
+        String numStr = "1";
+        String plusNumStr = "1";
+        for (int i = 0; i < length; i++) {
+            numStr += "0";
+            if (i != length - 1) {
+                plusNumStr += "0";
+            }
+        }
+        Random random = new Random();
+        int result = random.nextInt(Integer.parseInt(numStr)) + Integer.parseInt(plusNumStr);
+        if (result > Integer.parseInt(numStr)) {
+            result = result - Integer.parseInt(plusNumStr);
+        }
+        return result;
+    }
+    @Transactional
+    public int insertVerifySms(LoginInfo loginInfo) {
+    	osanSmsSql.insert("insertVerifySms", loginInfo);
+        return  insertSentVerifyNumber(loginInfo);
+    }
+    public int insertSentVerifyNumber(LoginInfo loginInfo) {
+        return osanPortalSql.insert("insertSentVerifyNumber", loginInfo);
+    }
+    public int selectOneVerifyNumberCheck(LoginInfo loginInfo) {
+        return osanPortalSql.selectOne("selectOneVerifyNumberCheck", loginInfo);
+    }
+    public LoginInfo selectOneUserNo(LoginInfo loginInfo) {
+    	return osanPortalSql.selectOne("selectOneUserNo", loginInfo);
+    }
+    public String selelctTempPassword(){ 
+        char pwCollection[] = new char[] { 
+                          '1','2','3','4','5','6','7','8','9', 
+                          'A','B','C','D','E','F','G','H','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 
+                          'a','b','c','d','e','f','g','h','i','j','k','m','n','o','p','q','r','s','t','u','v','w','x','y','z', 
+                          '!','@','#'};
+        String tempPassword = ""; 
+        for (int i = 0; i < 10; i++) { 
+          int selectRandomPw = (int)(Math.random()*(pwCollection.length));
+          tempPassword += pwCollection[selectRandomPw]; 
+        } 
+      return tempPassword; 
+    }
+    @Transactional
+    public int insertTempPassword(LoginInfo loginInfo) {
+    	//�ӽú�й�ȣ ����
+    	loginInfo.setTempPasswordAt("Y");
+    	if(loginInfo.getUserAuth().equals("5") || loginInfo.getUserAuth().equals("6")) {
+    		mainService.updateStntUserPassword(loginInfo);
+    	}else {
+    		mainService.updateUserPassword(loginInfo);
+    	}
+        return  osanSmsSql.insert("insertTempPassword", loginInfo);
+        
+    }
+    public LoginInfo selectUserForFindPassword(LoginInfo loginInfo){
+        return osanIsSql.selectOne("selectUserForFindPassword", loginInfo);
+    }
+    public int updateUserWrongPasswordCnt(LoginInfo loginInfo) {
+    	return osanPortalSql.update("updateUserWrongPasswordCnt",loginInfo);
+    }
+    public int updateStntUserWrongPasswordCnt(LoginInfo loginInfo) {
+    	return osanPortalSql.update("updateStntUserWrongPasswordCnt",loginInfo);
+    }
+    public int insertLoginInfo(LoginInfo loginInfo) {
+    	return osanPortalSql.insert("insertLoginInfo",loginInfo);
+    }
+}

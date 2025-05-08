@@ -1,0 +1,425 @@
+package com.osan.portal;
+
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.osan.portal.service.StudentService;
+import com.osan.portal.vo.HomePageInfo;
+import com.osan.portal.vo.LoginInfo;
+import com.osan.portal.vo.StudentSearchInfo;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Controller
+public class StudentController {
+	
+	private static Logger logger = LoggerFactory.getLogger(MainController.class);	
+    
+	@Autowired
+	StudentService studentService;
+	
+    /*학생 휴학정보 조회*/
+    @RequestMapping(value="/selectStudentInfo")
+    public @ResponseBody Map<String, Object> selectStudentInfo(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        StudentSearchInfo studentSearchInfo = new StudentSearchInfo();
+        StudentSearchInfo studentChange = new StudentSearchInfo();
+        StudentSearchInfo studentParam = new StudentSearchInfo();
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        studentParam.setSrch_stnt_numb(sessionLoginInfo.getUserNo());
+        Map<String, Object> jsonObject = new HashMap<String, Object>();
+        studentSearchInfo = studentService.selectStudentInfo(studentParam);
+        studentChange = studentService.selectStudentChange(studentParam);
+        jsonObject.put("studentInfo", studentSearchInfo);
+        jsonObject.put("studentChange", studentChange);
+        return jsonObject;
+    }
+    
+	/**
+	 * 메인페이지
+	 * @return "student_main"
+	 */    
+    @RequestMapping(value="/student_main")
+    public String student_main(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+    	    	
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+
+        StudentSearchInfo studentInfo = new StudentSearchInfo();
+        
+        studentInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+                
+        studentInfo  = studentService.getStudentInfo(studentInfo);
+        
+    	logger.info(studentInfo.toString());
+    	model.addAttribute("studentInfo", studentInfo);
+                
+    	return "student_main";
+    }  
+
+	/**
+	 * 학적부 - 기본정보
+	 * @return "regiBase"
+	 */ 
+    @RequestMapping(value="/regiBase")
+    public String regiBase(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+    	    	
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        
+        StudentSearchInfo studentInfo = new StudentSearchInfo();
+        
+        studentInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+                
+        studentInfo  = studentService.getStudentInfo(studentInfo);
+        
+    	logger.info(studentInfo.toString());
+    	model.addAttribute("studentInfo", studentInfo);
+
+        
+    	return "regiBase";
+    }
+    
+	/**
+	 * 학적부 - 복학신청
+	 * @return "regiApply"
+	 */ 
+    @RequestMapping(value="/regiApply")
+    public String regiApply(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+    	    	
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        
+        
+        StudentSearchInfo studentInfo = new StudentSearchInfo();
+        StudentSearchInfo studentOffInfo = new StudentSearchInfo();
+        StudentSearchInfo applyInfo = new StudentSearchInfo();
+        StudentSearchInfo checkInfo = new StudentSearchInfo();
+        
+        studentInfo  = studentService.getHakgi();
+        
+        studentInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+        
+        
+        //studentInfo  = studentService.getApplyCheck(studentInfo);
+        
+        studentInfo  = studentService.getStudentInfo(studentInfo);
+        
+        studentOffInfo  = studentService.getOffInfo(studentInfo);
+        applyInfo  = studentService.getApplySchedule();
+
+        if(studentOffInfo == null || Objects.isNull(studentOffInfo)) {
+        	alertAndBack(response, "휴학 정보가 존재하지 않습니다.");
+        } else if(!(studentInfo.getSrst_code().equals("A04002"))){
+        	alertAndBack(response, "휴학생이 아닙니다. 신청하실 수 없습니다.");
+        } else if(studentOffInfo.getApst_code().equals("A03001") || studentOffInfo.getApst_code().equals("A03002") || studentOffInfo.getApst_code().equals("A03003")) {
+        	alertAndBack(response, "신청중이거나, 신청 및 접수가 완료된 상태입니다. 정보만 확인 가능합니다.");
+        	model.addAttribute("studentOffInfo", studentOffInfo);
+        } else if(applyInfo.getAppy_flag().equals("N")){
+        	alertAndBack(response, "복학신청 기간이 아닙니다.");
+        } else {
+        	model.addAttribute("studentOffInfo", studentOffInfo);
+        }
+        	
+        
+        Map<String, Object> shtrInfo = new HashMap<String, Object>();
+        shtrInfo.put("1학년", 1);
+        shtrInfo.put("2학년", 2);
+        shtrInfo.put("3학년", 3);
+        model.addAttribute("shtrInfo", shtrInfo);
+        
+        Map<String, Object> shtmInfo = new HashMap<String, Object>();
+        shtmInfo.put("1학기", 1);
+        shtmInfo.put("2학기", 2);
+        model.addAttribute("shtmInfo", shtmInfo);
+        
+    	logger.info(studentInfo.toString());
+    	model.addAttribute("studentInfo", studentInfo);
+        
+    	return "regiApply";
+    }    
+    
+	/**
+	 * 학생정보 - 업데이트
+	 * @return "regiBase"
+	 */    
+ 
+    @RequestMapping(value="/updateStntInfo" , method=RequestMethod.POST)
+    public void updateStntInfo(StudentSearchInfo StudentSearchInfo, HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+        
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+    	/*
+        String flag = (String) request.getAttribute("flag");
+        System.out.println(flag);
+        */
+        StudentSearchInfo.setUpdt_addr(request.getRemoteAddr());
+        StudentSearchInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+        int resultInt = 0;
+        /*
+        if(flag.equals("stnt")) {
+        	//학생 업데이트 구문
+        	resultInt = studentService.updateStntInfo(StudentSearchInfo);
+        } else if(flag.equals("prtn")) {
+        	//부모 업데이트 구문
+        	resultInt = studentService.updateStntInfo(StudentSearchInfo);
+        }
+        */
+    	logger.info(StudentSearchInfo.toString());
+    	
+        resultInt = studentService.updateStntInfo(StudentSearchInfo);
+        
+        if(resultInt > 0) {
+        	
+        	response.getWriter().write("UPDATE_OK");
+        } else {
+        	response.getWriter().write("UPDATE_FAIL");
+        }
+        
+    }    
+
+	/**
+	 * 수업정보 - 강의시간표(1주차 첫화면)
+	 * @return "lectSchedule"
+	 */    
+ 
+    @RequestMapping(value="/lectSchedule")
+    public String lectSchedule(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+    	    	
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        
+        StudentSearchInfo lectInfo = new StudentSearchInfo();
+        lectInfo  = studentService.getHakgi();
+
+        lectInfo.setLect_week("1");
+        lectInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+        List<StudentSearchInfo> lectList1 = studentService.getSchedule(lectInfo);
+        List<StudentSearchInfo> lectList2 = studentService.getScheduleInfo(lectInfo);
+        
+                
+    	logger.info(lectInfo.toString());
+    	model.addAttribute("scheduleList", lectList1);
+    	model.addAttribute("scheduleInfoList", lectList2);
+
+    	
+        
+    	return "lectSchedule";
+    } 
+
+	/**
+	 * 수업정보 - 강의시간표(15주차)
+	 * @return "weeklectTime"
+	 */    
+ 
+    @RequestMapping(value="/weeklectTime")
+    public String weeklectTime(HttpServletRequest request, HttpServletResponse response,  Model model, @RequestParam(value = "lectWeek") String lectWeek) throws Exception{
+    	    	
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        
+        if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+            sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+        }
+        
+        StudentSearchInfo lectInfo = new StudentSearchInfo();
+        lectInfo  = studentService.getHakgi();
+
+        lectInfo.setLect_week(lectWeek);
+        lectInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+        
+        List<StudentSearchInfo> lectList1 = studentService.getSchedule(lectInfo);
+        List<StudentSearchInfo> lectList2 = studentService.getScheduleInfo(lectInfo);
+        
+                
+    	logger.info(lectInfo.toString());
+    	model.addAttribute("scheduleList", lectList1);
+    	model.addAttribute("scheduleInfoList", lectList2);
+
+    	
+        
+    	return "scheduleCall";
+    }
+
+
+
+/**
+ * 전체 성적 정보
+ * @return "totalGrade"
+ */    
+
+@RequestMapping(value="/totalGrade")
+public String totalGrade(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+	    	
+    HttpSession httpSession = request.getSession(false);
+    LoginInfo sessionLoginInfo = new LoginInfo();
+    
+    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+    }
+    
+    /*
+    String msg = "데이터없음";
+    
+    model.addAttribute("msg", msg);
+     */
+    
+    StudentSearchInfo  gradeInfo = new StudentSearchInfo();
+    gradeInfo  = studentService.getHakgi();
+
+    gradeInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+    
+    List<StudentSearchInfo> gradeList1 = studentService.getCourInfo(gradeInfo);
+    gradeInfo = studentService.getTotalGrade(gradeInfo);
+    
+	logger.info(gradeInfo.toString());
+	model.addAttribute("courInfo", gradeList1);
+	model.addAttribute("totalGrade", gradeInfo);
+
+
+	return "totalGrade";
+	}
+
+/**
+ * 전체 성적 정보
+ * @return "gradeCall"
+ */    
+
+@RequestMapping(value="/gradeList")
+public String gradeList(HttpServletRequest request, HttpServletResponse response,  Model model, @RequestParam("hakgiData") String hakgiData) throws Exception{
+	    	
+    HttpSession httpSession = request.getSession(false);
+    LoginInfo sessionLoginInfo = new LoginInfo();
+    
+    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+    }
+    
+    /*
+    String msg = "데이터없음";
+    
+    model.addAttribute("msg", msg);
+     */
+    
+    StudentSearchInfo  gradeInfo = new StudentSearchInfo();
+    gradeInfo  = studentService.getHakgi();
+
+    gradeInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+    gradeInfo.setLect_yesh(hakgiData);
+    
+    List<StudentSearchInfo> gradeList1 = studentService.getCourInfo(gradeInfo);
+    List<StudentSearchInfo> gradeList2 = studentService.getGradeList(gradeInfo);
+    
+	logger.info(gradeInfo.toString());
+	
+	gradeInfo = gradeList1.get(0);
+	
+	String avrg_mrks = gradeInfo.getAvrg_mrks();
+	String totl_aqpt = gradeInfo.getTotl_aqpt();
+	
+	model.addAttribute("gradeList", gradeList2);
+	model.addAttribute("avrg_mrks",avrg_mrks);
+	model.addAttribute("totl_aqpt",totl_aqpt);
+
+
+	return "gradeCall";
+	}
+
+/**
+ * 등록 정보
+ * @return "tuitInfo"
+ */    
+
+@RequestMapping(value="/tuitInfo")
+public String tuitInfo(HttpServletRequest request, HttpServletResponse response,  Model model) throws Exception{
+	    	
+    HttpSession httpSession = request.getSession(false);
+    LoginInfo sessionLoginInfo = new LoginInfo();
+    
+    if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+        sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+    }
+    
+    /*
+    String msg = "데이터없음";
+    
+    model.addAttribute("msg", msg);
+     */
+    
+    StudentSearchInfo  tuitInfo = new StudentSearchInfo();
+    
+    tuitInfo  = studentService.getTuitHakgi();
+
+    tuitInfo.setStnt_numb(sessionLoginInfo.getUserNo());
+
+    List<StudentSearchInfo> tuitList = studentService.getTuitList(tuitInfo);
+    
+    List<StudentSearchInfo> schoList = studentService.getSchoInfo(tuitInfo);
+
+    tuitInfo = studentService.getTuitInfo(tuitInfo);
+
+
+	logger.info(tuitInfo.toString());
+	model.addAttribute("tuitList", tuitList);
+	model.addAttribute("schoList", schoList);
+	model.addAttribute("tuitInfo", tuitInfo);
+
+
+	return "tuitInfo";
+	}
+
+	public static void alertAndBack(HttpServletResponse response, String msg) {
+	    try {
+	        response.setContentType("text/html; charset=utf-8");
+	        PrintWriter w = response.getWriter();
+	        w.write("<script>alert('"+msg+"');history.go(-1);</script>");
+	        w.flush();
+	        w.close();
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
+}

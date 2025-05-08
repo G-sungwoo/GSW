@@ -1,0 +1,507 @@
+package com.osan.portal;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.osan.portal.service.AttendanceService;
+import com.osan.portal.vo.AtendInfo;
+import com.osan.portal.vo.AtendSearchInfo;
+import com.osan.portal.vo.LoginInfo;
+
+@Controller
+public class AttendanceController {
+    
+	@Autowired
+	AttendanceService atendService;
+	
+    /*강의 조회*/
+    @RequestMapping(value="/searchLectureList")
+    public @ResponseBody Map<String, Object> srchAtendLectureList(AtendSearchInfo atendSearchInfo, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        if(atendSearchInfo.getSrch_professor_code() == null || atendSearchInfo.getSrch_professor_code().equals("")) {
+            //세션존재하면 세션 정보로 사용자 정보 세팅
+            if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+                sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+            }
+    	    atendSearchInfo.setSrch_professor_code(sessionLoginInfo.getUserNo());
+        }
+    	Map<String, Object> jsonObject = new HashMap<String, Object>();
+        ArrayList<Map<String, Object>> jsonList = new ArrayList<Map<String, Object>>();
+        jsonList.add(atendService.srchAtendLectureList(atendSearchInfo));
+        jsonObject.put("jsonList", jsonList);
+        return jsonObject;
+    }
+    
+    /*출석부 조회*/
+    @RequestMapping(value="/selectAtendLectureStdList")
+    public @ResponseBody Map<String, Object> selectAtendLectureStdList(AtendSearchInfo atendSearchInfo, HttpServletRequest request, HttpServletResponse response, AtendInfo info) throws Exception{
+        HttpSession httpSession = request.getSession(false);
+        LoginInfo sessionLoginInfo = new LoginInfo();
+        if(atendSearchInfo.getSrch_professor_code() == null || atendSearchInfo.getSrch_professor_code().equals("")) {
+            //세션존재하면 세션 정보로 사용자 정보 세팅
+            if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+                sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+            }
+    	    atendSearchInfo.setSrch_professor_code(sessionLoginInfo.getUserNo());
+        }
+    	info.setYear(atendSearchInfo.getSrch_year());
+    	info.setSemester(atendSearchInfo.getSrch_semester());
+    	AtendInfo lectureInfo = atendService.srchAtendLectureInfo(atendSearchInfo);
+    	List<AtendInfo> resultLectureList = atendService.srchAtendLectureTimeInfo(atendSearchInfo);
+        DecimalFormat df = new DecimalFormat("00");
+        Calendar calendar = Calendar.getInstance();
+        String strMonth = df.format(calendar.get(2) + 1);
+        String strDay = df.format(calendar.get(5));
+        String currentDate = strMonth + "/" + strDay;
+        int currentWeek = 4;
+        int startMonth = 8;
+        String[][] rltDateArry = new String[15][resultLectureList.size()];
+        if (!"".equals(info.getWeek_atend_no()))
+        {
+          int week_no = Integer.parseInt(info.getWeek_atend_no());
+          int old_lect_dday = Integer.parseInt(((AtendInfo)resultLectureList.get(0)).getLect_dday()) + 1;
+          int lect_dday = 0;
+          int year = 0;
+          for (int ii = 0; ii < resultLectureList.size(); ii++)
+          {
+            if (ii != 0) {
+              old_lect_dday = Integer.parseInt(((AtendInfo)resultLectureList.get(ii - 1)).getLect_dday()) + 1;
+            }
+            lect_dday = Integer.parseInt(((AtendInfo)resultLectureList.get(ii)).getLect_dday()) + 1;
+            year = Integer.parseInt(((AtendInfo)resultLectureList.get(ii)).getYear());
+            
+            String rltDate = "";
+            if (startMonth == 3) {
+              rltDate = getDate(year, startMonth, week_no + 1, lect_dday);
+            } else {
+              rltDate = getDate(year, startMonth, week_no + 4, lect_dday);
+            }
+            currentWeek = week_no;
+            if (old_lect_dday == lect_dday)
+            {
+              if (ii == 0) {
+                rltDateArry[0][ii] = rltDate;
+              } else {
+                rltDateArry[0][ii] = "";
+              }
+            }
+            else {
+              rltDateArry[0][ii] = rltDate;
+            }
+          }
+        }
+        else
+        {
+          int old_lect_dday = Integer.parseInt(((AtendInfo)resultLectureList.get(0)).getLect_dday()) + 1;
+          for (int weeks = 1; weeks <= 15; weeks++)
+          {
+            int lect_dday = 0;
+            int year = 0;
+            for (int ii = 0; ii < resultLectureList.size(); ii++)
+            {
+              if (ii != 0) {
+                old_lect_dday = Integer.parseInt(((AtendInfo)resultLectureList.get(ii - 1)).getLect_dday()) + 1;
+              }
+              lect_dday = Integer.parseInt(((AtendInfo)resultLectureList.get(ii)).getLect_dday()) + 1;
+              year = Integer.parseInt(((AtendInfo)resultLectureList.get(ii)).getYear());
+              
+              String rltDate = "";
+              if (startMonth == 3) {
+                rltDate = getDate(year, startMonth, weeks + 1, lect_dday);
+              } else {
+                rltDate = getDate(year, startMonth, weeks + 4, lect_dday);
+              }
+              if (currentDate.equals(rltDate)) {
+                currentWeek = weeks;
+              }
+              if (old_lect_dday == lect_dday)
+              {
+                if (ii == 0) {
+                  rltDateArry[(weeks - 1)][ii] = rltDate;
+                } else {
+                  rltDateArry[(weeks - 1)][ii] = "";
+                }
+              }
+              else {
+                rltDateArry[(weeks - 1)][ii] = rltDate;
+              }
+            }
+          }
+        }
+        List<AtendInfo> addInfoList = atendService.srchLectureAddInfoList(atendSearchInfo);
+        ((AtendInfo)resultLectureList.get(0)).setLect_date(rltDateArry);
+        info.setProfessor_code(atendSearchInfo.getSrch_professor_code());
+        info.setClass_divide(atendSearchInfo.getSrch_class_divide());
+        info.setSubject_title_no(atendSearchInfo.getSrch_subject_title_no());
+        List<AtendInfo> resultStdList = atendService.selectAtendLectureStdList(info, resultLectureList, addInfoList);
+        int weekForTime = Integer.parseInt(lectureInfo.getLecture_time());
+        int weekForTimeTotal = weekForTime * 15;
+        int useCnt = atendService.srchPfsAtendStdUseCnt(atendSearchInfo);
+        for (int i = 0; i < resultStdList.size(); i++)
+        {
+          ((AtendInfo)resultStdList.get(i)).setWeekTotalTime(weekForTimeTotal);
+          
+          AtendSearchInfo param = new AtendSearchInfo();
+          param.setSrch_student_code(((AtendInfo)resultStdList.get(i)).getStudent_code());
+          param.setSrch_year(((AtendInfo)resultStdList.get(i)).getYear());
+          param.setSrch_semester(((AtendInfo)resultStdList.get(i)).getSemester());
+          param.setSrch_subject_title_no(atendSearchInfo.getSrch_subject_title_no());
+          param.setSrch_class_divide(atendSearchInfo.getSrch_class_divide());
+          
+          List<AtendInfo> statisList = atendService.selectAtendStatisResult(param);
+          String statisString = "";
+          for (int ii = 0; ii < statisList.size(); ii++)
+          {
+            statisString = statisString;
+            int atendKind = Integer.parseInt(((AtendInfo)statisList.get(ii)).getWeek_atend_status());
+            switch (atendKind)
+            {
+            case 1: 
+              statisString = statisString + "출석 ";
+              break;
+            case 2: 
+              statisString = statisString + "지각 ";
+              break;
+            case 3: 
+              statisString = statisString + "결석 ";
+              break;
+            case 4: 
+              statisString = statisString + "조퇴 ";
+              break;
+            case 5: 
+              statisString = statisString + "조기취업 ";
+              break;
+            case 6: 
+              statisString = statisString + "휴강";
+            }
+            statisString = statisString + ((AtendInfo)statisList.get(ii)).getStatis_cnt() + "번<br>";
+          }
+          statisString = statisString + "총 " + weekForTimeTotal + "시수";
+          ((AtendInfo)resultStdList.get(i)).setStatisString(statisString);
+          
+          int weekTimeForPorint = 0;
+          if (((AtendInfo)resultStdList.get(i)).getAttend_score() != null) {
+            weekTimeForPorint = Integer.parseInt(((AtendInfo)resultStdList.get(i)).getAttend_score());
+          }
+          ((AtendInfo)resultStdList.get(i)).setWeekTimeForPoint(weekTimeForPorint);
+        }
+    	Map<String, Object> jsonObject = new HashMap<String, Object>();
+    	jsonObject.put("timeInfo", resultLectureList);
+    	jsonObject.put("currentWeek", Integer.valueOf(currentWeek));
+    	jsonObject.put("currentDate", currentDate);
+    	jsonObject.put("useCnt", Integer.valueOf(useCnt));
+    	jsonObject.put("addInfoList", addInfoList);
+    	jsonObject.put("stdList", resultStdList);
+    	jsonObject.put("info", lectureInfo);
+    	return jsonObject;
+    }
+    public String getDate(int year, int month, int week, int dayOfWeek)
+    {
+      String[] days = { "일", "월", "화", "수", "목", "금", "토" };
+      DecimalFormat df = new DecimalFormat("00");
+      Calendar calendar = Calendar.getInstance();
+      calendar.set(1, year);
+      calendar.set(2, month - 1);
+      calendar.set(4, week);
+      calendar.set(7, dayOfWeek);
+      String strMonth = df.format(calendar.get(2) + 1);
+      String strDay = df.format(calendar.get(5));
+      int strDDay = Integer.parseInt(df.format(calendar.get(7)));
+      String date = strMonth + "/" + strDay + "/" + days[(strDDay - 1)];
+      return date;
+    }
+    @RequestMapping({"/ShowImage"})
+    public ResponseEntity<byte[]> showImage(@RequestParam("imgIdx") String imgIdx, HttpServletResponse response, HttpServletRequest request)
+      throws Exception
+    {
+      Map resultMap = atendService.selectStdDefaultPhoto(imgIdx);
+      byte[] imageContent = (byte[]) resultMap.get("PICT_FILE");
+      final HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.IMAGE_JPEG);
+      return new ResponseEntity<byte[]>(imageContent, headers, HttpStatus.OK);
+    }
+    //마감
+    @RequestMapping(value="/AtendClose")
+    public void updateAtendClose(AtendSearchInfo atendSearchInfo, HttpServletRequest request, HttpServletResponse response) throws Exception{
+    	HttpSession httpSession = request.getSession(false);
+    	LoginInfo sessionLoginInfo = new LoginInfo();
+    	//세션존재하면 세션 정보로 사용자 정보 세팅
+    	if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+    		sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+    		atendSearchInfo.setSrch_professor_code(sessionLoginInfo.getUserNo());
+    	}
+    	int resultInt = 0;
+        resultInt = atendService.insertAtendLectureEnd(atendSearchInfo);
+        if(resultInt > 0) {
+            response.getWriter().write("UPDATE_OK");
+        }else {
+        	response.getWriter().write("UPDATE_FAIL");
+        }
+    }
+    //마감취소
+    @RequestMapping(value="/cancelClose")
+    public void updateCancelClose(AtendSearchInfo atendSearchInfo, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        int resultInt = 0;
+        resultInt = atendService.deleteAtendLectureEnd(atendSearchInfo);
+        if(resultInt > 0) {
+            response.getWriter().write("UPDATE_OK");
+        }else {
+        	response.getWriter().write("UPDATE_FAIL");
+        }
+    }
+    //출첵
+    @RequestMapping(value="/checkAtendStd")
+    public @ResponseBody Map<String, Object> checkAtendStd(AtendInfo atendInfo, HttpServletRequest request, HttpServletResponse response) throws Exception{
+    	HttpSession httpSession = request.getSession(false);
+    	LoginInfo sessionLoginInfo = new LoginInfo();
+    	//세션존재하면 세션 정보로 사용자 정보 세팅
+    	if(httpSession != null && httpSession.getAttribute("sessionUserInfo") != null) {
+    		sessionLoginInfo = (LoginInfo)httpSession.getAttribute("sessionUserInfo");
+    	}
+        String tagName = atendInfo.getTagName();
+        String rltMsg = "출석 체크 되었습니다.";
+    	String[] tag = tagName.split("_");
+        atendInfo.setWeek_atend_no(tag[1]);
+        atendInfo.setTime_no(tag[2]);
+        atendInfo.setSubject_title_no(tag[3]);
+        atendInfo.setYear(tag[4]);
+        atendInfo.setSemester(tag[5]);
+        atendInfo.setLect_dday(tag[6]);
+        atendInfo.setProfessor_code(tag[7]);
+        atendInfo.setClass_divide(tag[8]);
+        int cnt = atendService.selectCheckAtendStdCnt(atendInfo);
+        atendInfo.setUpduserid(sessionLoginInfo.getUserNo());
+        int result = 0;
+        if (cnt > 0)
+        {
+          result = atendService.updateCheckAtendStd(atendInfo);
+          rltMsg = "학생의 출석이 수정되었습니다.";
+        }
+        else
+        {
+          result = atendService.insertCheckAtendStd(atendInfo);
+        }
+        AtendSearchInfo param = new AtendSearchInfo();
+        param.setSrch_student_code(atendInfo.getStudent_code());
+        param.setSrch_subject_title_no(tag[3]);
+        param.setSrch_year(tag[4]);
+        param.setSrch_semester(tag[5]);
+        param.setSrch_class_divide(tag[8]);
+        List<AtendInfo> statisList = getAtendStatisResult(param);
+        
+        String statisString = "";
+        
+        int weekForTimeTotal = 0;
+        
+        int weekTimeForPoint = 0;
+        if (!"".equals(atendInfo.getLecture_time()))
+        {
+          weekForTimeTotal = Integer.parseInt(atendInfo.getLecture_time()) * 15;
+          for (int ii = 0; ii < statisList.size(); ii++)
+          {
+            statisString = statisString;
+            int atendKind = Integer.parseInt(((AtendInfo)statisList.get(ii)).getWeek_atend_status());
+            switch (atendKind)
+            {
+            case 1: 
+              statisString = statisString + "출석 ";
+              break;
+            case 2: 
+              statisString = statisString + "지각 ";
+              break;
+            case 3: 
+              statisString = statisString + "결석 ";
+              break;
+            case 4: 
+              statisString = statisString + "조퇴 ";
+              break;
+            case 5: 
+              statisString = statisString + "조기취업 ";
+              break;
+            case 6: 
+              statisString = statisString + "휴강";
+            }
+            statisString = statisString + ((AtendInfo)statisList.get(ii)).getStatis_cnt() + "번<br>";
+          }
+          statisString = statisString + "총" + weekForTimeTotal + "시수";
+          
+          weekTimeForPoint = getWeekForPoint(statisList, weekForTimeTotal);
+        }
+    	Map<String, Object> jsonObject = new HashMap<String, Object>();
+    	jsonObject.put("msg", rltMsg);
+    	jsonObject.put("resultAtendPoint", Integer.valueOf(weekTimeForPoint));
+    	jsonObject.put("statisString", statisString);
+    	return jsonObject;
+    }
+    public int getWeekForPoint(List<AtendInfo> resultInfoList, int weekForTimeTotal)
+    {
+      int point = 20;
+      
+      int status1 = 0;
+      
+      int status2 = 0;
+      
+      int status3 = 0;
+      
+      int resultCnt = 0;
+      for (int i = 0; i < resultInfoList.size(); i++)
+      {
+        int atendKind = Integer.parseInt(((AtendInfo)resultInfoList.get(i)).getWeek_atend_status());
+        int satisCnt = Integer.parseInt(((AtendInfo)resultInfoList.get(i)).getStatis_cnt());
+        switch (atendKind)
+        {
+        case 1: 
+          status1 += satisCnt;
+          break;
+        case 2: 
+          status2 += satisCnt;
+          break;
+        case 3: 
+          status3 += satisCnt;
+          break;
+        case 4: 
+          status2 += satisCnt;
+        }
+      }
+      resultCnt = status3 + status2 / 3;
+      if (weekForTimeTotal == 15)
+      {
+        if (resultCnt == 0) {
+          point = 20;
+        } else if (resultCnt == 1) {
+          point--;
+        } else if (resultCnt == 2) {
+          point -= 3;
+        } else if (resultCnt == 3) {
+          point -= 4;
+        } else {
+          point = 0;
+        }
+      }
+      else if (weekForTimeTotal == 30)
+      {
+        if (resultCnt == 0) {
+          point = 20;
+        } else if ((resultCnt == 1) || (resultCnt == 2)) {
+          point--;
+        } else if (resultCnt == 3) {
+          point -= 2;
+        } else if ((resultCnt == 4) || (resultCnt == 5)) {
+          point -= 3;
+        } else if (resultCnt == 6) {
+          point -= 4;
+        } else if (resultCnt == 7) {
+          point -= 5;
+        } else {
+          point = 0;
+        }
+      }
+      else if (weekForTimeTotal == 45)
+      {
+        if ((resultCnt == 0) || (resultCnt == 1)) {
+          point = 20;
+        } else if ((resultCnt == 2) || (resultCnt == 3)) {
+          point--;
+        } else if ((resultCnt == 4) || (resultCnt == 5)) {
+          point -= 2;
+        } else if ((resultCnt == 6) || (resultCnt == 7)) {
+          point -= 3;
+        } else if ((resultCnt == 8) || (resultCnt == 9) || (resultCnt == 10)) {
+          point -= 4;
+        } else if (resultCnt == 11) {
+          point -= 5;
+        } else {
+          point = 0;
+        }
+      }
+      else if (weekForTimeTotal == 60)
+      {
+        if ((resultCnt == 0) || (resultCnt == 1)) {
+          point = 20;
+        } else if ((resultCnt == 2) || (resultCnt == 3) || (resultCnt == 4)) {
+          point--;
+        } else if ((resultCnt == 5) || (resultCnt == 6) || (resultCnt == 7)) {
+          point -= 2;
+        } else if ((resultCnt == 8) || (resultCnt == 9) || (resultCnt == 10)) {
+          point -= 3;
+        } else if ((resultCnt == 11) || (resultCnt == 12) || (resultCnt == 13)) {
+          point -= 4;
+        } else if (resultCnt == 14) {
+          point -= 5;
+        } else {
+          point = 0;
+        }
+      }
+      else if (weekForTimeTotal == 75)
+      {
+        if ((resultCnt == 0) || (resultCnt == 1)) {
+          point = 20;
+        } else if ((resultCnt == 2) || (resultCnt == 3) || (resultCnt == 4) || (resultCnt == 5)) {
+          point--;
+        } else if ((resultCnt == 6) || (resultCnt == 7) || (resultCnt == 8) || (resultCnt == 9)) {
+          point -= 2;
+        } else if ((resultCnt == 10) || (resultCnt == 11) || (resultCnt == 12) || (resultCnt == 13)) {
+          point -= 3;
+        } else if ((resultCnt == 14) || (resultCnt == 15) || (resultCnt == 16)) {
+          point -= 4;
+        } else if ((resultCnt == 17) || (resultCnt == 18)) {
+          point -= 5;
+        } else {
+          point = 0;
+        }
+      }
+      else if (weekForTimeTotal == 90) {
+        if ((resultCnt == 0) || (resultCnt == 1) || (resultCnt == 2)) {
+          point = 20;
+        } else if ((resultCnt == 3) || (resultCnt == 4) || (resultCnt == 5) || (resultCnt == 6)) {
+          point--;
+        } else if ((resultCnt == 7) || (resultCnt == 8) || (resultCnt == 9) || (resultCnt == 10) || (resultCnt == 11)) {
+          point -= 2;
+        } else if ((resultCnt == 12) || (resultCnt == 13) || (resultCnt == 14) || (resultCnt == 15)) {
+          point -= 3;
+        } else if ((resultCnt == 16) || (resultCnt == 17) || (resultCnt == 18) || (resultCnt == 19) || (resultCnt == 20)) {
+          point -= 4;
+        } else if ((resultCnt == 21) || (resultCnt == 22)) {
+          point -= 5;
+        } else {
+          point = 0;
+        }
+      }
+      return point;
+    }
+    public List<AtendInfo> getAtendStatisResult(AtendSearchInfo searchInfo)
+    	    throws Exception
+    	  {
+    	    List<AtendInfo> resultInfoList = null;
+    	    resultInfoList = atendService.selectAtendStatisResult(searchInfo);
+    	    return resultInfoList;
+    	  }
+    @RequestMapping(value="/printAtend")
+    public ModelAndView printAtendPfs(HttpServletRequest request, HttpServletResponse response, AtendInfo info, ModelAndView mv)
+      throws Exception
+    {
+      mv.setViewName("print_atend_pfs");
+      mv.addObject("INFO_DATA", info);
+      return mv;
+    }
+}

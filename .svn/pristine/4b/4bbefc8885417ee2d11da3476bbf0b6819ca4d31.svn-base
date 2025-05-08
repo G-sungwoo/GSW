@@ -1,0 +1,822 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mainMapper">
+
+<resultMap type="com.osan.portal.vo.HomePageInfo" id="homePageInfoResultMap">
+    <!-- 게시판 -->
+    <result column="NEWSID" property="newsId"/>
+    <result column="TITLE" property="title"/>
+    <result column="CREATORID" property="creatorId"/> 
+    <result column="VIEWCOUNT" property="viewCount"/> 
+    <result column="REGDATE" property="regDate"/>  
+    <result column="FILENAME" property="fileName"/>
+    <result column="REPLYAT" property="replyAt"/>
+    <result column="ARTICLE_SEQ" property="articleSeq"/>
+    <result column="INSERT_NAME" property="insertName"/>
+    <result column="INSERT_DATE" property="insertDate"/>
+    <result column="PKID" property="pkId"/>
+    <result column="ENDDATE" property="endDate"/>
+    <result column="BOARDNO" property="boardNo"/>
+    <!-- 강의시간표 -->
+    <result column="CURRENTYM" property="currentYm"/>
+    <result column="LECT_YEAR" property="lectYear"/>
+    <result column="LECT_SHTM" property="lectShtm"/>
+    <result column="TERM_NUMB" property="termNumb"/>
+    <result column="LECT_MOND1" property="lectMond1"/>
+    <result column="LECT_MOND2" property="lectMond2"/>
+    <result column="LECT_MOND3" property="lectMond3"/>
+    <result column="LECT_TUED1" property="lectTued1"/>
+    <result column="LECT_TUED2" property="lectTued2"/>
+    <result column="LECT_TUED3" property="lectTued3"/>
+    <result column="LECT_WEDD1" property="lectWedd1"/>
+    <result column="LECT_WEDD2" property="lectWedd2"/>
+    <result column="LECT_WEDD3" property="lectWedd3"/>
+    <result column="LECT_THRD1" property="lectThrd1"/>
+    <result column="LECT_THRD2" property="lectThrd2"/>
+    <result column="LECT_THRD3" property="lectThrd3"/>
+    <result column="LECT_FRID1" property="lectFrid1"/>
+    <result column="LECT_FRID2" property="lectFrid2"/>
+    <result column="LECT_FRID3" property="lectFrid3"/>
+    <!-- 강의계획서 -->
+    <result column="HAKS_NUMB" property="haksNumb"/>
+    <result column="CORS_SHYR" property="corsShyr"/>
+    <result column="CLSS_NUMB" property="clssNumb"/>
+    <result column="SBJT_KRNM" property="sbjtKrnm"/>
+    <result column="SPRF_KRNM" property="sprfKrnm"/>
+    <result column="SPRF_NUMB" property="sprfNumb"/>
+    <result column="LECT_PONT" property="lectPont"/>
+    <result column="LECT_TIME" property="lectTime"/>
+    <result column="HAKS_NUMB2" property="haksNumb2"/>
+    <result column="CORS_SUST" property="corsSust"/>
+    <result column="CORS_MAJR" property="corsMajr"/>
+    <result column="LINC_YSNO" property="lincYsno"/>
+    <!-- 학생정보 -->
+    <result column="STNT_NUMB" property="stntNumb"/>
+    <result column="KORN_NAME" property="kornName"/>
+    <result column="STNT_SHYR" property="stntShyr"/>
+    <result column="SUST_NAME" property="sustName"/>
+    <result column="MAJR_NAME" property="majrName"/>
+    <result column="STNT_CLSS" property="stntClss"/>
+    <result column="STNT_HAND" property="stntHand"/>
+    <result column="STNT_EMAL" property="stntEmail"/>
+    <result column="SUST_URL" property="sustUrl"/>
+    <!-- 장학금/등록금 현황 -->
+    <result column="REGI_YEAR" property="regiYear"/>
+    <result column="REGI_SHTM" property="regiShtm"/>
+    <result column="ENTR_AMNT" property="entrAmnt"/>
+    <result column="LESN_AMNT" property="lesnAmnt"/>
+    <result column="SHSH_ETAM" property="shshEtam"/>
+    <result column="SHSH_LSAM" property="shshLsam"/>
+    <result column="SHSH_AMNT" property="shshAmnt"/>
+    <result column="RLPD_AMNT" property="rlpdAmnt"/>
+    <result column="PAID_NAME" property="paidName"/>
+    <result column="SHSH_KRNM" property="shshKrnm"/>
+    <!-- 성적조회 -->
+    <result column="APLY_SJCT" property="aplySjct"/>
+    <result column="POBT_SJCT" property="pobtSjct"/>
+    <result column="APLY_PONT" property="aplyPont"/>
+    <result column="ACQT_PONT" property="acqtPont"/>
+    <result column="UNAQ_PONT" property="unaqPont"/>
+    <result column="ACQT_MRKS" property="acqtMrks"/>
+    <result column="AVRG_MRKS" property="avrgMrks"/>
+    <result column="ACQT_GRAD" property="acqtGrad"/>
+    <result column="ACQT_SCOR" property="acqtScor"/>
+    <result column="ACQT_ARSC" property="acqtArsc"/>
+    <result column="SBJT_CODE" property="sbjtCode"/>
+    <result column="TOTL_SCOR" property="totlScor"/>
+    <result column="LECT_GRAD" property="lectGrad"/>
+    <!-- 채용정보 -->
+    <result column="COMP_NAME" property="compName"/>
+</resultMap>
+
+<resultMap type="java.util.HashMap" id="imageResultMap">
+    <result column="STNT_NUMB" property="stntNumb"/>
+    <result column="PICT_FILE" property="pictFile" jdbcType="BLOB" javaType="[B"/>
+</resultMap>
+
+<!-- 대학 공지 -->
+    <select id="selectListHomepageUniNotice" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.HomePageInfo">
+        SELECT TOP 8
+               BBSNO AS NEWSID
+             , BBSTITLE AS TITLE
+             , USERID AS CREATORID
+             , BBSHIT AS VIEWCOUNT
+             , SUBSTRING(BBSDATEREG,3,2) + '.' + SUBSTRING(BBSDATEREG,5,2) + '.' + SUBSTRING(BBSDATEREG,7,2) AS REGDATE  
+          FROM ZCMS.DBO.ZBOARDCOMMON361 (NOLOCK)         
+      ORDER BY BBSDATEREG DESC 
+    </select>
+    
+<!-- 입시 공지 -->
+    <select id="selectListHomepageIphakNotice" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.HomePageInfo">
+        SELECT TOP 8
+               BBSNO AS PKID
+             , BBSTITLE AS TITLE
+             , BBSHIT AS VIEWCOUNT
+             , SUBSTRING(BBSDATEREG,3,2) + '.' + SUBSTRING(BBSDATEREG,5,2) + '.' + SUBSTRING(BBSDATEREG,7,2) AS REGDATE 
+             , '' AS FILENAME 
+          FROM ZCMS.DBO.ZBOARDCOMMON378 (NOLOCK)         
+      ORDER BY BBSDATEREG DESC 
+    </select>
+
+<!-- 입찰 공지 -->
+    <select id="selectListHomepageBidNotice" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.HomePageInfo">
+        SELECT TOP 8
+               BBSNO AS NEWSID
+             , BBSTITLE AS TITLE
+             , USERID AS CREATORID
+             , BBSHIT AS VIEWCOUNT
+             , SUBSTRING(BBSDATEREG,3,2) + '.' + SUBSTRING(BBSDATEREG,5,2) + '.' + SUBSTRING(BBSDATEREG,7,2) AS REGDATE  
+          FROM ZCMS.DBO.ZBOARDCOMMON328          
+      ORDER BY BBSDATEREG DESC 
+    </select>
+<!-- 코로나 공지 -->
+    <select id="selectListHomepageCoronaNotice" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.HomePageInfo">
+        SELECT TOP 8
+               BBSNO AS NEWSID
+             , BBSTITLE AS TITLE
+             , USERID AS CREATORID
+             , BBSHIT AS VIEWCOUNT
+             , SUBSTRING(BBSDATEREG,3,2) + '.' + SUBSTRING(BBSDATEREG,5,2) + '.' + SUBSTRING(BBSDATEREG,7,2) AS REGDATE  
+          FROM ZCMS.DBO.ZBOARDCOMMON394          
+      ORDER BY BBSDATEREG DESC 
+    </select>
+<!-- 오산대소식 -->
+    <select id="selectListOsanUniNews" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.HomePageInfo">
+        SELECT TOP 11
+               BBSNO AS NEWSID
+             , BBSTITLE AS TITLE
+             , USERID AS CREATORID
+             , BBSHIT AS VIEWCOUNT
+             , SUBSTRING(BBSDATEREG,3,2) + '.' + SUBSTRING(BBSDATEREG,5,2) + '.' + SUBSTRING(BBSDATEREG,7,2) AS REGDATE  
+             , BOARDNO
+          FROM (SELECT *
+                  FROM ZCMS.DBO.ZBOARDPHOTOGALLERY247 (NOLOCK)
+             UNION ALL 
+                SELECT * 
+                  FROM ZCMS.DBO.ZBOARDPHOTOGALLERY183 (NOLOCK)
+                ) A         
+      ORDER BY BBSDATEREG DESC
+    </select>  
+<!-- QnA -->
+    <select id="selectListOsanUniQnA" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.HomePageInfo">
+        SELECT TOP 11
+               BBSNO AS PKID
+             , BBSTITLE AS TITLE
+             , BBSUSERNAME AS USERNAME
+             , BBSCATENOS AS GUBUN
+             , BBSHIT AS VIEWCOUNT
+             , SUBSTRING(BBSDATEREG,3,2) + '.' + SUBSTRING(BBSDATEREG,5,2) + '.' + SUBSTRING(BBSDATEREG,7,2) AS REGDATE 
+             , CASE WHEN BBSNOTICE = '1' THEN '공지'
+                    ELSE CASE WHEN ( SELECT COUNT(*) FROM ZCMS.DBO.ZBOARDCOMMON329 B WHERE B.BBSPARENTNO = A.BBSNO ) > 0
+                              THEN '답변완료'
+                              ELSE '답변대기'
+                          END
+                END AS REPLYAT
+          FROM ZCMS.DBO.ZBOARDCOMMON329 A (NOLOCK)  
+         WHERE BBSPARENTNO = 0  
+      ORDER BY BBSNOTICE DESC, BBSDATEREG DESC
+    </select>  
+<!-- 교직원 학생 게시판 -->
+    <select id="selectBoardArticleCnt" resultType="int" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT COUNT(1)
+          FROM PT_BOARDARTICLE_M a
+         WHERE DELETE_YN = 'N'
+           AND (EXISTS (SELECT AUTH
+                          FROM PT_BOARDAUTH_D
+                         WHERE ARTICLE_SEQ = a.ARTICLE_SEQ
+                           AND (AUTH = DECODE(#{userAuth},4,1,5,4,6,5,#{userAuth}) OR AUTH = -1))
+                    OR INSERT_ID = #{userNo})
+    </select>
+    <select id="selectListBoardArticle" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+       SELECT X.ARTICLE_SEQ
+            , X.TITLE
+            , SUBSTR(X.INSERT_NAME,0,3) AS INSERT_NAME
+            , SUBSTR(X.INSERT_DATE,3,2) || '.' || SUBSTR(X.INSERT_DATE,5,2) || '.' || SUBSTR(X.INSERT_DATE,7,2) AS INSERT_DATE
+            , X.READ_COUNT AS VIEWCOUNT
+         FROM (SELECT ROW_NUMBER () OVER (ORDER BY NOTICE_YN DESC, INSERT_DATE DESC , ARTICLE_SEQ DESC) RN
+                    , ARTICLE_SEQ
+                    , TITLE
+                    , INSERT_NAME
+                    , TO_CHAR (INSERT_DATE, 'YYYYMMDD') AS INSERT_DATE
+                    , READ_COUNT
+                 FROM PT_BOARDARTICLE_M a
+                WHERE DELETE_YN = 'N'
+                  AND (EXISTS (SELECT AUTH
+                                 FROM PT_BOARDAUTH_D
+                                WHERE ARTICLE_SEQ = a.ARTICLE_SEQ
+                                  AND (AUTH = DECODE(#{userAuth},4,1,5,4,6,5,#{userAuth}) OR AUTH = -1))
+                           OR INSERT_ID = #{userNo})) X
+        WHERE X.RN BETWEEN #{first} AND #{last}
+    </select>
+<!-- 개인요약정보(결재건수)-->
+    <select id="selectSignDocCnt" resultType="int" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT COUNT(1) AS signDocCnt
+          FROM UBIFLOW.SIGN_DOC A
+             , UBIFLOW.SIGN_DOC_FOLDER B
+             , UBIFLOW.SIGN_SIGN C
+             , UBIFLOW.PT_USER U
+             , UBIFLOW.SIGN_FOLDER F
+         WHERE A.SUSB_YN != 'Y'
+           AND A.DOC_YEARMON = B.DOC_YEARMON
+           AND A.DOC_NUMBER = B.DOC_NUMBER
+           AND A.DOC_YEARMON = C.DOC_YEARMON
+           AND A.DOC_NUMBER = C.DOC_NUMBER
+           AND C.SIGN_ACTION != 'Y'
+           AND U.USER_SPEC_ID = #{userNo}
+           AND U.USER_RETIRED = 'N'
+           AND C.SIGN_USER_ID = U.USER_ID
+           AND F.FOLDER_TYPE = 1
+           AND F.OWNER_ID = U.USER_ID
+           AND B.FOLDER_ID = F.FOLDER_ID
+    </select>
+<!-- 개인요약정보(공람건수)-->
+    <select id="selectPublicDocCnt" resultType="int" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT COUNT(1) AS publicDocCnt
+          FROM UBIFLOW.SIGN_DOC A
+             , UBIFLOW.SIGN_DOC_FOLDER B
+             , UBIFLOW.SIGN_SIGN C
+             , UBIFLOW.PT_USER U
+             , UBIFLOW.SIGN_FOLDER F
+         WHERE A.SUSB_YN != 'Y'
+           AND A.DOC_YEARMON = B.DOC_YEARMON
+           AND A.DOC_NUMBER = B.DOC_NUMBER
+           AND A.DOC_YEARMON = C.DOC_YEARMON
+           AND A.DOC_NUMBER = C.DOC_NUMBER
+           AND C.SIGN_ACTION != 'Y'
+           AND U.USER_SPEC_ID = #{userNo}
+           AND U.USER_RETIRED = 'N'
+           AND C.SIGN_USER_ID = U.USER_ID
+           AND F.FOLDER_TYPE = 6
+           AND F.OWNER_ID = U.USER_ID
+           AND B.FOLDER_ID = F.FOLDER_ID
+    </select>
+<!-- 개인요약정보(수신함건수)-->
+    <select id="selectInboxDocCnt" resultType="int" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT COUNT(1) AS inboxDocCnt
+          FROM UBIFLOW.SIGN_DOC_FOLDER B
+             , (SELECT FOLDER_ID
+                  FROM UBIFLOW.SIGN_FOLDER S
+                     , (SELECT M1.GROUP_ID
+                          FROM UBIFLOW.PT_MEMBER M1
+                             , UBIFLOW.PT_USER U1
+                         WHERE M1.USER_ID = U1.USER_ID
+                           AND U1.USER_SPEC_ID = #{userNo}
+                           AND USER_RETIRED = 'N') M
+                  WHERE S.OWNER_ID IN M.GROUP_ID
+                    AND FOLDER_TYPE = 1) F
+         WHERE  B.FOLDER_ID = F.FOLDER_ID
+         <![CDATA[
+           AND  B.DOC_YEARMON >= '201801'
+           ]]>
+    </select>
+<!-- 학사력 -->
+    <select id="selectListAcademicSchedule" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT SCHDUL_ID AS PKID
+             , SCHDUL_NM AS TITLE
+             , SUBSTRING(CONVERT(CHAR(8), SCHDUL_BGNDE),3,2) + '.' + SUBSTRING(CONVERT(CHAR(8), SCHDUL_BGNDE),5,2) + '.' + SUBSTRING(CONVERT(CHAR(8), SCHDUL_BGNDE),7,2) AS REGDATE 
+             , CASE WHEN SCHDUL_ENDDE = '0000' 
+                    THEN ''
+                    ELSE SUBSTRING(CONVERT(CHAR(8), SCHDUL_ENDDE),3,2) + '.' + SUBSTRING(CONVERT(CHAR(8), SCHDUL_ENDDE),5,2) + '.' + SUBSTRING(CONVERT(CHAR(8), SCHDUL_ENDDE),7,2) 
+                END AS ENDDATE
+             , #{searchYm} AS CURRENTYM
+          FROM ZCMS.DBO.ZSCHDULINFO  (NOLOCK)
+         WHERE CONVERT(CHAR(6), REPLACE(SCHDUL_BGNDE, '-',''), 112) =  #{searchYm}
+      ORDER BY REGDATE
+    </select>
+<!-- 개인정보 수정(교직원) -->
+    <update id="updateUserInfo" parameterType="com.osan.portal.vo.LoginInfo">
+        UPDATE OSANUNIV.PSNL235
+           SET HAND_NUMB = #{hp}         
+             , EMAL_ADDR = #{email}      
+             , INCS_NUMB = #{tel}      
+             , FAXN_NUMB = #{fax}        
+             , TELP_NUMB = #{hTell}       
+             , UPDT_USID = #{userNo}   
+             , UPDT_DATE = SYSDATE   
+             , UPDT_ADDR = #{userIp}  
+         WHERE PSNL_NUMB = #{userNo} 
+    </update>
+<!-- 개인정보 수정(학생) -->
+    <update id="updateStntUserInfo" parameterType="com.osan.portal.vo.LoginInfo">
+        MERGE INTO OSANUNIV.REGI110 A
+        USING DUAL 
+                ON ( A.STNT_NUMB = #{userNo} )
+      WHEN MATCHED 
+              THEN
+            UPDATE 
+               SET STNT_HAND  = #{hp}        
+                 , STNT_EMAL  = #{email}      
+                 , STNT_TELE  = #{hTell}
+                 , UPDT_USID  = #{userNo}
+                 , UPDT_DATE  = SYSDATE
+                 , UPDT_ADDR  = #{userIp}
+  WHEN NOT MATCHED 
+              THEN
+            INSERT(STNT_HAND
+                 , STNT_EMAL
+                 , STNT_TELE
+                 , INPT_USID
+                 , INPT_DATE
+                 , INPT_ADDR)
+            VALUES(#{hp}
+                 , #{email}
+                 , #{hTell}
+                 , #{userNo}
+                 , SYSDATE
+                 , #{userIp})
+    </update>
+<!-- 비밀번호 수정(교직원) -->
+    <update id="updateUserPassword" parameterType="com.osan.portal.vo.LoginInfo">
+        UPDATE OSANUNIV.PSNL200
+           SET PASS_WORD = damo.hash_str_data(#{newPassword})
+           <choose>
+             <when test="tempPasswordAt !=null and tempPasswordAt.equals('Y')">
+             /*임시비밀번호 일경우 변경팝업 뜰 수 있도록 6개월 전으로 세팅*/
+             , CHGE_PWDE = TO_CHAR(ADD_MONTHS(SYSDATE,-6),'YYYYMMDD')
+             </when>
+             <otherwise>
+             , CHGE_PWDE = TO_CHAR(SYSDATE,'YYYYMMDD')
+             </otherwise>
+           </choose>  
+             , UPDT_USID = #{userNo}    
+             , UPDT_DATE = SYSDATE      
+             , UPDT_ADDR = #{userIp}
+         WHERE PSNL_NUMB = #{userNo}
+    </update>
+<!-- 비밀번호 수정(학생) -->
+    <update id="updateStntUserPassword" parameterType="com.osan.portal.vo.LoginInfo">
+        UPDATE OSANUNIV.REGI100
+           SET PASS_WORD = damo.hash_str_data(#{newPassword}) 
+           <choose>
+             <when test="tempPasswordAt !=null and tempPasswordAt.equals('Y')">
+             /*임시비밀번호 일경우 변경팝업 뜰 수 있도록 6개월 전으로 세팅*/
+             , CHGE_PWDE = TO_CHAR(ADD_MONTHS(SYSDATE,-6),'YYYYMMDD')
+             </when>
+             <otherwise>
+             , CHGE_PWDE = TO_CHAR(SYSDATE,'YYYYMMDD')
+             </otherwise>
+           </choose>  
+             , UPDT_USID = #{userNo}    
+             , UPDT_DATE = SYSDATE      
+             , UPDT_ADDR = #{userIp}
+         WHERE STNT_NUMB = #{userNo}
+    </update>
+<!-- 교직원 검색 -->
+    <select id="selectSearchWorkerCnt" resultType="int" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT COUNT(1) AS SEARCHWORKERCNT
+          FROM PSNL200 A 
+    INNER JOIN PSNL235 B 
+            ON A.PSNL_NUMB = B.PSNL_NUMB
+         WHERE UPPER (A.KORN_NAME) LIKE UPPER ('%' || #{searchName} || '%') --성명
+           AND A.HOOF_STCD = 'N02010' --재직상태
+    </select>
+    <select id="selectListSearchWorker" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+       SELECT X.USERNAME
+            , X.DEPTNAME
+            , X.PSNLGBNM
+            , NVL(X.TEL,' ') AS TEL
+            , NVL(X.HP,' ') AS HP
+         FROM (SELECT ROW_NUMBER () OVER (ORDER BY CONVERT(A.KORN_NAME,'ISO2022-KR'), A.PSNL_NUMB) RN
+                    , A.KORN_NAME                          AS USERNAME
+                    , F_CMMN_DEPT_NAME (A.DEPT_CODE, '00') AS DEPTNAME
+                    , F_CMMN_CDNM (A.PSNL_GBCD, '00')      AS PSNLGBNM
+                    , B.INCS_NUMB                          AS TEL
+                    , REGEXP_REPLACE(REGEXP_REPLACE (b.hand_numb, '[^[:digit:]]'), '(^[[:digit:]]{3})([[:digit:]]{3,4})([[:digit:]]{4}$$)', '\1-\2-\3') AS HP
+                 FROM PSNL200 A 
+           INNER JOIN PSNL235 B 
+                   ON A.PSNL_NUMB = B.PSNL_NUMB
+                WHERE UPPER (A.KORN_NAME) LIKE UPPER ('%' || #{searchName} || '%') --성명
+                  AND A.HOOF_STCD = 'N02010') X
+        WHERE X.RN BETWEEN #{first} AND #{last}
+    </select>
+<!-- 현재 년도 학기 -->
+    <select id="selectSchpYearShtm" resultMap="homePageInfoResultMap">
+        SELECT X.SCHP_YEAR AS LECT_YEAR 
+             , X.SCHP_SHTM AS LECT_SHTM
+          FROM (SELECT '1' RN
+                     , SCHP_YEAR
+                     , CASE WHEN ( TO_CHAR(SYSDATE,'yyyymmdd') BETWEEN OPS1_STRT AND OPS1_ENDD) THEN '1'
+                            WHEN ( TO_CHAR(SYSDATE,'yyyymmdd') BETWEEN OPS2_STRT AND OPS2_ENDD) THEN '2'
+                            WHEN ( TO_CHAR(SYSDATE,'yyyymmdd') BETWEEN OPS3_STRT AND OPS3_ENDD) THEN '3'
+                            WHEN ( TO_CHAR(SYSDATE,'yyyymmdd') BETWEEN OPS4_STRT AND OPS4_ENDD) THEN '4'
+                            ELSE '1'
+                        END AS SCHP_SHTM
+                     , OPS1_STRT
+                     , OPS1_ENDD
+                     , OPS2_STRT
+                     , OPS2_ENDD
+                  FROM REGI001
+              ORDER BY SCHP_YEAR DESC) X
+         WHERE ROWNUM = 1
+    </select>
+<!-- 강의 시간표(교원) -->
+    <select id="selectListLectTimetable" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT MAX(LECT_YEAR) AS LECT_YEAR 
+             , MAX(LECT_SHTM) AS LECT_SHTM
+             , TO_NUMBER(TERM_NUMB) || '교시' AS TERM_NUMB
+             , SUBSTR(FRTM_TIME,0,2)||':'||SUBSTR(FRTM_TIME,3,2) ||'~' ||SUBSTR(TOTM_TIME,0,2)||':'||SUBSTR(TOTM_TIME,3,2) AS LECT_TIME
+             , MAX(MON)  AS LECT_MOND1
+             , MAX(MON1) AS LECT_MOND2
+             , MAX(MON2) AS LECT_MOND3
+             , MAX(TUE)  AS LECT_TUED1
+             , MAX(TUE1) AS LECT_TUED2
+             , MAX(TUE2) AS LECT_TUED3
+             , MAX(WED)  AS LECT_WEDD1
+             , MAX(WED1) AS LECT_WEDD2
+             , MAX(WED2) AS LECT_WEDD3
+             , MAX(THR)  AS LECT_THRD1
+             , MAX(THR1) AS LECT_THRD2
+             , MAX(THR2) AS LECT_THRD3
+             , MAX(FRI)  AS LECT_FRID1
+             , MAX(FRI1) AS LECT_FRID2
+             , MAX(FRI2) AS LECT_FRID3
+          FROM (SELECT D.LECT_YEAR
+                     , D.LECT_SHTM
+                     , D.TERM_NUMB
+                     , D.FRTM_TIME
+                     , D.TOTM_TIME
+                     , MAX(C.MON) AS MON
+                     , F_CMMN_PSNL_INFO(MAX(C.MON1),'NAME') AS MON1 
+                     , F_COUR_ROOM_INFO(MAX(C.MON2),'3') AS MON2
+                     , MAX(C.TUE) AS TUE
+                     , F_CMMN_PSNL_INFO(MAX(C.TUE1),'NAME') AS TUE1 
+                     , F_COUR_ROOM_INFO(MAX(C.TUE2),'3') AS TUE2
+                     , MAX(C.WED) AS WED
+                     , F_CMMN_PSNL_INFO(MAX(C.WED1),'NAME') AS WED1 
+                     , F_COUR_ROOM_INFO(MAX(C.WED2),'3') AS WED2
+                     , MAX(C.THR) AS THR
+                     , F_CMMN_PSNL_INFO(MAX(C.THR1),'NAME') AS THR1 
+                     , F_COUR_ROOM_INFO(MAX(C.THR2),'3') AS THR2
+                     , MAX(C.FRI) AS FRI
+                     , F_CMMN_PSNL_INFO(MAX(C.FRI1),'NAME') AS FRI1 
+                     , F_COUR_ROOM_INFO(MAX(C.FRI2),'3') AS FRI2
+                  FROM (SELECT A.LECT_YEAR
+                             , A.LECT_SHTM
+                             , TIME_NUMB
+                             , FRTM_TIME
+                             , TOTM_TIME
+                             , A.SPRF_NUMB
+                             , LTRM_CODE
+                             , TYPL_KRNM
+                             , DECODE(LECT_DDAY,'1',TYPL_KRNM,'') AS MON
+                             , DECODE(LECT_DDAY,'2',TYPL_KRNM,'') AS TUE
+                             , DECODE(LECT_DDAY,'3',TYPL_KRNM,'') AS WED
+                             , DECODE(LECT_DDAY,'4',TYPL_KRNM,'') AS THR
+                             , DECODE(LECT_DDAY,'5',TYPL_KRNM,'') AS FRI
+                             , DECODE(LECT_DDAY,'1',A.SPRF_NUMB,'') AS MON1
+                             , DECODE(LECT_DDAY,'2',A.SPRF_NUMB,'') AS TUE1
+                             , DECODE(LECT_DDAY,'3',A.SPRF_NUMB,'') AS WED1
+                             , DECODE(LECT_DDAY,'4',A.SPRF_NUMB,'') AS THR1
+                             , DECODE(LECT_DDAY,'5',A.SPRF_NUMB,'') AS FRI1
+                             , DECODE(LECT_DDAY,'1',LTRM_CODE,'') AS MON2
+                             , DECODE(LECT_DDAY,'2',LTRM_CODE,'') AS TUE2
+                             , DECODE(LECT_DDAY,'3',LTRM_CODE,'') AS WED2
+                             , DECODE(LECT_DDAY,'4',LTRM_CODE,'') AS THR2
+                             , DECODE(LECT_DDAY,'5',LTRM_CODE,'') AS FRI2
+                          FROM COUR014 A 
+                             , COUR011 B
+                         WHERE A.LECT_YEAR = B.LECT_YEAR
+                           AND A.LECT_SHTM = B.LECT_SHTM
+                           AND A.HAKS_NUMB = B.HAKS_NUMB
+                           AND A.CLSS_NUMB = B.CLSS_NUMB
+                           AND A.LECT_YEAR = #{lectYear}
+                           AND A.LECT_SHTM = #{lectShtm}
+                           AND A.SPRF_NUMB = #{userNo}
+                      ORDER BY TIME_NUMB ) C
+                     , COUR016 D
+                 WHERE C.LECT_YEAR (+) = D.LECT_YEAR
+                   AND C.LECT_SHTM (+) = D.LECT_SHTM
+                   AND C.TIME_NUMB (+) = D.TERM_NUMB
+                   AND D.LECT_YEAR = #{lectYear}
+                   AND D.LECT_SHTM = #{lectShtm}
+              GROUP BY D.LECT_YEAR
+                     , D.LECT_SHTM
+                     , D.TERM_NUMB
+                     , D.FRTM_TIME 
+                     , D.TOTM_TIME  )
+                 <![CDATA[
+                 WHERE ROWNUM < 14
+                 ]]>
+              GROUP BY TERM_NUMB
+                     , FRTM_TIME
+                     , TOTM_TIME
+    </select>
+<!-- 강의 시간표(학생) -->
+    <select id="selectListLectTimetableForStnt" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT MAX(LECT_YEAR) as LECT_YEAR 
+             , MAX(LECT_SHTM) as LECT_SHTM
+             , TO_NUMBER(TERM_NUMB) || '교시' AS TERM_NUMB
+             , SUBSTR(FRTM_TIME,0,2)||':'||SUBSTR(FRTM_TIME,3,2) ||'~' ||SUBSTR(TOTM_TIME,0,2)||':'||SUBSTR(TOTM_TIME,3,2) AS LECT_TIME
+             , MAX(MON) AS LECT_MOND1
+             , MAX(MON1) AS LECT_MOND2
+             , MAX(MON2) AS LECT_MOND3
+             , MAX(TUE) AS LECT_TUED1
+             , MAX(TUE1) AS LECT_TUED2
+             , MAX(TUE2) AS LECT_TUED3
+             , MAX(WED) AS LECT_WEDD1
+             , MAX(WED1) AS LECT_WEDD2
+             , MAX(WED2) AS LECT_WEDD3
+             , MAX(THR) AS LECT_THRD1
+             , MAX(THR1) AS LECT_THRD2
+             , MAX(THR2) AS LECT_THRD3
+             , MAX(FRI) AS LECT_FRID1
+             , MAX(FRI1) AS LECT_FRID2
+             , MAX(FRI2) AS LECT_FRID3
+          FROM (SELECT D.LECT_YEAR
+                     , D.LECT_SHTM
+                     , D.TERM_NUMB
+                     , D.FRTM_TIME
+                     , D.TOTM_TIME
+                     , MAX(C.MON) AS MON
+                     , F_CMMN_PSNL_INFO(MAX(C.MON1),'NAME') AS MON1 
+                     , F_COUR_ROOM_INFO(MAX(C.MON2),'3') AS MON2
+                     , MAX(C.TUE) AS TUE
+                     , F_CMMN_PSNL_INFO(MAX(C.TUE1),'NAME') AS TUE1 
+                     , F_COUR_ROOM_INFO(MAX(C.TUE2),'3') AS TUE2
+                     , MAX(C.WED) AS WED
+                     , F_CMMN_PSNL_INFO(MAX(C.WED1),'NAME') AS WED1 
+                     , F_COUR_ROOM_INFO(MAX(C.WED2),'3') AS WED2
+                     , MAX(C.THR) AS THR
+                     , F_CMMN_PSNL_INFO(MAX(C.THR1),'NAME') AS THR1 
+                     , F_COUR_ROOM_INFO(MAX(C.THR2),'3') AS THR2
+                     , MAX(C.FRI) AS FRI
+                     , F_CMMN_PSNL_INFO(MAX(C.FRI1),'NAME') AS FRI1 
+                     , F_COUR_ROOM_INFO(MAX(C.FRI2),'3') AS FRI2
+                  FROM (SELECT A.LECT_YEAR
+                             , A.LECT_SHTM
+                             , TIME_NUMB
+                             , FRTM_TIME
+                             , TOTM_TIME
+                             , A.SPRF_NUMB
+                             , LTRM_CODE
+                             , TYPL_KRNM
+                             , DECODE(LECT_DDAY,'1',TYPL_KRNM,'') AS MON
+                             , DECODE(LECT_DDAY,'2',TYPL_KRNM,'') AS TUE
+                             , DECODE(LECT_DDAY,'3',TYPL_KRNM,'') AS WED
+                             , DECODE(LECT_DDAY,'4',TYPL_KRNM,'') AS THR
+                             , DECODE(LECT_DDAY,'5',TYPL_KRNM,'') AS FRI
+                             , DECODE(LECT_DDAY,'1',A.SPRF_NUMB,'') AS MON1
+                             , DECODE(LECT_DDAY,'2',A.SPRF_NUMB,'') AS TUE1
+                             , DECODE(LECT_DDAY,'3',A.SPRF_NUMB,'') AS WED1
+                             , DECODE(LECT_DDAY,'4',A.SPRF_NUMB,'') AS THR1
+                             , DECODE(LECT_DDAY,'5',A.SPRF_NUMB,'') AS FRI1
+                             , DECODE(LECT_DDAY,'1',LTRM_CODE,'') AS MON2
+                             , DECODE(LECT_DDAY,'2',LTRM_CODE,'') AS TUE2
+                             , DECODE(LECT_DDAY,'3',LTRM_CODE,'') AS WED2
+                             , DECODE(LECT_DDAY,'4',LTRM_CODE,'') AS THR2
+                             , DECODE(LECT_DDAY,'5',LTRM_CODE,'') AS FRI2
+                          FROM COUR014 A 
+                             , COUR011 B
+                             , COUR100 C
+                         WHERE A.LECT_YEAR = B.LECT_YEAR
+                           AND A.LECT_SHTM = B.LECT_SHTM
+                           AND A.HAKS_NUMB = B.HAKS_NUMB
+                           AND A.CLSS_NUMB = B.CLSS_NUMB
+                           AND A.LECT_YEAR = C.LECT_YEAR
+                           AND A.LECT_SHTM = C.LECT_SHTM
+                           AND A.HAKS_NUMB = C.HAKS_NUMB
+                           AND A.CLSS_NUMB = C.CLSS_NUMB
+                           AND A.LECT_YEAR = #{lectYear}
+                           AND A.LECT_SHTM = #{lectShtm}
+                           AND C.STNT_NUMB = #{userNo}
+                      ORDER BY TIME_NUMB ) C
+                     , COUR016 D
+                 WHERE C.LECT_YEAR (+) = D.LECT_YEAR
+                   AND C.LECT_SHTM (+) = D.LECT_SHTM
+                   AND C.TIME_NUMB (+) = D.TERM_NUMB
+                   AND D.LECT_YEAR = #{lectYear}
+                   AND D.LECT_SHTM = #{lectShtm}
+              GROUP BY D.LECT_YEAR
+                     , D.LECT_SHTM
+                     , D.TERM_NUMB
+                     , D.FRTM_TIME 
+                     , D.TOTM_TIME)
+         <![CDATA[
+         WHERE ROWNUM < 14
+         ]]>
+      GROUP BY TERM_NUMB
+             , FRTM_TIME
+             , TOTM_TIME
+    </select>
+<!-- 강의계획서(교원) -->
+    <select id="selectListLectPlan" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT A.LECT_YEAR
+             , A.LECT_SHTM
+             , SUBSTR(A.HAKS_NUMB,0,7) AS HAKS_NUMB
+             , A.CLSS_NUMB
+             , F_CMMN_CDNM(POBT_FLAG,'') AS POBT_NAME
+             , F_COUR_LECT_INFO(A.LECT_YEAR, A.LECT_SHTM, A.HAKS_NUMB, A.CLSS_NUMB, '1') AS SBJT_KRNM
+             , B.LECT_PONT
+             , B.LECT_TIME
+             , A.SPRF_NUMB
+             , F_CMMN_PSNL_INFO(A.SPRF_NUMB,'NAME') AS SPRF_KRNM
+             , B.CORS_SHYR  -- 개설학년
+             , NVL(B.LINC_YSNO,'0') AS LINC_YSNO
+             , B.CORS_SUST
+             , B.CORS_MAJR
+             , A.HAKS_NUMB AS HAKS_NUMB2
+          FROM COUR015 A
+LEFT OUTER JOIN COUR011 B
+             ON A.LECT_YEAR = B.LECT_YEAR 
+     AND A.LECT_SHTM = B.LECT_SHTM 
+     AND A.HAKS_NUMB = B.HAKS_NUMB   
+     AND A.CLSS_NUMB = B.CLSS_NUMB   
+     AND A.SPRF_NUMB = B.SPRF_NUMB 
+         WHERE 1=1
+           AND A.LECT_YEAR = #{lectYear}
+           AND A.LECT_SHTM = #{lectShtm}
+           AND A.SPRF_NUMB   = #{userNo}
+      ORDER BY B.CORS_SHYR
+             , A.CLSS_NUMB
+             , B.POBT_FLAG
+             , A.HAKS_NUMB
+    </select>
+<!-- 강의계획서(학생) -->
+    <select id="selectListLectPlanForStnt" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT A.LECT_YEAR
+             , A.LECT_SHTM
+             , SUBSTR(A.HAKS_NUMB,0,7) AS HAKS_NUMB
+             , A.CLSS_NUMB
+             , F_COUR_LECT_INFO(A.LECT_YEAR, A.LECT_SHTM, A.HAKS_NUMB, A.CLSS_NUMB, '1') AS SBJT_KRNM
+             , A.LECT_PONT
+             , A.LECT_TIME
+             , A.SPRF_NUMB
+             , F_CMMN_PSNL_INFO(A.SPRF_NUMB,'NAME') AS SPRF_KRNM
+             , A.CORS_SHYR
+          FROM COUR011 A
+             , COUR100 B
+         WHERE 1=1
+           AND A.LECT_YEAR = B.LECT_YEAR
+           AND A.LECT_SHTM = B.LECT_SHTM
+           AND A.HAKS_NUMB = B.HAKS_NUMB
+           AND A.CLSS_NUMB = B.CLSS_NUMB
+           AND A.LECT_YEAR = #{lectYear}
+           AND A.LECT_SHTM = #{lectShtm}
+           AND B.STNT_NUMB = #{userNo}
+      ORDER BY A.CORS_SHYR
+             , A.CLSS_NUMB
+             , B.POBT_FLAG
+             , B.HAKS_NUMB
+    </select>
+<!-- 학생정보(사진) -->
+    <select id="selectStntPhoto" resultMap="imageResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT STNT_NUMB
+             , PICT_FILE
+          FROM REGI102
+         WHERE STNT_NUMB = #{userNo}
+    </select>
+<!-- 학생정보 조회 -->
+    <select id="selectStntInfo" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT F_CMMN_DEPT_NAME(REGI100.SUST_CODE,'DEPT_ORDR') AS SUST_NAME --학과
+             , (SELECT MAX(DEPTPAGE) FROM  PORTAL.PV_DEPTPAGE_M WHERE SUST_CODE=DEPTCODE) AS SUST_URL    -- 학과주소
+             , F_CMMN_MAJR_INFO(REGI100.MAJR_CODE,'NAME') AS MAJR_NAME --전공
+             , REGI100.STNT_NUMB --학번
+             , REGI100.KORN_NAME --성명
+             , REGI100.STNT_SHYR --학년
+             , REGI110.STNT_HAND --핸드폰
+             , REGI110.STNT_EMAL --이메일
+          FROM REGI100
+             , REGI110
+         WHERE REGI100.STNT_NUMB = REGI110.STNT_NUMB(+)
+           AND REGI100.STNT_NUMB = #{userNo}
+    </select>
+<!-- 등록금 현황 -->
+    <select id="selectListLesnAmnt" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT REGI_YEAR -- 년도
+             , REGI_SHTM -- 학기
+             , NVL(ENTR_AMNT, 0) AS ENTR_AMNT -- 입학금
+             , NVL(LESN_AMNT, 0) AS LESN_AMNT -- 수업료
+             , NVL(SHSH_ETAM, 0) AS SHSH_ETAM -- 장학입학금
+             , NVL(SHSH_LSAM, 0) AS SHSH_LSAM -- 장학수업료
+             , NVL(SHSH_AMNT, 0) AS SHSH_AMNT -- 장학금
+             , NVL(RLPD_AMNT, 0) AS RLPD_AMNT -- 실납부금액
+             , F_CMMN_CDNM(PAID_FGCD,'') AS PAID_NAME --납부여부
+             , PAID_DATE AS 납부일자
+             , F_CMMN_CDNM(RPYM_RSCD,'') AS RPYM_NAME -- 환불사유
+             , RPYM_AMNT AS 환불금액
+             , RPYM_DATE AS 환불일자
+             , DECODE(LOAN_YSNO,'1','대출','미대출') AS LOAN_YSNO -- 학자금대출여부
+          FROM TUIT100
+         WHERE 1 = 1
+           AND STNT_NUMB = #{userNo}
+      ORDER BY REGI_YEAR DESC
+             , REGI_SHTM DESC
+    </select>
+<!-- 장학금 현황 -->
+    <select id="selectListShshAmnt" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT SHSH_YEAR AS REGI_YEAR --년도
+             , SHSH_SHTM AS REGI_SHTM -- 학기
+             , BNFT_DATE -- 지금일자
+             , SCHL_SHYR -- 학년
+             , F_HAKSA_SCHO_INFO(SHSH_CODE,'NAME') AS SHSH_KRNM -- 장학금명
+             , SHSH_ERAM -- 입학금
+             , SHSH_LSAM -- 수업료
+             , SHSH_AMNT -- 장학금
+             , TRET_DATE -- 환납일자
+          FROM SCHO025
+         WHERE 1 = 1
+           AND BNFT_FLAG = '1'
+           AND STNT_NUMB = #{userNo}
+      ORDER BY SHSH_YEAR DESC
+             , SHSH_SHTM DESC
+    </select>
+<!-- 성적 조회(전체) -->
+    <select id="selectTotalGrad" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT APLY_SJCT
+             , POBT_SJCT
+             , APLY_PONT
+             , ACQT_PONT
+             , UNAQ_PONT
+             , ACQT_MRKS
+             , AVRG_MRKS
+             , ACQT_GRAD
+             , ACQT_SCOR
+             , ACQT_ARSC
+          FROM GRAD030
+         WHERE STNT_NUMB = #{userNo}
+    </select>
+<!-- 성적 조회(학기) -->
+    <select id="selectListShtmGrad" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT LECT_YEAR
+             , LECT_SHTM
+             , STNT_SHYR
+             , TOTL_APPT AS APLY_PONT
+             , TOTL_AQPT AS ACQT_PONT
+             , ACQT_SCOR
+             , ACQT_ARSC
+             , ACQT_MRKS
+             , AVRG_MRKS
+          FROM GRAD020
+         WHERE STNT_NUMB = #{userNo}
+    </select>
+<!-- 성적 조회(과목) -->
+    <select id="selectListSubjectGrad" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT LECT_YEAR
+             , LECT_SHTM
+             , SBJT_CODE
+             , SBJT_KRNM
+             , F_CMMN_CDNM(POBT_FLAG,'') AS POBT_NANE
+             , LECT_PONT
+             , TOTL_SCOR
+             , LECT_MAKS
+             , LECT_GRAD
+             , F_CMMN_CDNM(LECT_FLAG,'') AS LECT_NANE --수강구분
+          FROM GRAD010
+         WHERE STNT_NUMB = #{userNo}
+           AND LECT_YEAR = #{lectYear}
+           AND DECODE(LECT_SHTM,'3','1','4','2') = #{lectShtm}
+           AND DELE_FLAG IS NULL  -- 성적삭제플래그
+     UNION ALL
+        SELECT LECT_YEAR
+             , LECT_SHTM
+             , '계' AS SBJT_CODE
+             , ' ' AS SBJT_KRNM
+             , ' ' AS POBT_NANE
+             , TOTL_AQPT AS LECT_PONT
+             , ACQT_ARSC AS TOTL_SCOR
+             , ACQT_MRKS AS LECT_MAKS
+             , ACQT_GRAD AS LECT_GRAD
+             , ' ' AS LECT_NANE
+          FROM GRAD020
+         WHERE STNT_NUMB = #{userNo}  
+           AND LECT_YEAR = #{lectYear}
+           AND LECT_SHTM = #{lectShtm}
+    </select>
+<!-- 성적이 있는 연도 조회 -->
+    <select id="selectListGradYear" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT DISTINCT LECT_YEAR
+          FROM GRAD020
+         WHERE STNT_NUMB = #{userNo}
+      ORDER BY LECT_YEAR DESC
+    </select>
+<!-- 교내채용 정보 -->
+    <select id="selectListJob" resultMap="homePageInfoResultMap">
+        <![CDATA[
+        SELECT TITLE
+             , CNAME AS COMP_NAME
+             , TO_CHAR(RCRT_TO_DATE,'YYYY.MM.DD') AS ENDDATE  
+          FROM OSTORY.OSTORY_JOB_VIEW
+         WHERE ROWNUM <= 15
+      ORDER BY RCRT_SEQ DESC
+      ]]>
+    </select>
+<!-- 아르바이트 정보 -->
+    <select id="selectListParttimeJob" resultMap="homePageInfoResultMap">
+        SELECT TOP 10 STRSUBJECT AS TITLE
+             , STRCOMPANY AS COMP_NAME
+             , CASE WHEN ISNULL(STRENDDATE,'') = '' 
+                    THEN '' 
+                    ELSE SUBSTRING(STRENDDATE,3,2) + '.' + SUBSTRING(STRENDDATE,5,2) + '.' + SUBSTRING(STRENDDATE,7,2) 
+                END AS ENDDATE
+          FROM A_ARB
+      ORDER BY IDX DESC
+    </select>
+<!-- 도서 대출 목록 -->
+    <select id="selectListRentBook" resultMap="homePageInfoResultMap" parameterType="com.osan.portal.vo.LoginInfo">
+        SELECT TITLE
+             , SUBSTRING(DATECHG,1,4) + '.' + SUBSTRING(DATECHG,5,2) + '.' + SUBSTRING(DATECHG,7,2) AS REGDATE
+             , SUBSTRING(DATEDUE,1,4) + '.' + SUBSTRING(DATEDUE,5,2) + '.' + SUBSTRING(DATEDUE,7,2) AS ENDDATE
+          FROM LOAN_LIST
+         WHERE HAKBUN = #{userNo}
+    </select>
+</mapper>

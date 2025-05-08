@@ -1,0 +1,1468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StudentMapper">
+
+<resultMap type="com.osan.portal.vo.StudentSearchInfo" id="studentInfo">
+    <result column="SRCH_STNT_NUMB"         property="srch_stnt_numb"/>
+    <result column="STNT_NUMB"              property="stnt_numb"/>
+    <result column="LECT_YEAR"              property="lect_year"/>
+    <result column="LECT_SHTM"              property="lect_shtm"/>
+    <result column="LECT_WEEK"              property="lect_week"/>
+    <result column="LECT_YESH"              property="lect_yesh"/>
+    <result column="ADPT_YEAR"              property="adpt_year"/>
+    <result column="ADPT_SHTM"              property="adpt_shtm"/>
+    <result column="APPY_FLAG"              property="appy_flag"/>
+</resultMap>
+
+<resultMap type="com.osan.portal.vo.SurveyInfo" id="SurveyInfo">
+    <result column="STNT_NUMB"              property="stnt_numb"/>
+    <result column="LECT_YEAR"              property="lect_year"/>
+    <result column="LECT_SHTM"              property="lect_shtm"/>
+    <result column="ADPT_YEAR"              property="adpt_year"/>
+    <result column="ADPT_SHTM"              property="adpt_shtm"/>
+    <result column="APPR_FLAG"              property="appr_flag"/>
+</resultMap>
+
+<resultMap type="com.osan.portal.vo.DualResearchInfo" id="DualResearchInfo">
+    <result column="STNT_NUMB"              property="stnt_numb"/>
+    <result column="LECT_YEAR"              property="lect_year"/>
+    <result column="LECT_SHTM"              property="lect_shtm"/>
+    <result column="PSNL_NAME"              property="psnl_name"/>
+</resultMap>
+
+
+    <select id="selectStudentInfo" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+         SELECT A.STNT_NUMB
+              , A.KORN_NAME
+              , B.STNT_HAND
+              , B.STNT_EMAL
+              , B.STNT_ZIPC
+              , B.STNT_BSAR
+              , B.STNT_DTAR
+              , B.PTRN_HAND
+              , DECODE(A.SRST_CODE,'A04002','XXXYYDDWWE','DDDWWWESSSX') AS SRST_CODE 
+           FROM REGI100 A
+LEFT OUTER JOIN REGI110 B
+             ON A.STNT_NUMB = B.STNT_NUMB
+          WHERE A.STNT_NUMB = #{srch_stnt_numb}
+    </select>
+    
+    <select id="selectStudentChange" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+         SELECT A.*
+              , F_CMMN_CDNM(A.SRCG_RSCD, '00') AS SRCG_RSCD_NAME
+              , A.CSST_SHTM || '학기' AS CSST_SHTM_K
+              , A.CSST_SHYR || '학년' AS CSST_SHYR_K
+              , A.RSEP_SHTM || '학기' AS RSEP_SHTM_K
+              , A.RSEP_SHYR || '학년' AS RSEP_SHYR_K
+              , F_CMMN_CDNM(A.ENST_CODE, '00') AS ENST_CODE_NAME
+              , C.SUST_CODE
+              , F_CMMN_DEPT_NAME(C.SUST_CODE,'') AS SUST_NAME
+              , C.CHGE_SUST
+              , F_CMMN_DEPT_NAME(C.CHGE_SUST,'') AS CHGE_NAME
+           FROM REGI150 A
+LEFT OUTER JOIN (SELECT E.STNT_NUMB
+                      , E.ERSS_KRNM
+                   FROM REGI100 E
+                  WHERE E.STNT_NUMB NOT IN( SELECT STNT_NUMB
+                                              FROM REGI150
+                                             WHERE SRCG_CODE = 'A15012'
+                                               AND APST_CODE = 'A03003'
+                                           )
+                ) B
+             ON A.STNT_NUMB = B.STNT_NUMB
+LEFT OUTER JOIN (SELECT E.*
+                      , D.DEPT_KRNM
+                   FROM REGI200 E
+        LEFT OUTER JOIN CMMN510 D
+                     ON E.SUST_CODE = D.DEPT_CODE) C
+             ON B.ERSS_KRNM = C.DEPT_KRNM
+          WHERE A.STNT_NUMB = #{srch_stnt_numb}
+            AND A.SRCG_CODE = 'A15004'
+            AND A.APST_CODE = 'A03003'
+            AND A.SRCG_RSCD != 'A18998'
+            AND A.APLY_DATE = (SELECT MAX(APLY_DATE)
+                               FROM REGI150 F
+                              WHERE F.STNT_NUMB = #{srch_stnt_numb}
+                                AND F.SRCG_CODE = 'A15004'
+                                AND F.APST_CODE = 'A03003'
+                                AND F.SRCG_RSCD != 'A18998')
+    </select>
+    
+    <select id="getStudentInfo" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+        SELECT F_CMMN_DEPT_NAME(REGI100.SUST_CODE,'DEPT_ORDR') AS SUST_NAME --학과
+             , (SELECT MAX(DEPTPAGE) FROM  PORTAL.PV_DEPTPAGE_M WHERE SUST_CODE=DEPTCODE) AS SUST_URL    -- 학과주소
+             , F_CMMN_MAJR_INFO(REGI100.MAJR_CODE,'NAME') AS MAJR_NAME --전공
+             , REGI100.STNT_NUMB --학번
+             , REGI100.KORN_NAME --성명
+             , REGI100.STNT_SHYR --학년
+             , REGI100.SRST_CODE --학적상태코드
+             , F_CMMN_CDNM(REGI100.SRST_CODE,'') AS SRST_STAT --학적상태
+             , REGI100.SSPT_FLAG --일반(1),위탁(2),심화(3) 구분코드
+             , REGI110.STNT_HAND --핸드폰
+             , REGI110.STNT_EMAL --이메일
+             , REGI110.STNT_ZIPC --우편번호
+             , REGI110.STNT_BSAR --기본주소
+             , REGI110.STNT_DTAR --상세주소
+             , REGI110.PTRN_NAME --보호자 성명
+             , REGI110.PTRN_JOBC --보호자와 관계
+             , REGI110.PTRN_RLNM --보호자 직업명
+             , REGI110.PTRN_ZIPC --보호자 우편변호
+             , REGI110.PTRN_BSAR --보호자 기본주소
+             , REGI110.PTRN_DTAR --보호자 상세주소
+             , REGI110.PTRN_TELE --보호자 전화번호
+             , REGI110.PTRN_HAND --보호자 핸드폰번호
+          FROM REGI100
+             , REGI110
+         WHERE REGI100.STNT_NUMB = REGI110.STNT_NUMB(+)
+           AND REGI100.STNT_NUMB = #{stnt_numb}
+    </select>
+    
+    <select id="getOffInfo" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+        SELECT REGI150.*,
+                 to_char(to_date(REGI150.aply_date,'YYYY-MM-DD'),'YYYY-MM-DD') as aply_date_format,
+                 to_char(to_date(REGI150.csst_date,'YYYY-MM-DD'),'YYYY-MM-DD') as csst_date_format,
+                 F_CMMN_CDNM(REGI150.apst_code,'') as apst_name,
+                 F_CMMN_CDNM (REGI150.SRCG_RSCD, '00') AS SRCG_RSCD_NAME,
+                 REGI150.CSST_SHTM || '학기'       AS CSST_SHTM_K,
+                 REGI150.CSST_SHYR || '학년'       AS CSST_SHYR_K,
+                 REGI150.RSEP_SHTM || '학기'       AS RSEP_SHTM_K,
+                 REGI150.RSEP_SHYR || '학년'       AS RSEP_SHYR_K,
+                 F_CMMN_CDNM (REGI150.ENST_CODE, '00') AS ENST_CODE_NAME,
+                 c.SUST_CODE,
+                 F_CMMN_DEPT_NAME (c.SUST_CODE, '')  AS sust_name,
+                 c.CHGE_SUST,
+                 F_CMMN_DEPT_NAME (c.CHGE_SUST, '')  AS chge_name
+            FROM REGI150
+                 LEFT OUTER JOIN
+                 (SELECT E.STNT_NUMB, ERSS_KRNM
+                    FROM REGI100 E
+                   WHERE E.STNT_NUMB NOT IN
+                             (SELECT STNT_NUMB
+                                FROM REGI150
+                               WHERE SRCG_CODE = 'A15012' AND APST_CODE = 'A03003')) B
+                     ON REGI150.STNT_NUMB = B.STNT_NUMB
+                 LEFT OUTER JOIN
+                 (SELECT A.*, D.DEPT_KRNM
+                    FROM REGI200 A
+                         LEFT OUTER JOIN CMMN510 D ON A.SUST_CODE = D.DEPT_CODE) C
+                     ON B.ERSS_KRNM = C.DEPT_KRNM
+           WHERE     REGI150.STNT_NUMB = #{stnt_numb}
+                 AND REGI150.SRCG_CODE = 'A15004'
+                 AND REGI150.APST_CODE = 'A03003'
+                 AND REGI150.SRCG_RSCD != 'A18998'
+                 AND APLY_DATE =
+                         (SELECT MAX (APLY_DATE)
+                            FROM REGI150
+                           WHERE     STNT_NUMB = #{stnt_numb}
+                                 AND REGI150.SRCG_CODE = 'A15004'
+                                 AND REGI150.APST_CODE = 'A03003'
+                                 AND REGI150.SRCG_RSCD != 'A18998')
+        ORDER BY APLY_DATE DESC 
+    </select>
+    
+    <select id="getApplyCheck" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+        SELECT REGI150.*,
+               APLY_YEAR||REGI150.APLY_SHTM||REGI150.STNT_NUMB||REGI150.SRCG_CODE||REGI150.APLY_DATE AS FIND_KEY
+          FROM REGI150
+         WHERE 1 = 1
+           AND STNT_NUMB =  #{stnt_numb}
+           AND SRCG_CODE = 'A15005'
+           AND APLY_YEAR = #{lect_year}
+           AND APLY_SHTM = #{lect_shtm}
+         ORDER BY APLY_DATE DESC
+    </select>
+    
+    <select id="getApplySchedule" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+             SELECT
+               CASE
+                   WHEN     ADPT_FRDT  <![CDATA[<=]]> TO_CHAR (SYSDATE, 'YYYYMMDD')
+                        AND ADPT_TODT  <![CDATA[>=]]> TO_CHAR (SYSDATE, 'YYYYMMDD')
+                   THEN
+                       'Y'
+                   ELSE
+                       'N'
+               END
+                   AS APPY_FLAG
+          FROM REGI002
+         WHERE SCHP_SDCD = 'A99020'
+    </select>
+    
+    <select id="getHakgi" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+        SELECT ADPT_YEAR AS LECT_YEAR,
+               ADPT_SHTM AS LECT_SHTM
+        FROM REGI002
+        WHERE SCHP_SDCD = 'A99050'
+    </select>
+ 
+    <select id="getSchedule" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+        SELECT LECT_YEAR, LECT_SHTM, LECT_WEEK, STNT_NUMB, LECT_WEEK_NM, LECT_WEEK_DATE, LECT_DDAY_NM, LECT_TERM 
+        FROM TABLE(TFN_MOBI_SCH_TIME_TABLE_NEW(#{lect_year},#{lect_shtm},#{lect_week},#{stnt_numb}))
+    </select>     
+
+    <select id="getScheduleInfo" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+      SELECT
+             TO_NUMBER(TERM_NUMB) || '교시' AS TERM_NUMB,
+             LECT_WEEK,
+             SUBSTR(FRTM_TIME,0,2)||':'||SUBSTR(FRTM_TIME,3,2) ||'~' ||SUBSTR(TOTM_TIME,0,2)||':'||SUBSTR(TOTM_TIME,3,2) AS LECT_TIME,
+                                                (SELECT '('||SUBSTR(FRDT_DATE,0,4)||'.'||SUBSTR(FRDT_DATE,5,2)||'.'||SUBSTR(FRDT_DATE,7,2) ||' - '||
+                                                                SUBSTR(TODT_DATE,0,4)||'.'||SUBSTR(TODT_DATE,5,2)||'.'||SUBSTR(TODT_DATE,7,2)||')'
+                                                                   FROM COUR041 A
+                                  WHERE A.LECT_YEAR = #{lect_year}
+                                        AND A.LECT_SHTM = #{lect_shtm}
+                                        AND A.LECT_WEEK = #{lect_week}
+                                                                    ) AS LECT_WEEK_DATE,
+             MAX(MON) AS LECT_MOND,
+             MAX(TUE) AS LECT_TUED,
+             MAX(WED) AS LECT_WEDD,
+             MAX(THR) AS LECT_THRD,
+             MAX(FRI) AS LECT_FRID,
+             MAX(SAT) AS LECT_SATD,
+             MAX(SUN) AS LECT_SUND
+       FROM ( SELECT D.TERM_NUMB,
+                     D.LECT_WEEK,
+                     D.FRTM_TIME,
+                     D.TOTM_TIME,
+                     MAX(C.MON) ||CASE WHEN MAX(C.MON) is not null then '/' END|| F_CMMN_PSNL_INFO(MAX(C.MON1),'NAME')||CASE WHEN MAX(C.MON) is not null then '/' END|| F_COUR_ROOM_INFO(MAX(C.MON2),'3') AS MON,
+                     MAX(C.TUE) ||CASE WHEN MAX(C.TUE) is not null then '/' END|| F_CMMN_PSNL_INFO(MAX(C.TUE1),'NAME')||CASE WHEN MAX(C.TUE) is not null then '/' END|| F_COUR_ROOM_INFO(MAX(C.TUE2),'3') AS TUE,
+                     MAX(C.WED) ||CASE WHEN MAX(C.WED) is not null then '/' END|| F_CMMN_PSNL_INFO(MAX(C.WED1),'NAME')||CASE WHEN MAX(C.WED) is not null then '/' END|| F_COUR_ROOM_INFO(MAX(C.WED2),'3') AS WED,
+                     MAX(C.THR) ||CASE WHEN MAX(C.THR) is not null then '/' END|| F_CMMN_PSNL_INFO(MAX(C.THR1),'NAME')||CASE WHEN MAX(C.THR) is not null then '/' END|| F_COUR_ROOM_INFO(MAX(C.THR2),'3') AS THR,
+                     MAX(C.FRI) ||CASE WHEN MAX(C.FRI) is not null then '/' END|| F_CMMN_PSNL_INFO(MAX(C.FRI1),'NAME')||CASE WHEN MAX(C.FRI) is not null then '/' END|| F_COUR_ROOM_INFO(MAX(C.FRI2),'3') AS FRI,
+                     MAX(C.SAT) ||CASE WHEN MAX(C.SAT) is not null then '/' END|| F_CMMN_PSNL_INFO(MAX(C.SAT1),'NAME')||CASE WHEN MAX(C.SAT) is not null then '/' END|| F_COUR_ROOM_INFO(MAX(C.SAT2),'3') AS SAT,
+                     MAX(C.SUN) ||CASE WHEN MAX(C.SUN) is not null then '/' END|| F_CMMN_PSNL_INFO(MAX(C.SUN1),'NAME')||CASE WHEN MAX(C.SUN) is not null then '/' END|| F_COUR_ROOM_INFO(MAX(C.SUN2),'3') AS SUN
+               FROM (SELECT A.LECT_YEAR, A.LECT_SHTM, A.TIME_NUMB, FRTM_TIME, TOTM_TIME, A.SPRF_NUMB, A.LTRM_CODE, TYPL_KRNM, A.LECT_WEEK,
+                            DECODE(LECT_DDAY,'1',TYPL_KRNM,'') AS MON,
+                            DECODE(LECT_DDAY,'2',TYPL_KRNM,'') AS TUE,
+                            DECODE(LECT_DDAY,'3',TYPL_KRNM,'') AS WED,
+                            DECODE(LECT_DDAY,'4',TYPL_KRNM,'') AS THR,
+                            DECODE(LECT_DDAY,'5',TYPL_KRNM,'') AS FRI,
+                            DECODE(LECT_DDAY,'6',TYPL_KRNM,'') AS SAT,
+                            DECODE(LECT_DDAY,'7',TYPL_KRNM,'') AS SUN,
+                            DECODE(LECT_DDAY,'1',A.SPRF_NUMB,'') AS MON1,
+                            DECODE(LECT_DDAY,'2',A.SPRF_NUMB,'') AS TUE1,
+                            DECODE(LECT_DDAY,'3',A.SPRF_NUMB,'') AS WED1,
+                            DECODE(LECT_DDAY,'4',A.SPRF_NUMB,'') AS THR1,
+                            DECODE(LECT_DDAY,'5',A.SPRF_NUMB,'') AS FRI1,
+                            DECODE(LECT_DDAY,'6',A.SPRF_NUMB,'') AS SAT1,
+                            DECODE(LECT_DDAY,'7',A.SPRF_NUMB,'') AS SUN1,
+                            DECODE(LECT_DDAY,'1',LTRM_CODE,'') AS MON2,
+                            DECODE(LECT_DDAY,'2',LTRM_CODE,'') AS TUE2,
+                            DECODE(LECT_DDAY,'3',LTRM_CODE,'') AS WED2,
+                            DECODE(LECT_DDAY,'4',LTRM_CODE,'') AS THR2,
+                            DECODE(LECT_DDAY,'5',LTRM_CODE,'') AS FRI2,
+                            DECODE(LECT_DDAY,'6',LTRM_CODE,'') AS SAT2,
+                            DECODE(LECT_DDAY,'7',LTRM_CODE,'') AS SUN2
+                      FROM COUR014_WEEK A , COUR011 B, COUR100 C
+                                          WHERE A.LECT_YEAR = B.LECT_YEAR
+                      AND A.LECT_SHTM = B.LECT_SHTM
+                      AND A.HAKS_NUMB = B.HAKS_NUMB
+                      AND A.CLSS_NUMB = B.CLSS_NUMB
+                      AND A.LECT_YEAR = C.LECT_YEAR
+                      AND A.LECT_SHTM = C.LECT_SHTM
+                      AND A.HAKS_NUMB = C.HAKS_NUMB
+                      AND A.CLSS_NUMB = C.CLSS_NUMB
+                      AND C.LECT_YEAR = #{lect_year}
+                      AND C.LECT_SHTM = #{lect_shtm}
+                      AND C.STNT_NUMB = #{stnt_numb}
+                      AND C.TLSN_FLAG != 'B23200'
+                      AND C.TLSN_FLAG != 'B23130'
+                    ORDER BY TIME_NUMB ) C,
+                       (
+                        SELECT A.LECT_YEAR, A.LECT_SHTM, A.TERM_NUMB, A.FRTM_TIME, A.TOTM_TIME
+                          , A.LECT_TIME, A.DYNT_FLAG, B.LECT_WEEK
+                       FROM COUR016 A
+                      CROSS JOIN
+                      (
+                        SELECT LEVEL AS LECT_WEEK
+                        FROM DUAL
+                        CONNECT BY LEVEL <![CDATA[ < ]]> 16
+                      )  B
+                        WHERE A.LECT_YEAR = #{lect_year}
+                          AND A.LECT_SHTM = #{lect_shtm}
+                      ) D
+            WHERE C.LECT_YEAR (+) = D.LECT_YEAR
+              AND C.LECT_SHTM (+) = D.LECT_SHTM
+              AND C.TIME_NUMB (+) = D.TERM_NUMB
+              AND C.LECT_WEEK (+) = D.LECT_WEEK
+              AND D.LECT_YEAR = #{lect_year}
+              AND D.LECT_SHTM = #{lect_shtm}
+            GROUP BY D.LECT_YEAR, D.LECT_SHTM, D.TERM_NUMB, D.FRTM_TIME ,D.TOTM_TIME, D.LECT_WEEK )
+            WHERE LECT_WEEK =  #{lect_week}
+            GROUP BY LECT_WEEK, TERM_NUMB, FRTM_TIME, TOTM_TIME
+    </select>
+
+    <!-- 전체성적(학점 기준) -->
+    <select id="getTotalGrade" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+       SELECT A.STNT_NUMB                       AS STNT_NUMB,
+           A.AVRG_MRKS                       AS AVTO_MRKS,
+           A.ACQT_PONT                       AS ACQT_PONT,
+           A.CTNS_AQPT + A.CTCC_AQPT         AS GYOT_PONT,
+           A.MJNS_AQPT + A.MJCC_AQPT         AS JUNT_PONT,
+           CASE
+               WHEN B.SSPT_FLAG = '3' AND B.STNT_EDSY = '1' THEN 20    --1년제심화
+               WHEN B.SSPT_FLAG = '3' AND B.STNT_EDSY = '2' THEN 56    --2년제심화
+               WHEN B.STNT_EDSY = '2' THEN 72                            --2년제
+               WHEN B.STNT_EDSY = '3' THEN 108                           --3년제
+           END
+               AS JOED_PONT,
+           CASE
+               WHEN B.SSPT_FLAG != '3' AND B.STNT_EDSY = '2' THEN 12
+               WHEN B.SSPT_FLAG != '3' AND B.STNT_EDSY = '3' THEN 16
+               ELSE 0
+           END
+               AS GYED_PONT,
+           CASE
+               WHEN B.SSPT_FLAG != '3' AND B.STNT_EDSY = '2' THEN 48
+               WHEN B.SSPT_FLAG != '3' AND B.STNT_EDSY = '3' THEN 74
+               ELSE 0
+           END
+               AS JUED_PONT
+      FROM GRAD030 A LEFT OUTER JOIN REGI100 B ON A.STNT_NUMB = B.STNT_NUMB
+      WHERE B.STNT_NUMB = #{stnt_numb}
+    </select>
+
+    <!-- select box List(학기) -->
+    <select id="getCourInfo" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+        SELECT LECT_YEAR||'년도 '||LECT_SHTM||'학기' AS LECT_HAKS,
+               LECT_YEAR,
+               LECT_SHTM,
+               AVRG_MRKS,
+               TOTL_AQPT
+          FROM GRAD020
+         WHERE STNT_NUMB = #{stnt_numb}
+            <if test='lect_yesh != null'>
+                AND LECT_YEAR||LECT_SHTM = #{lect_yesh}
+           </if>
+         ORDER BY LECT_YEAR, LECT_SHTM
+    </select>
+
+    <!-- 학기별 과목 및 성적 -->
+    <select id="getGradeList" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+    SELECT F_CMMN_CDNM(POBT_FLAG, '1') AS POBT_FLAG,
+           SBJT_KRNM,
+           LECT_PONT,
+           LECT_GRAD,
+           CASE WHEN LECT_GRAD = 'A+' THEN '4.5'
+                WHEN LECT_GRAD = 'A' THEN '4'
+                WHEN LECT_GRAD = 'B+' THEN '3.5'
+                WHEN LECT_GRAD = 'B' THEN '3'
+                WHEN LECT_GRAD = 'C+' THEN '2.5'
+                WHEN LECT_GRAD = 'C' THEN '2'
+                WHEN LECT_GRAD = 'D+' THEN '1.5'
+                WHEN LECT_GRAD = 'D' THEN '1'
+                WHEN LECT_GRAD = 'F' THEN '0'
+                WHEN LECT_GRAD = 'P' THEN '-'
+           END AS GRAD_PONT
+           FROM GRAD010 a
+           WHERE STNT_NUMB = #{stnt_numb}
+           AND LECT_YEAR||LECT_SHTM = #{lect_yesh}
+    </select>
+    
+    <select id="getTuitHakgi" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+        SELECT ADPT_YEAR,
+               ADPT_SHTM,
+               ADPT_FRDT,
+               ADPT_FRTM,
+               ADPT_TODT,
+               ADPT_TOTM
+          FROM CMMN900
+         WHERE 1 = 1 AND SCHP_BSFG = '205D99'
+           AND SCHP_SDCD = 'D99001'             --등록고지서확인기간(등록일정관리)
+    </select>   
+    
+    <select id="getTuitList" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+      SELECT REGI_YEAR || '-' || REGI_SHTM AS REGI_YESH, 
+             REGI_YEAR,
+             REGI_SHTM
+            FROM TUIT100
+           WHERE     STNT_NUMB = #{stnt_numb}
+                 AND REGI_STAT = 'D55001'
+                 AND PAID_DATE IS NOT NULL
+        ORDER BY PAID_DATE DESC
+    </select>
+    
+    <select id="getTuitInfo" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+       SELECT REGI_YEAR AS ADPT_YEAR,
+           REGI_SHTM AS ADPT_SHTM,
+           STNT_NUMB,
+           SCHL_SHYR,
+           TO_CHAR(ENTR_AMNT,'999,999,999') AS ENTR_AMNT,
+           TO_CHAR(LESN_AMNT,'999,999,999') AS LESN_AMNT,
+           TO_CHAR(REGI_AMNT,'999,999,999') AS REGI_AMNT,
+           TO_CHAR(SHSH_AMNT,'999,999,999') AS SHSH_AMNT,
+           (select shsh_krnm from scho010 where shsh_code = TUIT100.SHSH_CODE) AS SHSH_KRNM,
+           TO_CHAR(RLPD_AMNT,'999,999,999') AS RLPD_AMNT,
+           CASE
+               WHEN PAID_FGCD = 'D62001' THEN '미납'
+               WHEN PAID_FGCD = 'D62004' THEN '납부완료'
+               WHEN PAID_FGCD = 'D62002' THEN '1차분납부완료'
+               WHEN PAID_FGCD = 'D62003' THEN '2차분납부완료'
+               WHEN PAID_FGCD = 'D62009' THEN '3차분납부완료'
+               WHEN PAID_FGCD = 'D62005' THEN '납부완료(분할납부)'
+           END
+               AS PAID_STAT,
+           PAID_DATE
+      FROM TUIT100
+      where regi_year = #{adpt_year}
+        and regi_shtm = #{adpt_shtm}
+        and stnt_numb = #{stnt_numb}
+    </select>
+    
+    <select id="getSchoInfo" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+    SELECT STNT_NUMB,
+           SHSH_YEAR,
+           SHSH_SHTM,
+           TO_CHAR(SHSH_AMNT,'999,999,999') AS SCHO_AMNT,
+           F_CMMN_CDNM (F_HAKSA_SCHO_INFO (SHSH_CODE, 'KIND'), '') AS SCHO_NAME
+      FROM SCHO025
+        WHERE SHSH_YEAR = #{adpt_year}
+          AND SHSH_SHTM = #{adpt_shtm}
+          AND STNT_NUMB = #{stnt_numb}
+    </select>
+
+    <update id="updateStntInfo" parameterType="com.osan.portal.vo.StudentSearchInfo">
+            MERGE INTO OSANUNIV.REGI110 A
+            USING DUAL 
+                    ON ( A.STNT_NUMB = #{stnt_numb} )
+          WHEN MATCHED 
+                  THEN
+                UPDATE 
+                   SET STNT_HAND  = #{stnt_hand}
+                     , STNT_EMAL  = #{stnt_emal}
+                     , STNT_ZIPC  = #{stnt_zipc}
+                     , STNT_BSAR  = #{stnt_bsar}
+                     , STNT_DTAR  = #{stnt_dtar}
+                     , PTRN_NAME  = #{ptrn_name}
+                     , PTRN_JOBC  = #{ptrn_jobc}
+                     , PTRN_RLNM  = #{ptrn_rlnm} 
+                     , PTRN_ZIPC  = #{ptrn_zipc} 
+                     , PTRN_BSAR  = #{ptrn_bsar} 
+                     , PTRN_DTAR  = #{ptrn_dtar} 
+                     , PTRN_TELE  = #{ptrn_tele} 
+                     , PTRN_HAND  = #{ptrn_hand} 
+                     , UPDT_USID  = #{stnt_numb}
+                     , UPDT_DATE  = SYSDATE
+                     , UPDT_ADDR  = #{updt_addr}
+      WHEN NOT MATCHED 
+                  THEN
+                INSERT(STNT_HAND
+                     , STNT_EMAL
+                     , STNT_ZIPC
+                     , STNT_BSAR
+                     , STNT_DTAR
+                     , PTRN_NAME
+                     , PTRN_JOBC
+                     , PTRN_RLNM
+                     , PTRN_ZIPC
+                     , PTRN_BSAR
+                     , PTRN_DTAR
+                     , PTRN_TELE
+                     , PTRN_HAND
+                     , INPT_USID
+                     , INPT_DATE
+                     , INPT_ADDR)
+                VALUES(#{stnt_hand}
+                     , #{stnt_emal}
+                     , #{stnt_zipc}
+                     , #{stnt_bsar}
+                     , #{stnt_dtar}
+                     , #{ptrn_name}
+                     , #{ptrn_jobc}
+                     , #{ptrn_rlnm}
+                     , #{ptrn_zipc}
+                     , #{ptrn_bsar}
+                     , #{ptrn_dtar}
+                     , #{ptrn_tele}
+                     , #{ptrn_hand}
+                     , #{stnt_numb}
+                     , SYSDATE
+                     , #{updt_addr})
+    </update>
+    
+    <select id="getSurveyQInfo" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+		  SELECT LECT_YEAR,
+		         LECT_SHTM,
+		         LECT_TYPE,
+		         PRBL_NUMB,
+		         PRBL_TYPE,
+		         PRBL_CTNT,
+		         PRTN_NUMB
+		    FROM COUR030
+		   WHERE     LECT_YEAR = #{lect_year}
+		         AND LECT_SHTM = #{lect_shtm}
+		         AND LECT_TYPE = #{lect_type_code}
+		ORDER BY TO_NUMBER (PRBL_NUMB) ASC
+    </select>
+    
+    <select id="getSurveyAInfo" parameterType="com.osan.portal.vo.StudentSearchInfo" resultMap="studentInfo">
+		      SELECT LECT_TYPE,
+		         PRBL_NUMB,
+		         PRBL_CTNT,
+		         PRBL_SCOR
+		    FROM COUR031
+		   WHERE LECT_YEAR = #{lect_year} AND LECT_SHTM = #{lect_shtm} AND LECT_TYPE = #{lect_type_code}
+		ORDER BY TO_NUMBER (PRBL_NUMB), PRBL_SEQN
+    </select>
+    
+    
+    <!-- 재학생 기준 쿼리 -->
+    <!-- 전공심화 쿼리 작성필요  -->
+    <!-- 추가안내(대학정보시스템의 문항 및 답변 데이터를 그대로 사용하기 때문에 포털 저장 쿼리 매칭은 수정이 불가피함.) -->
+    <!-- 문항중에 'B11004'제외하고 문항 번호 갯수 체크 -->
+    <insert id="SaveSurveyData_B02049" parameterType="com.osan.portal.vo.SurveyInfo">
+        INSERT INTO COUR049 
+                  ( LECT_YEAR
+                  , LECT_SHTM
+                  , STNT_NUMB
+                  , PRBL_AN01
+                  , PRBL_AN02
+                  , PRBL_AN03
+                  , PRBL_AN04
+                  , PRBL_AN05
+                  , PRBL_AN06
+                  , PRBL_AN07
+                  , PRBL_AN08
+                  , PRBL_AN09
+                  , PRBL_AN10
+                  , PRBL_AN11
+                  , PRBL_AN12
+                  , PRBL_AN13
+                  , PRBL_AN14
+                  , PRBL_AN15
+                  , PRBL_AN16
+                  , PRBL_AN17
+                  , PRBL_AN18
+                  , PRBL_AN19
+                  , PRBL_AN20
+                  , PRBL_AN21
+                  , PRBL_AN22
+                  , PRBL_AN23
+                  , PRBL_AN24
+                  , PRBL_AN25
+                  , PRBL_AN26
+                  , PRBL_AN27
+                  , PRBL_AN28
+                  , PRBL_AN29
+                  , PRBL_AN30
+                  , PRBL_AN31
+                  , PRBL_AN32
+                  , PRBL_AN33
+                  , PRBL_AN34
+                  , PRBL_AN35
+                  , PRBL_AN36
+                  , PRBL_AN37
+                  , PRBL_AN38
+                  , PRBL_AN39
+                  , PRBL_AN40
+                  , PRBL_AN41
+                  , PRBL_AN42
+                  , PRBL_AN43
+                  , PRBL_AN44
+                  , PRBL_AN45
+                  , PRBL_AN46
+                  , PRBL_AN47
+                  , PRBL_AN48
+                  , PRBL_AN49
+                  , PRBL_AN50
+                  , PRBL_AN51
+                  , PRBL_AN52
+                  , PRBL_AN53
+                  , PRBL_AN54
+                  , PRBL_AN55
+                  , PRBL_AN56
+                  , PRBL_AN57
+                  , PRBL_AN58
+                  , PRBL_AN59
+                  , PRBL_AN60
+                  , PRBL_AN61
+                  , PRBL_AN62
+                  , PRBL_AN63
+                  , PRBL_AN64
+                  , PRBL_AN65
+                  , PRBL_AN66
+                  , PRBL_AN67
+                  , ANSR_TXT1
+                  , INPT_USID
+                  , INPT_DATE
+                  , INPT_ADDR
+                  ) 
+           VALUES ( 
+                    #{lect_year}
+                  , #{lect_shtm}
+                  , #{stnt_numb}
+                  , #{answers2 }
+                  , #{answers3 }
+                  , #{answers4 }
+                  , #{answers5 }
+                  , #{answers6 }
+                  , #{answers7 }
+                  , #{answers8 }
+                  , #{answers10}
+                  , #{answers11}
+                  , #{answers12}
+                  , #{answers13}
+                  , #{answers14}
+                  , #{answers15}
+                  , #{answers17}
+                  , #{answers19}
+                  , #{answers20}
+                  , #{answers22}
+                  , #{answers23}
+                  , #{answers24}
+                  , #{answers25}
+                  , #{answers26}
+                  , #{answers27}
+                  , ''
+                  , #{answers29}
+                  , #{answers30}
+                  , #{answers31}
+                  , #{answers32}
+                  , #{answers33}
+                  , #{answers34}
+                  , #{answers36}
+                  , #{answers37}
+                  , #{answers38}
+                  , #{answers39}
+                  , #{answers40}
+                  , #{answers42}
+                  , #{answers43}
+                  , #{answers45}
+                  , #{answers47}
+                  , #{answers48}
+                  , #{answers49}
+                  , #{answers50}
+                  , #{answers52}
+                  , #{answers53}
+                  , #{answers54}
+                  , #{answers55}
+                  , #{answers56}
+                  , #{answers57}
+                  , #{answers58}
+                  , #{answers60}
+                  , #{answers61}
+                  , #{answers62}
+                  , #{answers64}
+                  , #{answers65}
+                  , #{answers66}
+                  , #{answers68}
+                  , #{answers69}
+                  , #{answers70}
+                  , #{answers71}
+                  , #{answers73}
+                  , #{answers75}
+                  , #{answers76}
+                  , #{answers78}
+                  , #{answers79}
+                  , #{answers81}
+                  , #{answers83}
+                  , #{answers84}
+                  , #{answers85}
+                  , #{ansr_txt1}
+                  , #{stnt_numb}
+                  , SYSDATE     
+                  , #{inpt_addr}
+                  ) 
+    </insert>
+
+
+    <insert id="SaveSurveyData_B02050" parameterType="com.osan.portal.vo.SurveyInfo">
+        INSERT INTO COUR049 
+                  ( LECT_YEAR
+                  , LECT_SHTM
+                  , STNT_NUMB
+                  , PRBL_AN01
+                  , PRBL_AN02
+                  , PRBL_AN03
+                  , PRBL_AN04
+                  , PRBL_AN05
+                  , PRBL_AN08
+                  , PRBL_AN09
+                  , PRBL_AN10
+                  , PRBL_AN11
+                  , PRBL_AN12
+                  , PRBL_AN13
+                  , PRBL_AN14
+                  , PRBL_AN15
+                  , PRBL_AN16
+                  , PRBL_AN17
+                  , PRBL_AN18
+                  , PRBL_AN19
+                  , PRBL_AN20
+                  , PRBL_AN21
+                  , PRBL_AN22
+                  , PRBL_AN23
+                  , PRBL_AN30
+                  , PRBL_AN31
+                  , PRBL_AN32
+                  , PRBL_AN33
+                  , PRBL_AN34
+                  , PRBL_AN35
+                  , PRBL_AN36
+                  , PRBL_AN37
+                  , PRBL_AN38
+                  , PRBL_AN39
+                  , PRBL_AN40
+                  , PRBL_AN41
+                  , PRBL_AN42
+                  , PRBL_AN43
+                  , PRBL_AN44
+                  , PRBL_AN45
+                  , PRBL_AN46
+                  , PRBL_AN47
+                  , PRBL_AN48
+                  , PRBL_AN49
+                  , PRBL_AN50
+                  , PRBL_AN51
+                  , PRBL_AN52
+                  , PRBL_AN53
+                  , PRBL_AN54
+                  , PRBL_AN55
+                  , PRBL_AN56
+                  , PRBL_AN57
+                  , PRBL_AN58
+                  , PRBL_AN59
+                  , PRBL_AN60
+                  , PRBL_AN61
+                  , PRBL_AN62
+                  , PRBL_AN63
+                  , PRBL_AN64
+                  , PRBL_AN65
+                  , PRBL_AN66
+                  , PRBL_AN67
+                  , ANSR_TXT1
+                  , INPT_USID
+                  , INPT_DATE
+                  , INPT_ADDR
+                  ) 
+           VALUES ( 
+                    #{lect_year}
+                  , #{lect_shtm}
+                  , #{stnt_numb}
+                  , #{answers2 }
+                  , #{answers3 }
+                  , #{answers4 }
+                  , #{answers5 }
+                  , #{answers6 }
+                  , #{answers8 }
+                  , #{answers9 }
+                  , #{answers10}
+                  , #{answers11}
+                  , #{answers12}
+                  , #{answers13}
+                  , #{answers15}
+                  , #{answers17}
+                  , #{answers18}
+                  , #{answers20}
+                  , #{answers21}
+                  , #{answers22}
+                  , #{answers23}
+                  , #{answers24}
+                  , #{answers25}
+                  , #{answers26}
+                  , #{answers28}
+                  , #{answers29}
+                  , #{answers30}
+                  , #{answers31}
+                  , #{answers32}
+                  , #{answers34}
+                  , #{answers35}
+                  , #{answers37}
+                  , #{answers39}
+                  , #{answers40}
+                  , #{answers41}
+                  , #{answers42}
+                  , #{answers44}
+                  , #{answers45}
+                  , #{answers46}
+                  , #{answers47}
+                  , #{answers48}
+                  , #{answers49}
+                  , #{answers50}
+                  , #{answers52}
+                  , #{answers53}
+                  , #{answers54}
+                  , #{answers56}
+                  , #{answers57}
+                  , #{answers58}
+                  , #{answers60}
+                  , #{answers61}
+                  , #{answers62}
+                  , #{answers63}
+                  , #{answers65}
+                  , #{answers67}
+                  , #{answers68}
+                  , #{answers70}
+                  , #{answers71}
+                  , #{answers73}
+                  , #{answers75}
+                  , #{answers76}
+                  , #{answers77}
+                  , #{ansr_txt1}
+                  , #{stnt_numb}
+                  , SYSDATE     
+                  , #{inpt_addr}
+                  ) 
+    </insert>
+    
+    <!-- 강의평가 일정 가져오기 -->
+    <select id="getCourAppr" parameterType="com.osan.portal.vo.SurveyInfo" resultMap="SurveyInfo">
+		SELECT ADPT_YEAR,
+		       ADPT_SHTM,
+		       ADPT_FRDT,
+		       ADPT_FRTM,
+		       ADPT_TODT,
+		       ADPT_TOTM,
+		       CASE
+		           WHEN TO_CHAR (SYSDATE, 'yyyymmddhhmmss') BETWEEN    ADPT_FRDT
+		                                                            || ADPT_FRTM
+		                                                        AND    ADPT_TODT
+		                                                            || ADPT_TOTM
+		           THEN
+		               'Y'
+		           ELSE
+		               'N'
+		       END AS APPR_FLAG
+		  FROM CMMN900
+		 WHERE 1 = 1 AND SCHP_BSFG = '202B49' AND SCHP_SDCD = 'B49100' --강의평가(기말)일정(수업일정관리)
+    </select>
+    
+    <!-- 중간 강의평가 일정 가져오기 -->
+    <select id="getMidTerm" parameterType="com.osan.portal.vo.SurveyInfo" resultMap="SurveyInfo">
+        SELECT ADPT_YEAR,
+               ADPT_SHTM,
+               ADPT_FRDT,
+               ADPT_FRTM,
+               ADPT_TODT,
+               ADPT_TOTM,
+               CASE
+                   WHEN TO_CHAR (SYSDATE, 'yyyymmddhhmmss') BETWEEN    ADPT_FRDT
+                                                                    || ADPT_FRTM
+                                                                AND    ADPT_TODT
+                                                                    || ADPT_TOTM
+                   THEN
+                       'Y'
+                   ELSE
+                       'N'
+               END AS APPR_FLAG
+          FROM CMMN900
+         WHERE 1 = 1 AND SCHP_BSFG = '202B49' AND SCHP_SDCD = 'B49120'
+    </select>    
+
+    <!-- 강의평가 과목 리스트 가져오기 -->
+    <select id="getCourApprList" parameterType="com.osan.portal.vo.SurveyInfo" resultMap="SurveyInfo">
+		  SELECT B.LECT_YEAR||B.LECT_SHTM||B.HAKS_NUMB||B.CLSS_NUMB||B.STNT_NUMB AS FIND_KEY,
+		         F_COUR_LECT_INFO(B.LECT_YEAR, B.LECT_SHTM, B.HAKS_NUMB,B.CLSS_NUMB,'1') AS SBJT_KRNM,
+		         A.SPRF_NUMB,
+		         A.SPRF_KRNM,
+		         F_CMMN_CDNM(B.POBT_FLAG,'1') AS POBT_NAME,
+		         DECODE(B.LTEV_PTYN, '1', '완료', '강의평가') AS PTYN_FLAG,
+		        DECODE(NVL((SELECT MAX(STNT_NUMB) FROM COUR032
+		                WHERE LECT_YEAR = B.LECT_YEAR
+		                  AND LECT_SHTM = B.LECT_SHTM
+		                  AND HAKS_NUMB = B.HAKS_NUMB
+		                  AND CLSS_NUMB = B.CLSS_NUMB
+		                  AND STNT_NUMB = B.STNT_NUMB
+		                  AND SPRF_NUMB = A.SPRF_NUMB ),'0'),'0', '평가하기', '완료' ) AS PTYN_TEXT,
+		         B.HAKS_NUMB,
+		         B.CLSS_NUMB,
+		         B.LECT_PONT||'/'||C.LECT_TIME AS LECT_PONT,
+		         F_CMMN_CDNM(C.LECT_TYPE,'') AS LECT_TYPE,
+                 C.LECT_TYPE AS LECT_TYPE_CODE
+		    FROM COUR015 A, COUR100 B, COUR011 C
+		   WHERE 1=1
+		     AND A.LECT_YEAR = B.LECT_YEAR
+		     AND A.LECT_SHTM = B.LECT_SHTM
+		     AND A.HAKS_NUMB = B.HAKS_NUMB
+		     AND A.CLSS_NUMB = B.CLSS_NUMB
+		     AND A.LECT_YEAR = C.LECT_YEAR
+		     AND A.LECT_SHTM = C.LECT_SHTM
+		     AND A.HAKS_NUMB = C.HAKS_NUMB
+		     AND A.CLSS_NUMB = C.CLSS_NUMB
+		     AND A.SPRF_NUMB = C.SPRF_NUMB
+		     AND NVL(C.CLSE_YSNO,'0') = '0'
+		     AND NVL(B.TLSN_FLAG,'B23100') NOT IN ('B23130','B23200')
+		     AND NVL(C.APPR_EXYN,'0') <![CDATA[<>]]> '1'
+		     AND B.STNT_NUMB = #{stnt_numb}
+		    AND A.LECT_YEAR = #{adpt_year}
+		    AND A.LECT_SHTM = #{adpt_shtm}
+    </select>
+    
+    <!-- 중간 강의평가 과목 리스트 가져오기 -->
+    <select id="getMidTermList" parameterType="com.osan.portal.vo.SurveyInfo" resultMap="SurveyInfo">
+          SELECT B.LECT_YEAR||B.LECT_SHTM||B.HAKS_NUMB||B.CLSS_NUMB||B.STNT_NUMB AS FIND_KEY,
+                 F_COUR_LECT_INFO(B.LECT_YEAR, B.LECT_SHTM, B.HAKS_NUMB,B.CLSS_NUMB,'1') AS SBJT_KRNM,
+                 A.SPRF_NUMB,
+                 A.SPRF_KRNM,
+                 F_CMMN_CDNM(B.POBT_FLAG,'1') AS POBT_NAME,
+                 DECODE(B.LTEV_PTYN, '1', '완료', '강의평가') AS PTYN_FLAG,
+                DECODE(NVL((SELECT MAX(STNT_NUMB) FROM COUR050
+                        WHERE LECT_YEAR = B.LECT_YEAR
+                          AND LECT_SHTM = B.LECT_SHTM
+                          AND HAKS_NUMB = B.HAKS_NUMB
+                          AND CLSS_NUMB = B.CLSS_NUMB
+                          AND STNT_NUMB = B.STNT_NUMB
+                          AND SPRF_NUMB = A.SPRF_NUMB ),'0'),'0', '평가하기', '완료' ) AS PTYN_TEXT,
+                 B.HAKS_NUMB,
+                 B.CLSS_NUMB,
+                 B.LECT_PONT||'/'||C.LECT_TIME AS LECT_PONT,
+                 F_CMMN_CDNM(C.LECT_TYPE,'') AS LECT_TYPE,
+                 C.LECT_TYPE AS LECT_TYPE_CODE
+            FROM COUR015 A, COUR100 B, COUR011 C
+           WHERE 1=1
+             AND A.LECT_YEAR = B.LECT_YEAR
+             AND A.LECT_SHTM = B.LECT_SHTM
+             AND A.HAKS_NUMB = B.HAKS_NUMB
+             AND A.CLSS_NUMB = B.CLSS_NUMB
+             AND A.LECT_YEAR = C.LECT_YEAR
+             AND A.LECT_SHTM = C.LECT_SHTM
+             AND A.HAKS_NUMB = C.HAKS_NUMB
+             AND A.CLSS_NUMB = C.CLSS_NUMB
+             AND A.SPRF_NUMB = C.SPRF_NUMB
+             AND NVL(C.CLSE_YSNO,'0') = '0'
+             AND NVL(B.TLSN_FLAG,'B23100') NOT IN ('B23130','B23200')
+             AND NVL(C.APPR_EXYN,'0') <![CDATA[<>]]> '1'
+             AND B.STNT_NUMB = #{stnt_numb}
+            AND A.LECT_YEAR = #{adpt_year}
+            AND A.LECT_SHTM = #{adpt_shtm}
+    </select>    
+    
+    <insert id="SaveCourAppryData" parameterType="com.osan.portal.vo.SurveyInfo">
+        INSERT INTO COUR032 
+                  ( LECT_YEAR
+                  , LECT_SHTM
+                  , HAKS_NUMB
+                  , CLSS_NUMB
+                  , SPRF_NUMB
+                  , STNT_NUMB
+                  , LECT_TYPE
+                  , PRBL_AN01
+                  , PRBL_AN02
+                  , PRBL_AN03
+                  , PRBL_AN04
+                  , PRBL_AN05
+                  , PRBL_AN06
+                  , PRBL_AN07
+                  , PRBL_AN08
+                  , PRBL_AN09
+                  , PRBL_AN10
+                  , PRBL_AN11
+                  , DSCP_ANSR
+                  , INPT_USID
+                  , INPT_DATE
+                  , INPT_ADDR
+                  ) 
+           VALUES ( 
+                    #{lect_year}
+                  , #{lect_shtm}
+                  , #{haks_numb}
+                  , #{clss_numb}
+                  , #{sprf_numb}
+                  , #{stnt_numb}
+                  , #{lect_type_code}
+                  , #{answers1 }
+                  , #{answers2 }
+                  , #{answers3 }
+                  , #{answers4 }
+                  , #{answers5 }
+                  , #{answers6 }
+                  , #{answers7 }
+                  , #{answers8 }
+                  , #{answers9 }
+                  , #{answers10}
+                  , #{answers11}
+                  , #{dscp_ansr}
+                  , #{stnt_numb}
+                  , SYSDATE
+                  , #{inpt_addr}
+                  )
+    </insert>
+    
+    <!-- 금학기성적 일정 가져오기 -->
+    <select id="getGradeSchedule" parameterType="com.osan.portal.vo.SurveyInfo" resultMap="SurveyInfo">
+        SELECT ADPT_YEAR,
+               ADPT_SHTM,
+               ADPT_FRDT,
+               ADPT_FRTM,
+               ADPT_TODT,
+               ADPT_TOTM,
+               CASE
+                   WHEN TO_CHAR (SYSDATE, 'yyyymmddhhmmss') >= ADPT_FRDT|| ADPT_FRTM
+                   THEN
+                       'Y'
+                   ELSE
+                       'N'
+               END AS APPR_FLAG,
+               CASE
+                   WHEN TO_CHAR (SYSDATE, 'yyyymmddhhmmss') BETWEEN    ADPT_FRDT
+                                                                    || ADPT_FRTM
+                                                                AND    ADPT_TODT
+                                                                    || ADPT_TOTM
+                   THEN
+                       'Y'
+                   ELSE
+                       'N'
+               END AS APPR_USED,
+               TO_CHAR(TO_DATE(ADPT_FRDT,'YYYY.MM.DD'),'YYYY-MM-DD')||' '||SUBSTR(ADPT_FRTM,0,2)||'시' AS ADPT_STRT
+          FROM CMMN900
+         WHERE 1 = 1 AND SCHP_BSFG = '203B99' AND SCHP_SDCD = 'B99040' --성적조회 일정(성적은 시작시간만 체크)
+    </select>
+
+    <!-- 1.강의평가 / 2.듀얼지도 / 3.만족도(2학기에만) 진행 여부 -->
+	<select id="getCheckAnswer" parameterType="com.osan.portal.vo.SurveyInfo" resultMap="SurveyInfo">
+		SELECT (SELECT CASE WHEN COUNT (*) > 0 THEN 'N' ELSE 'Y' END
+		          FROM COUR100 A, COUR011 B
+		         WHERE     1 = 1
+		               AND A.LECT_YEAR = B.LECT_YEAR
+		               AND A.LECT_SHTM = B.LECT_SHTM
+		               AND A.HAKS_NUMB = B.HAKS_NUMB
+		               AND A.CLSS_NUMB = B.CLSS_NUMB
+		               AND NVL (A.LTEV_PTYN, '0') <![CDATA[<>]]> '1'                      --강의평가여부
+		               AND NVL (B.APPR_EXYN, '0') <![CDATA[<>]]> '1'                    --강의평가과목여부
+		               AND NVL (A.TLSN_FLAG, '0') <![CDATA[<>]]> 'B23200'
+		               AND NVL (A.TLSN_FLAG, '0') NOT IN ('B23200', 'B23130')
+		               AND A.STNT_NUMB = #{stnt_numb}
+		               AND A.LECT_YEAR = #{lect_year}
+		               AND A.LECT_SHTM = #{lect_shtm})
+		           RESULT1,
+		       (SELECT CASE WHEN COUNT (*) > 0 THEN 'Y' ELSE 'N' END
+		          FROM COUR039                                           --듀얼지도교수제설문조사
+		         WHERE     LECT_YEAR = #{lect_year}
+		               AND LECT_SHTM = #{lect_shtm}
+		               AND STNT_NUMB = #{stnt_numb})
+		           AS RESULT2,
+		       (SELECT CASE WHEN COUNT (*) > 0 THEN 'Y' ELSE 'N' END
+		          FROM COUR049                                         --만족도조사(2학기만진행)
+		         WHERE     LECT_YEAR = #{lect_year}
+		               AND LECT_SHTM = #{lect_shtm}
+		               AND STNT_NUMB = #{stnt_numb})
+		           AS RESULT3
+		  FROM DUAL	
+	</select>
+
+    <!-- 성적조회 쿼리(2학기) -->
+    <select id="getGradeCheck_survey" parameterType="com.osan.portal.vo.SurveyInfo" resultMap="SurveyInfo">
+        SELECT A.HAKS_NUMB,
+               A.CLSS_NUMB,
+               B.TYPL_KRNM                                 AS SBJT_NAME,
+               B.SPRF_NUMB,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'NAME')      AS STAF_NAME,
+               A.LECT_PONT,
+               F_CMMN_CDNM (A.POBT_FLAG, '')               AS POBT_FLAG,
+               CASE
+                   WHEN    (A.POBT_FLAG = 'B04100' AND B.JIKUP_FLAG = '1')
+                        OR (A.POBT_FLAG = 'B04110' AND B.JIKUP_FLAG = '1')
+                        OR (A.POBT_FLAG = 'B04120')
+                        OR (A.POBT_FLAG = 'B04130')
+                        OR (A.POBT_FLAG = 'B04140')
+                        OR (A.POBT_FLAG = 'B04150')
+                        OR (A.POBT_FLAG = 'B04160')
+                   THEN
+                       CASE
+                           WHEN (NVL (
+                                     (SELECT MAX (STNT_NUMB)
+                                        FROM COUR049
+                                       WHERE     LECT_YEAR = A.LECT_YEAR
+                                             AND LECT_SHTM = A.LECT_SHTM
+                                             AND STNT_NUMB = A.STNT_NUMB),
+                                     '0') = '0')
+                           THEN
+                               ' '
+                           ELSE
+                               TO_CHAR (A.TOTL_SCOR)
+                       END
+                   ELSE
+                       TO_CHAR (A.TOTL_SCOR)
+               END
+                   AS TOTL_SCOR,
+               CASE
+                   WHEN    (A.POBT_FLAG = 'B04100' AND B.JIKUP_FLAG = '1')
+                        OR (A.POBT_FLAG = 'B04110' AND B.JIKUP_FLAG = '1')
+                        OR (A.POBT_FLAG = 'B04120')
+                        OR (A.POBT_FLAG = 'B04130')
+                        OR (A.POBT_FLAG = 'B04140')
+                        OR (A.POBT_FLAG = 'B04150')
+                        OR (A.POBT_FLAG = 'B04160')
+                   THEN
+                       CASE
+                           WHEN (NVL (
+                                     (SELECT MAX (STNT_NUMB)
+                                        FROM COUR049
+                                       WHERE     LECT_YEAR = A.LECT_YEAR
+                                             AND LECT_SHTM = A.LECT_SHTM
+                                             AND STNT_NUMB = A.STNT_NUMB),
+                                     '0') = '0')
+                           THEN
+                               ' '
+                           ELSE
+                               TO_CHAR (A.LECT_MAKS)
+                       END
+                   ELSE
+                       TO_CHAR (A.LECT_MAKS)
+               END
+                   AS LECT_MAKS,
+               CASE
+                   WHEN    (A.POBT_FLAG = 'B04100' AND B.JIKUP_FLAG = '1')
+                        OR (A.POBT_FLAG = 'B04110' AND B.JIKUP_FLAG = '1')
+                        OR (A.POBT_FLAG = 'B04120')
+                        OR (A.POBT_FLAG = 'B04130')
+                        OR (A.POBT_FLAG = 'B04140')
+                        OR (A.POBT_FLAG = 'B04150')
+                        OR (A.POBT_FLAG = 'B04160')
+                   THEN
+                       CASE
+                           WHEN (NVL (
+                                     (SELECT MAX (STNT_NUMB)
+                                        FROM COUR049
+                                       WHERE     LECT_YEAR = A.LECT_YEAR
+                                             AND LECT_SHTM = A.LECT_SHTM
+                                             AND STNT_NUMB = A.STNT_NUMB),
+                                     '0') = '0')
+                           THEN
+                               ' '
+                           ELSE
+                               TO_CHAR (A.LECT_GRAD)
+                       END
+                   ELSE
+                       TO_CHAR (A.LECT_GRAD)
+               END
+                   AS LECT_GRAD,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'HAND_NUMB') AS HAND_NUMB,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'EMAL_ADDR') AS EMAL_ADDR,
+               A.LECT_MAKS                                 AS AVRG,
+               B.PSSJ_FLAG,
+               (SELECT DECODE (COUNT (STNT_NUMB), 0, 'N', 'Y')
+                  FROM COUR039
+                 WHERE     LECT_YEAR = A.LECT_YEAR
+                       AND LECT_SHTM = A.LECT_SHTM
+                       AND STNT_NUMB = A.STNT_NUMB)
+                   CHKK_RULT,
+               ' '                                         AS PTYN_TEXT,
+               (SELECT DECODE (NVL (MAX (STNT_NUMB), '0'),
+                               '0', '만족도조사',
+                               '완    료')
+                  FROM COUR049
+                 WHERE     LECT_YEAR = A.LECT_YEAR
+                       AND LECT_SHTM = A.LECT_SHTM
+                       AND STNT_NUMB = A.STNT_NUMB)
+                   AS SECH_TEXT,
+               (SELECT EXNG_SCOR
+                  FROM COUR034
+                 WHERE     LECT_YEAR = B.LECT_YEAR
+                       AND LECT_SHTM = B.LECT_SHTM
+                       AND HAKS_NUMB = B.HAKS_NUMB
+                       AND CLSS_NUMB = B.CLSS_NUMB
+                       AND SPRF_NUMB = B.SPRF_NUMB
+                       AND B.CVMJ_YSNO = '0')
+                   AS EXNG_SCOR,
+               CASE WHEN B.CVMJ_YSNO = '0' THEN '대면' ELSE '비대면' END AS CVMJ_YSNO
+          FROM COUR100 A, COUR011 B, cmmn510 c510
+         WHERE     1 = 1
+               AND A.LECT_YEAR = B.LECT_YEAR
+               AND A.LECT_SHTM = B.LECT_SHTM
+               AND A.HAKS_NUMB = B.HAKS_NUMB
+               AND A.CLSS_NUMB = B.CLSS_NUMB
+               AND NVL (B.CLSE_YSNO, '0') <![CDATA[<>]]> '1'
+               AND NVL (A.TLSN_FLAG, '0') <![CDATA[<>]]> 'B23200'
+               AND B.GRAD_CLYN = '1'
+               AND A.SUST_CODE = c510.dept_code(+)
+               AND A.MAJR_CODE NOT IN ('070301')
+               AND A.LECT_YEAR = #{lect_year}
+               AND A.LECT_SHTM = #{lect_shtm}
+               AND A.STNT_NUMB = #{stnt_numb}
+    </select>
+    
+    <!-- 성적조회 쿼리(나머지학기) -->
+    <select id="getGradeCheck" parameterType="com.osan.portal.vo.SurveyInfo" resultMap="SurveyInfo">
+        SELECT A.HAKS_NUMB,
+               A.CLSS_NUMB,
+               B.TYPL_KRNM                                 AS SBJT_NAME,
+               B.SPRF_NUMB,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'NAME')      AS STAF_NAME,
+               A.LECT_PONT,
+               F_CMMN_CDNM (A.POBT_FLAG, '')               AS POBT_FLAG,
+               CASE
+                   WHEN    (A.POBT_FLAG = 'B04100')
+                        OR (A.POBT_FLAG = 'B04110')
+                        OR (A.POBT_FLAG = 'B04120')
+                        OR (A.POBT_FLAG = 'B04130')
+                        OR (A.POBT_FLAG = 'B04140')
+                        OR (A.POBT_FLAG = 'B04150')
+                        OR (A.POBT_FLAG = 'B04160')
+                   THEN
+                       TO_CHAR (A.TOTL_SCOR)
+               END
+                   AS TOTL_SCOR,
+               CASE
+                   WHEN    (A.POBT_FLAG = 'B04100')
+                        OR (A.POBT_FLAG = 'B04110')
+                        OR (A.POBT_FLAG = 'B04120')
+                        OR (A.POBT_FLAG = 'B04130')
+                        OR (A.POBT_FLAG = 'B04140')
+                        OR (A.POBT_FLAG = 'B04150')
+                        OR (A.POBT_FLAG = 'B04160')
+                   THEN
+                       TO_CHAR (A.LECT_MAKS)
+               END
+                   AS LECT_MAKS,
+               CASE
+                   WHEN    (A.POBT_FLAG = 'B04100')
+                        OR (A.POBT_FLAG = 'B04110')
+                        OR (A.POBT_FLAG = 'B04120')
+                        OR (A.POBT_FLAG = 'B04130')
+                        OR (A.POBT_FLAG = 'B04140')
+                        OR (A.POBT_FLAG = 'B04150')
+                        OR (A.POBT_FLAG = 'B04160')
+                   THEN
+                       TO_CHAR (A.LECT_GRAD)
+               END
+                   AS LECT_GRAD,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'HAND_NUMB') AS HAND_NUMB,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'EMAL_ADDR') AS EMAL_ADDR,
+               A.LECT_MAKS                                 AS AVRG,
+               B.PSSJ_FLAG,
+               (SELECT DECODE (COUNT (STNT_NUMB), 0, 'N', 'Y')
+                  FROM COUR039
+                 WHERE     LECT_YEAR = A.LECT_YEAR
+                       AND LECT_SHTM = A.LECT_SHTM
+                       AND STNT_NUMB = A.STNT_NUMB)
+                   CHKK_RULT,
+               CASE
+                   WHEN    (A.POBT_FLAG = 'B04100' AND B.JIKUP_FLAG = '1')
+                        OR (A.POBT_FLAG = 'B04110' AND B.JIKUP_FLAG = '1')
+                        OR (A.POBT_FLAG = 'B04120')
+                        OR (A.POBT_FLAG = 'B04130')
+                        OR (A.POBT_FLAG = 'B04140')
+                        OR (A.POBT_FLAG = 'B04150')
+                        OR (A.POBT_FLAG = 'B04160')
+                   THEN
+                       ' '
+               END
+                   AS PTYN_TEXT,
+               (SELECT DECODE (NVL (MAX (STNT_NUMB), '0'),
+                               '0', '만족도조사',
+                               '완    료')
+                  FROM COUR049
+                 WHERE     LECT_YEAR = A.LECT_YEAR
+                       AND LECT_SHTM = A.LECT_SHTM
+                       AND STNT_NUMB = A.STNT_NUMB)
+                   AS SECH_TEXT,
+               (SELECT EXNG_SCOR
+                  FROM COUR034
+                 WHERE     LECT_YEAR = B.LECT_YEAR
+                       AND LECT_SHTM = B.LECT_SHTM
+                       AND HAKS_NUMB = B.HAKS_NUMB
+                       AND CLSS_NUMB = B.CLSS_NUMB
+                       AND SPRF_NUMB = B.SPRF_NUMB
+                       AND B.CVMJ_YSNO = '0')
+                   AS EXNG_SCOR,
+               CASE WHEN B.CVMJ_YSNO = '0' THEN '대면' ELSE '비대면' END AS CVMJ_YSNO
+          FROM COUR100 A, COUR011 B
+         WHERE     1 = 1
+               AND A.LECT_YEAR = B.LECT_YEAR
+               AND A.LECT_SHTM = B.LECT_SHTM
+               AND A.HAKS_NUMB = B.HAKS_NUMB
+               AND A.CLSS_NUMB = B.CLSS_NUMB
+               AND NVL (B.CLSE_YSNO, '0') <![CDATA[<>]]> '1'
+               AND NVL (A.TLSN_FLAG, '0') <![CDATA[<>]]> 'B23200'
+               AND B.GRAD_CLYN = '1'
+               AND A.SUST_CODE <![CDATA[<]]> '073000'
+               AND A.MAJR_CODE NOT IN ('070301')
+               AND A.LECT_YEAR = #{lect_year}
+               AND A.LECT_SHTM = #{lect_shtm}
+               AND A.STNT_NUMB = #{stnt_numb}
+        UNION ALL
+        SELECT A.HAKS_NUMB,
+               A.CLSS_NUMB,
+               B.TYPL_KRNM                                 AS SBJT_NAME,
+               B.SPRF_NUMB,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'NAME')      AS STAF_NAME,
+               A.LECT_PONT,
+               F_CMMN_CDNM (A.POBT_FLAG, '')               AS POBT_FLAG,
+               TO_CHAR (A.TOTL_SCOR)                       AS TOTL_SCOR,
+               TO_CHAR (A.LECT_MAKS)                       AS LECT_MAKS,
+               TO_CHAR (A.LECT_GRAD)                       AS LECT_GRAD,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'HAND_NUMB') AS HAND_NUMB,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'EMAL_ADDR') AS EMAL_ADDR,
+               A.LECT_MAKS                                 AS AVRG,
+               B.PSSJ_FLAG,
+               (SELECT DECODE (COUNT (STNT_NUMB), 0, 'N', 'Y')
+                  FROM COUR039
+                 WHERE     LECT_YEAR = A.LECT_YEAR
+                       AND LECT_SHTM = A.LECT_SHTM
+                       AND STNT_NUMB = A.STNT_NUMB)
+                   CHKK_RULT,
+               ' '                                         AS PTYN_TEXT,
+               ' '                                         AS SECH_TEXT,
+               (SELECT EXNG_SCOR
+                  FROM COUR034
+                 WHERE     LECT_YEAR = B.LECT_YEAR
+                       AND LECT_SHTM = B.LECT_SHTM
+                       AND HAKS_NUMB = B.HAKS_NUMB
+                       AND CLSS_NUMB = B.CLSS_NUMB
+                       AND SPRF_NUMB = B.SPRF_NUMB
+                       AND B.CVMJ_YSNO = '0')
+                   AS EXNG_SCOR,
+               CASE WHEN B.CVMJ_YSNO = '0' THEN '대면' ELSE '비대면' END AS CVMJ_YSNO
+          FROM COUR100 A, COUR011 B
+         WHERE     1 = 1
+               AND A.LECT_YEAR = B.LECT_YEAR
+               AND A.LECT_SHTM = B.LECT_SHTM
+               AND A.HAKS_NUMB = B.HAKS_NUMB
+               AND A.CLSS_NUMB = B.CLSS_NUMB
+               AND NVL (B.CLSE_YSNO, '0') <![CDATA[<>]]> '1'
+               AND NVL (A.TLSN_FLAG, '0') <![CDATA[<>]]> 'B23200'
+               AND B.GRAD_CLYN = '1'
+               AND A.MAJR_CODE IN ('070301')
+               AND A.LECT_YEAR = #{lect_year}
+               AND A.LECT_SHTM = #{lect_shtm}
+               AND A.STNT_NUMB = #{stnt_numb}
+        UNION ALL
+        SELECT A.HAKS_NUMB,
+               A.CLSS_NUMB,
+               B.TYPL_KRNM                                 AS SBJT_NAME,
+               B.SPRF_NUMB,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'NAME')      AS STAF_NAME,
+               A.LECT_PONT,
+               F_CMMN_CDNM (A.POBT_FLAG, '')               AS POBT_FLAG,
+               TO_CHAR (A.TOTL_SCOR)                       AS TOTL_SCOR,
+               TO_CHAR (A.LECT_MAKS)                       AS LECT_MAKS,
+               TO_CHAR (A.LECT_GRAD)                       AS LECT_GRAD,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'HAND_NUMB') AS HAND_NUMB,
+               F_CMMN_PSNL_INFO (B.SPRF_NUMB, 'EMAL_ADDR') AS EMAL_ADDR,
+               A.LECT_MAKS                                 AS AVRG,
+               B.PSSJ_FLAG,
+               (SELECT DECODE (COUNT (STNT_NUMB), 0, 'N', 'Y')
+                  FROM COUR039
+                 WHERE     LECT_YEAR = A.LECT_YEAR
+                       AND LECT_SHTM = A.LECT_SHTM
+                       AND STNT_NUMB = A.STNT_NUMB)
+                   CHKK_RULT,
+               ' '                                         AS PTYN_TEXT,
+               (SELECT DECODE (NVL (MAX (STNT_NUMB), '0'),
+                               '0', '만족도조사',
+                               '완    료')
+                  FROM COUR049
+                 WHERE     LECT_YEAR = A.LECT_YEAR
+                       AND LECT_SHTM = A.LECT_SHTM
+                       AND STNT_NUMB = A.STNT_NUMB)
+                   AS SECH_TEXT,
+               (SELECT EXNG_SCOR
+                  FROM COUR034
+                 WHERE     LECT_YEAR = B.LECT_YEAR
+                       AND LECT_SHTM = B.LECT_SHTM
+                       AND HAKS_NUMB = B.HAKS_NUMB
+                       AND CLSS_NUMB = B.CLSS_NUMB
+                       AND SPRF_NUMB = B.SPRF_NUMB
+                       AND B.CVMJ_YSNO = '0')
+                   AS EXNG_SCOR,
+               CASE WHEN B.CVMJ_YSNO = '0' THEN '대면' ELSE '비대면' END AS CVMJ_YSNO
+          FROM COUR100 A, COUR011 B
+         WHERE     1 = 1
+               AND A.LECT_YEAR = B.LECT_YEAR
+               AND A.LECT_SHTM = B.LECT_SHTM
+               AND A.HAKS_NUMB = B.HAKS_NUMB
+               AND A.CLSS_NUMB = B.CLSS_NUMB
+               AND NVL (B.CLSE_YSNO, '0') <![CDATA[<>]]> '1'
+               AND NVL (A.TLSN_FLAG, '0') <![CDATA[<>]]> 'B23200'
+               AND B.GRAD_CLYN = '1'
+               AND A.SUST_CODE >= '073000'
+               AND A.LECT_YEAR = #{lect_year}
+               AND A.LECT_SHTM = #{lect_shtm}
+               AND A.STNT_NUMB = #{stnt_numb}   
+    </select>
+    
+    <select id="getStudInfo" parameterType="com.osan.portal.vo.DualResearchInfo" resultMap="DualResearchInfo">
+	       SELECT 
+	       A.lect_year,
+	       A.lect_shtm,
+	       A.stnt_numb,
+	       F_Cmmn_Dept_Name(F_Cmmn_Stnt_Info(A.stnt_numb,'SUST'),'TOTL_NAME') as dept_name,
+	       F_CMMN_PSNL_INFO (A.psnl_numb, 'NAME') AS psnl_name1,
+	       F_CMMN_PSNL_INFO (B.psnl_numb, 'NAME') AS psnl_name2
+	  FROM STUD850 A
+	       LEFT OUTER JOIN STUD860 B
+	       ON A.LECT_YEAR = B.LECT_YEAR
+	      AND A.LECT_SHTM = B.LECT_SHTM
+	      AND A.STNT_NUMB = B.STNT_NUMB
+	 WHERE A.LECT_YEAR = #{lect_year}
+	   AND A.LECT_SHTM = #{lect_shtm}
+	   AND A.STNT_NUMB = #{stnt_numb}
+    </select>
+
+    <insert id="SaveDualData" parameterType="com.osan.portal.vo.DualResearchInfo">
+        INSERT INTO COUR039 
+                  ( LECT_YEAR
+                  , LECT_SHTM
+                  , STNT_NUMB
+                  , PRBL_AN01
+                  , PRBL_AN02
+                  , PRBL_AN03
+                  , PRBL_AN04
+                  , PRBL_AN05
+                  , PRBL_AN06
+                  , PRBL_AN07
+                  , PRBL_AN08
+                  , PRBL_AN09
+                  , PRBL_AN10
+                  , DSCP_ANSR
+                  , DSCP_ANSR2
+                  , DSCP_ANSR3
+                  , INPT_USID
+                  , INPT_DATE
+                  , INPT_ADDR
+                  ) 
+           VALUES ( 
+                    #{lect_year}, #{lect_shtm}, #{stnt_numb}
+                  , #{prbl_an01 }
+                  , #{prbl_an02 }
+                  , #{prbl_an03 }
+                  , #{prbl_an04 }
+                  , #{prbl_an05 }
+                  , #{prbl_an06 }
+                  , #{prbl_an07 }
+                  , #{prbl_an08 }
+                  , #{prbl_an09 }
+                  , #{prbl_an10}
+                  , #{dscp_ansr}
+                  , #{dscp_ansr2}
+                  , #{dscp_ansr3}
+                  , #{stnt_numb}
+                  , SYSDATE   
+                  , #{inpt_addr}
+                  ) 
+    </insert>
+
+    <insert id="SaveMidData" parameterType="com.osan.portal.vo.DualResearchInfo">
+        INSERT INTO COUR050 
+                  ( LECT_YEAR
+                  , LECT_SHTM
+                  , HAKS_NUMB
+                  , CLSS_NUMB
+                  , SPRF_NUMB
+                  , STNT_NUMB
+                  , DSCP_ANSR1
+                  , DSCP_ANSR2
+                  , DSCP_ANSR3
+                  , PRBL_AN01
+                  , PRBL_AN02
+                  , INPT_USID
+                  , INPT_DATE
+                  , INPT_ADDR
+                  ) 
+           VALUES ( 
+                    #{lect_year},
+                    #{lect_shtm},
+                    #{haks_numb}
+                  , #{clss_numb }
+                  , #{sprf_numb }
+                  , #{stnt_numb }
+                  , #{dscp_ansr1}
+                  , #{dscp_ansr2}
+                  , #{dscp_ansr3}
+                  , #{prbl_an01 }
+                  , #{prbl_an02 }
+                  , #{stnt_numb}
+                  , SYSDATE   
+                  , #{inpt_addr}
+                  ) 
+    </insert>
+</mapper>

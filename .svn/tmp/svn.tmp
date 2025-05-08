@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AttendanceMapper">
+
+<resultMap type="com.osan.portal.vo.AtendInfo" id="atendInfo">
+    <result column="SUBJECT_NAME"              property="subject_name"/>
+    <result column="SUBJECT_GRP_CODE"          property="subject_grp_code"/> 
+    <result column="SUBJECT_GRP_NAME"          property="subject_grp_name"/> 
+    <result column="SUBJECT_CODE"              property="subject_code"/> 
+    <result column="SUBJECT_NAME"              property="subject_name"/> 
+    <result column="SUBJECT_TITLE_NO"          property="subject_title_no"/> 
+    <result column="SUBJECT_TITLE_NAME"        property="subject_title_name"/> 
+    <result column="ENG_SUBJECT_NAME"          property="eng_subject_name"/> 
+    <result column="YEAR"                      property="year"/> 
+    <result column="GRADE"                     property="grade"/> 
+    <result column="SEMESTER"                  property="semester"/> 
+    <result column="PROFESSOR_CODE"            property="professor_code"/> 
+    <result column="PROFESSOR_NAME"            property="professor_name"/> 
+    <result column="CLASS_DIVIDE"              property="class_divide"/> 
+    <result column="FINISH_TYPE"               property="finish_type"/> 
+    <result column="FINISH_NAME"               property="finish_name"/> 
+    <result column="COLLEGE_CREDIT"            property="college_credit"/> 
+    <result column="THEORY_CREDIT"             property="theory_credit"/> 
+    <result column="PRACTICE_CREDIT"           property="practice_credit"/> 
+    <result column="THEORY_TIME"               property="theory_time"/> 
+    <result column="PRACTICE_TIME"             property="practice_time"/> 
+    <result column="LECTURE_TIME"              property="lecture_time"/> 
+    <result column="THEORY_PRACTICE_TYPE"      property="theory_practice_type"/> 
+    <result column="SUBJECT_TYPE"              property="subject_type"/> 
+    <result column="NCS_APPLY_YN"              property="ncs_apply_yn"/> 
+    <result column="GUBUN"                     property="gubun"/> 
+    <result column="WEEK_ATEND_STATUS_NAME"    property="week_atend_status_name"/> 
+</resultMap>
+
+    <resultMap id="studentPhoto" type="java.util.HashMap">
+        <result property="PICT_FILE" column="PICT_FILE" jdbcType="BLOB" javaType="[B" />
+    </resultMap>    
+
+    <select id="srchAtendLectureList" parameterType="com.osan.portal.vo.AtendSearchInfo" resultMap="atendInfo">
+        SELECT DISTINCT 
+               A.SUBJECT_GRP_CODE
+             , B.SUBJECT_GRP_NAME
+             , A.SUBJECT_CODE
+             , B.SUBJECT_NAME
+             , A.SUBJECT_TITLE_NO
+             , A.SUBJECT_TITLE_NAME
+             , A.ENG_SUBJECT_NAME
+             , A.YEAR
+             , A.GRADE
+             , A.SEMESTER
+             , A.PROFESSOR_CODE
+             , A.PROFESSOR_NAME
+             , A.CLASS_DIVIDE
+             , A.FINISH_TYPE
+             , A.FINISH_NAME
+             , A.COLLEGE_CREDIT
+             , A.THEORY_CREDIT
+             , A.PRACTICE_CREDIT
+             , A.THEORY_TIME
+             , A.PRACTICE_TIME
+             , A.LECTURE_TIME
+             , A.THEORY_PRACTICE_TYPE
+             , A.SUBJECT_TYPE
+             , A.NCS_APPLY_YN
+             , A.GUBUN
+          FROM ccscuser.VIEW_LECTURE_INFO A 
+          JOIN ccscuser.VIEW_SUBJECT_INFO B
+            ON A.SUBJECT_GRP_CODE = B.SUBJECT_GRP_CODE
+           AND A.SUBJECT_CODE = B.SUBJECT_CODE
+         WHERE A.YEAR = #{srch_year}
+           AND A.SEMESTER = #{srch_semester}
+           AND A.PROFESSOR_CODE = #{srch_professor_code}
+           AND A.SUBJECT_TITLE_NAME LIKE '%' || #{srch_content} || '%'
+      ORDER BY A.SUBJECT_TITLE_NAME
+             , A.GRADE
+             , A.CLASS_DIVIDE
+    </select>
+    <select id="srchAtendLectureTimeInfo" parameterType="com.osan.portal.vo.AtendSearchInfo" resultMap="atendInfo">
+        SELECT A.SUBJECT_GRP_CODE
+             , B.SUBJECT_GRP_NAME
+             , A.SUBJECT_CODE
+             , B.SUBJECT_NAME
+             , A.SUBJECT_TITLE_NO
+             , A.SUBJECT_TITLE_NAME
+             , A.ENG_SUBJECT_NAME
+             , A.YEAR
+             , A.GRADE
+             , A.SEMESTER
+             , A.PROFESSOR_CODE
+             , A.PROFESSOR_NAME
+             , A.CLASS_DIVIDE
+             , A.FINISH_TYPE
+             , A.FINISH_NAME
+             , A.COLLEGE_CREDIT
+             , A.THEORY_CREDIT
+             , A.PRACTICE_CREDIT
+             , A.THEORY_TIME
+             , A.PRACTICE_TIME
+             , A.LECTURE_ROOM
+             , A.LECTURE_TIME
+             , A.THEORY_PRACTICE_TYPE
+             , A.SUBJECT_TYPE
+             , A.NCS_APPLY_YN
+             , A.GUBUN
+             , A.LECT_DDAY
+             , A.TIME_NUMB
+             , A.FROM_LTTM
+             , A.TEND_LTTM
+          FROM ccscuser.VIEW_LECTURE_INFO A 
+          JOIN ccscuser.VIEW_SUBJECT_INFO B
+            ON A.SUBJECT_GRP_CODE = B.SUBJECT_GRP_CODE
+           AND A.SUBJECT_CODE = B.SUBJECT_CODE
+         WHERE A.PROFESSOR_CODE = #{srch_professor_code}
+           AND A.YEAR = #{srch_year}
+           AND A.CLASS_DIVIDE = #{srch_class_divide}
+           AND A.SEMESTER = #{srch_semester}
+           AND A.SUBJECT_TITLE_NO = #{srch_subject_title_no}
+      ORDER BY A.LECT_DDAY
+             , A.FROM_LTTM ASC
+    </select>
+    <select id="srchLectureAddInfoList" parameterType="com.osan.portal.vo.AtendSearchInfo" resultMap="atendInfo">
+        SELECT NO
+             , SUBJECT_TITLE_NO
+             , YEAR
+             , SEMESTER
+             , PROFESSOR_CODE
+             , PROFESSOR_NAME
+             , CLASS_DIVIDE
+             , LECTURE_ROOM
+             , LECTURE_TIME
+             , LECT_DDAY
+             , TIME_NUMB
+             , FROM_LTTM
+             , TEND_LTTM
+             , ADD_REASON
+             , LECT_DAY
+             , ORIGIN_INFO
+          FROM ccscuser.LECTURE_ADD_INFO
+         WHERE PROFESSOR_CODE = #{srch_professor_code}
+           AND YEAR = #{srch_year}
+           AND CLASS_DIVIDE = #{srch_class_divide}
+           AND SEMESTER = #{srch_semester}
+           AND SUBJECT_TITLE_NO = #{srch_subject_title_no}
+           AND DELFLAG IS NULL
+    </select>
+    <select id="selectAtendLectureStdList" parameterType="com.osan.portal.vo.AtendInfo" resultMap="atendInfo">
+        SELECT A.YEAR
+             , A.SEMESTER
+             , A.SUBJECT_GRP_CODE
+             , A.SUBJECT_CODE
+             , A.STUDENT_CODE
+             , B.NAME AS STUDENT_NAME
+             , A.PROFESSOR_CODE
+             , A.COLLEGE_CREDIT
+             , A.LECTURE_TIME
+             , A.SUBJECT_TITLE_NAME
+             , A.SUBJECT_TITLE_NO
+             , A.CLASS_DIVIDE
+             , A.GUBUN
+             , B.INSCHOOL_KIND
+             , (SELECT NAME FROM CCSCUSER.MST_CODE WHERE GRP_CODE = 'INSCHOOL_KIND' AND CODE = B.INSCHOOL_KIND) AS INSCHOOL_NAME
+             , NVL(C.ATTEND_SCORE,0) AS ATTEND_SCORE
+          FROM ccscuser.VIEW_COURSE_INFO A 
+          JOIN ccscuser.VIEW_STUDENT_ALL_INFO B
+            ON A.STUDENT_CODE = B.STUDENT_CODE 
+     LEFT JOIN ccscuser.ATEND_SCORE C 
+            ON A.STUDENT_CODE = C.STUDENT_CODE
+           AND C.REGUSERID = #{professor_code}
+           AND C.YEAR = #{year}
+           AND C.CLASS_DIVIDE = #{class_divide}
+           AND C.SEMESTER = #{semester}
+           AND C.SUBJECT_TITLE_NO = #{subject_title_no}
+         WHERE A.PROFESSOR_CODE = #{professor_code}
+           AND A.YEAR = #{year}
+           AND A.CLASS_DIVIDE = #{class_divide}
+           AND A.SEMESTER = #{semester}
+           AND A.SUBJECT_TITLE_NO = #{subject_title_no}
+      ORDER BY A.STUDENT_CODE
+    </select>
+    <select id="srchAtendStdDetailList" parameterType="com.osan.portal.vo.AtendInfo" resultMap="atendInfo">
+        SELECT ATEND_NO
+             , STUDENT_CODE
+             , YEAR
+             , SEMESTER
+             , SUBJECT_TITLE_NO
+             , WEEK_ATEND_NO
+             , WEEK_ATEND_STATUS
+             , (SELECT NAME FROM CCSCUSER.MST_CODE WHERE GRP_CODE = 'ATEND_KIND' AND CODE = WEEK_ATEND_STATUS) AS WEEK_ATEND_STATUS_NAME
+             , TIME_NO
+             , ATEND_CMMT
+             , LECT_DDAY
+             , PROFESSOR_CODE
+             , CLASS_DIVIDE
+          FROM ccscuser.ATEND_LECTURE_INFO
+         WHERE STUDENT_CODE = #{student_code}
+           AND YEAR = #{year}
+           AND SEMESTER = #{semester}
+           AND SUBJECT_TITLE_NO = #{subject_title_no}
+      ORDER BY WEEK_ATEND_NO
+             , LECT_DDAY
+             , TIME_NO
+    </select>
+    <select id="srchPfsAtendStdUseCnt" parameterType="com.osan.portal.vo.AtendInfo" resultType="int">
+        SELECT COUNT(*)
+          FROM ccscuser.ATTEND_LECTURE_USE
+         WHERE YEAR = #{srch_year}
+           AND SEMESTER = #{srch_semester}
+           AND CLASS_DIVIDE = #{srch_class_divide}
+           AND SUBJECT_TITLE_NO = #{srch_subject_title_no}
+    </select>
+    
+    <select id="selectAtendStatisResult" parameterType="com.osan.portal.vo.AtendSearchInfo" resultMap="atendInfo">
+        SELECT WEEK_ATEND_STATUS
+             , COUNT(*) AS STATIS_CNT
+          FROM ccscuser.ATEND_LECTURE_INFO
+         WHERE SUBJECT_TITLE_NO = #{srch_subject_title_no}
+           AND YEAR = #{srch_year}
+           AND SEMESTER = #{srch_semester}
+           AND STUDENT_CODE = #{srch_student_code}
+           AND CLASS_DIVIDE = #{srch_class_divide}
+      GROUP BY WEEK_ATEND_STATUS
+    </select>
+    
+    <select id="srchAtendLectureInfo" parameterType="com.osan.portal.vo.AtendSearchInfo" resultMap="atendInfo">
+        SELECT DISTINCT 
+               A.SUBJECT_GRP_CODE
+             , B.SUBJECT_GRP_NAME
+             , A.SUBJECT_CODE
+             , B.SUBJECT_NAME
+             , A.SUBJECT_TITLE_NO
+             , A.SUBJECT_TITLE_NAME
+             , A.ENG_SUBJECT_NAME
+             , A.YEAR
+             , A.GRADE
+             , A.SEMESTER
+             , A.PROFESSOR_CODE
+             , A.PROFESSOR_NAME
+             , A.CLASS_DIVIDE
+             , A.FINISH_TYPE
+             , A.FINISH_NAME
+             , A.COLLEGE_CREDIT
+             , A.THEORY_CREDIT
+             , A.PRACTICE_CREDIT
+             , A.THEORY_TIME
+             , A.PRACTICE_TIME
+             , A.LECTURE_TIME
+             , A.THEORY_PRACTICE_TYPE
+             , A.SUBJECT_TYPE
+             , A.NCS_APPLY_YN
+             , A.GUBUN
+          FROM ccscuser.VIEW_LECTURE_INFO A 
+          JOIN ccscuser.VIEW_SUBJECT_INFO B
+            ON A.SUBJECT_GRP_CODE = B.SUBJECT_GRP_CODE
+           AND A.SUBJECT_CODE = B.SUBJECT_CODE
+         WHERE A.YEAR = #{srch_year}
+           AND A.SEMESTER = #{srch_semester}
+           AND A.PROFESSOR_CODE = #{srch_professor_code}
+           AND A.CLASS_DIVIDE = #{srch_class_divide}
+           AND A.SUBJECT_TITLE_NO = #{srch_subject_title_no}
+    </select>
+    <select id="selectStdDefaultPhoto" parameterType="String"  resultMap="studentPhoto">
+        SELECT PICT_FILE
+          FROM ccscuser.VIEW_STUDENT_PHOTO
+         WHERE STNT_NUMB = #{imgIdx}
+    </select>
+    <delete id="deleteAtendLectureEnd" parameterType="com.osan.portal.vo.AtendSearchInfo">       
+        DELETE 
+          FROM ccscuser.ATTEND_LECTURE_USE
+         WHERE YEAR = #{srch_year}
+           AND SEMESTER = #{srch_semester}
+           AND CLASS_DIVIDE = #{srch_class_divide}
+           AND SUBJECT_TITLE_NO = #{srch_subject_title_no}
+    </delete>
+    <select id="selectCheckAtendStdCnt" parameterType="com.osan.portal.vo.AtendInfo" resultType="int">
+        SELECT COUNT(*)
+          FROM ccscuser.ATEND_LECTURE_INFO
+         WHERE STUDENT_CODE = #{student_code}
+           AND YEAR = #{year}
+           AND SEMESTER = #{semester}
+           AND SUBJECT_TITLE_NO = #{subject_title_no}
+           AND WEEK_ATEND_NO = #{week_atend_no}
+           AND TIME_NO = #{time_no}
+           AND LECT_DDAY = #{lect_dday}
+           AND PROFESSOR_CODE = #{professor_code}
+           AND CLASS_DIVIDE = #{class_divide}
+    </select>
+    <update id="updateCheckAtendStd" parameterType="com.osan.portal.vo.AtendInfo">
+        UPDATE ccscuser.ATEND_LECTURE_INFO 
+           SET WEEK_ATEND_STATUS = #{week_atend_status}
+             , UPDTIME = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS')
+             , UPDUSERID = #{upduserid}
+         WHERE STUDENT_CODE = #{student_code}
+           AND YEAR = #{year}
+           AND SEMESTER = #{semester}
+           AND SUBJECT_TITLE_NO = #{subject_title_no}
+           AND WEEK_ATEND_NO = #{week_atend_no}
+           AND TIME_NO = #{time_no}
+           AND LECT_DDAY = #{lect_dday}
+           AND PROFESSOR_CODE = #{professor_code}
+           AND CLASS_DIVIDE = #{class_divide}
+    </update>
+    <insert id="insertAtendLectureEnd" parameterType="com.osan.portal.vo.AtendSearchInfo">
+    INSERT INTO ccscuser.ATTEND_LECTURE_USE (
+            SUBJECT_TITLE_NO,
+            YEAR,
+            SEMESTER,
+            CLASS_DIVIDE,
+            REGTIME,
+            REGUSERID
+        ) VALUES (
+            #{srch_subject_title_no},
+            #{srch_year},
+            #{srch_semester},            
+            #{srch_class_divide},
+            TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+            #{srch_professor_code}
+        )
+    </insert>
+    <insert id="insertCheckAtendStd" parameterType="com.osan.portal.vo.AtendInfo">
+        <selectKey keyProperty="atend_no" resultType="String">
+            SELECT NVL(MAX(ATEND_NO),0) + 1 AS ATEND_NO
+              FROM ccscuser.ATEND_LECTURE_INFO
+             WHERE STUDENT_CODE = #{student_code}
+        </selectKey>
+        INSERT INTO ccscuser.ATEND_LECTURE_INFO 
+                  ( ATEND_NO
+                  , STUDENT_CODE
+                  , YEAR
+                  , SEMESTER
+                  , SUBJECT_TITLE_NO
+                  , WEEK_ATEND_NO
+                  , WEEK_ATEND_STATUS
+                  , TIME_NO
+                  , LECT_DDAY
+                  , PROFESSOR_CODE
+                  , CLASS_DIVIDE
+                  , REGTIME
+                  , REGUSERID
+                  ) 
+           VALUES ( 
+                    NVL(#{atend_no}, 2019)
+                  , #{student_code}
+                  , #{year}
+                  , #{semester}
+                  , #{subject_title_no}
+                  , #{week_atend_no}
+                  , #{week_atend_status}
+                  , #{time_no}
+                  , #{lect_dday}
+                  , #{professor_code}
+                  , #{class_divide}
+                  , TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS')
+                  , #{reguserid}
+                  )
+    </insert>
+    <update id="procedureAtendLectureEnd" statementType="CALLABLE" parameterType="com.osan.portal.vo.AtendSearchInfo">
+    { call ccscuser.ATTEND_SCORE_CALCULATOR(#{srch_year, mode=IN, jdbcType=VARCHAR, javaType=string}
+                                          , #{srch_semester, mode=IN, jdbcType=VARCHAR, javaType=string}
+                                         , #{srch_subject_title_no, mode=IN, jdbcType=VARCHAR, javaType=string}
+                                         , #{srch_class_divide, mode=IN, jdbcType=VARCHAR, javaType=string}
+                                         , #{srch_professor_code, mode=IN, jdbcType=VARCHAR, javaType=string}
+                                         , #{err_code, mode=OUT, jdbcType=INTEGER, javaType=integer}
+                                         , #{err_msg, mode=OUT, jdbcType=VARCHAR, javaType=string})}
+    </update>
+</mapper>

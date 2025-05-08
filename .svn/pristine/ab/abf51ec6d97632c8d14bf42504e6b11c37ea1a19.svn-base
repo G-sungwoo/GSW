@@ -1,0 +1,949 @@
+package com.osan.portal.vo;
+
+public class StudentSearchInfo
+{
+  private String srch_stnt_numb;
+  private String stnt_numb;
+  private String korn_name;
+  private String stnt_hand;
+  private String stnt_emal;
+  private String stnt_zipc;
+  private String stnt_bsar;
+  private String stnt_dtar;
+  private String ptrn_hand;
+  private String srst_code;
+  private String srcg_rscd_name;
+  private String csst_shtm_k;
+  private String csst_shyr_k;
+  private String rsep_shtm_k;
+  private String rsep_shyr_k;
+  private String enst_code_name;
+  private String sust_name;
+  private String chge_name;
+  private String csst_year;
+  private String srcg_date;
+  private String srcg_resn;
+  private String rsep_epdt;
+  private String rsep_year;
+  private String enst_date;
+  private String dcmi_date;
+  private String remk_text;
+  private String srcg_rscd;
+  private String csst_date;
+  private String prtn_numb;
+  private String csst_shyr;
+  private String csst_shtm;
+  private String aply_date;
+  private String apst_code;
+  private String aply_date_format;
+  private String csst_date_format;
+  private String apst_name;
+  
+  private String appy_flag;
+  
+  
+  //추가 컬럼
+  private String majr_name;
+  private String stnt_shyr;
+  private String srst_stat;
+  private String sspt_flag;
+  
+  private String ptrn_name;
+  private String ptrn_jobc;
+  private String ptrn_rlnm;
+  private String ptrn_zipc;
+  private String ptrn_bsar;
+  private String ptrn_dtar;
+  private String ptrn_tele;
+  private String updt_addr;
+ 
+  //강의 시간표
+  private String lect_year;
+  private String lect_shtm;
+  private String lect_week;
+  private String lect_week_nm;
+  private String lect_week_date;
+  private String lect_dday_nm;
+  private String lect_term;
+  
+  private String term_numb;
+  private String lect_time;
+  private String lect_mond;
+  private String lect_tued;
+  private String lect_wedd;
+  private String lect_thrd;
+  private String lect_frid;
+  private String lect_satd;
+  private String lect_sund;
+  
+  private String lect_yesh;		//년도학기
+  private String lect_haks;		//
+  private String avrg_mrks;		//
+  private String totl_aqpt;		//
+  private String avto_mrks;		//
+  private String acqt_pont;		//현재취득학점
+  private String gyot_pont;		//졸업기준학점
+  private String junt_pont;		//교양취득학점
+  private String joed_pont;		//교양기준학점
+  private String gyed_pont;		//전공취득학점
+  private String jued_pont;		//전공기준학점
+  
+  private String pobt_flag;
+  private String sbjt_krnm;
+  private String lect_pont;
+  private String lect_grad;
+  private String grad_pont;
+  
+  /* 등록 선언 */
+  private String  regi_yesh;	//년도학기
+  private String  regi_year;	//년도학기
+  private String  regi_shtm;	//년도학기
+  private String  adpt_year;	//적용년도
+  private String  adpt_shtm;	//적용학기
+  private String  entr_amnt;	//입학금
+  private String  lesn_amnt;	//수업료
+  private String  regi_amnt;	//등록금
+  private String  shsh_amnt;	//장학금
+  private String  rlpd_amnt;	//실납부금
+  private String  paid_stat;	//등록상태
+  private String  paid_date;	//등록일자
+  private String  scho_name;	//장학이름
+  private String  scho_amnt;	//장학금액
+  
+  private String  shsh_krnm;    //장학명
+  
+  /* 강의 평가 */
+  private String  lect_type;
+  private String  prbl_numb;
+  private String  prbl_type;
+  private String  prbl_ctnt;
+  private String  prbl_scor;
+  private String  prbl_stnt;
+  private String  lect_type_code;
+
+  
+public String getSrch_stnt_numb() {
+	return srch_stnt_numb;
+}
+
+public void setSrch_stnt_numb(String srch_stnt_numb) {
+	this.srch_stnt_numb = srch_stnt_numb;
+}
+
+public String getStnt_numb() {
+	return stnt_numb;
+}
+
+public void setStnt_numb(String stnt_numb) {
+	this.stnt_numb = stnt_numb;
+}
+
+public String getKorn_name() {
+	return korn_name;
+}
+
+public void setKorn_name(String korn_name) {
+	this.korn_name = korn_name;
+}
+
+public String getStnt_hand() {
+	return stnt_hand;
+}
+
+public void setStnt_hand(String stnt_hand) {
+	this.stnt_hand = stnt_hand;
+}
+
+public String getStnt_emal() {
+	return stnt_emal;
+}
+
+public void setStnt_emal(String stnt_emal) {
+	this.stnt_emal = stnt_emal;
+}
+
+public String getStnt_zipc() {
+	return stnt_zipc;
+}
+
+public void setStnt_zipc(String stnt_zipc) {
+	this.stnt_zipc = stnt_zipc;
+}
+
+public String getStnt_bsar() {
+	return stnt_bsar;
+}
+
+public void setStnt_bsar(String stnt_bsar) {
+	this.stnt_bsar = stnt_bsar;
+}
+
+public String getStnt_dtar() {
+	return stnt_dtar;
+}
+
+public void setStnt_dtar(String stnt_dtar) {
+	this.stnt_dtar = stnt_dtar;
+}
+
+public String getPtrn_hand() {
+	return ptrn_hand;
+}
+
+public void setPtrn_hand(String ptrn_hand) {
+	this.ptrn_hand = ptrn_hand;
+}
+
+public String getSrst_code() {
+	return srst_code;
+}
+
+public void setSrst_code(String srst_code) {
+	this.srst_code = srst_code;
+}
+
+public String getSrcg_rscd_name() {
+	return srcg_rscd_name;
+}
+
+public void setSrcg_rscd_name(String srcg_rscd_name) {
+	this.srcg_rscd_name = srcg_rscd_name;
+}
+
+public String getCsst_shtm_k() {
+	return csst_shtm_k;
+}
+
+public void setCsst_shtm_k(String csst_shtm_k) {
+	this.csst_shtm_k = csst_shtm_k;
+}
+
+public String getCsst_shyr_k() {
+	return csst_shyr_k;
+}
+
+public void setCsst_shyr_k(String csst_shyr_k) {
+	this.csst_shyr_k = csst_shyr_k;
+}
+
+public String getRsep_shtm_k() {
+	return rsep_shtm_k;
+}
+
+public void setRsep_shtm_k(String rsep_shtm_k) {
+	this.rsep_shtm_k = rsep_shtm_k;
+}
+
+public String getRsep_shyr_k() {
+	return rsep_shyr_k;
+}
+
+public void setRsep_shyr_k(String rsep_shyr_k) {
+	this.rsep_shyr_k = rsep_shyr_k;
+}
+
+public String getEnst_code_name() {
+	return enst_code_name;
+}
+
+public void setEnst_code_name(String enst_code_name) {
+	this.enst_code_name = enst_code_name;
+}
+
+public String getSust_name() {
+	return sust_name;
+}
+
+public void setSust_name(String sust_name) {
+	this.sust_name = sust_name;
+}
+
+public String getChge_name() {
+	return chge_name;
+}
+
+public void setChge_name(String chge_name) {
+	this.chge_name = chge_name;
+}
+
+public String getCsst_year() {
+	return csst_year;
+}
+
+public void setCsst_year(String csst_year) {
+	this.csst_year = csst_year;
+}
+
+public String getSrcg_date() {
+	return srcg_date;
+}
+
+public void setSrcg_date(String srcg_date) {
+	this.srcg_date = srcg_date;
+}
+
+public String getSrcg_resn() {
+	return srcg_resn;
+}
+
+public void setSrcg_resn(String srcg_resn) {
+	this.srcg_resn = srcg_resn;
+}
+
+public String getEnst_date() {
+	return enst_date;
+}
+
+public void setEnst_date(String enst_date) {
+	this.enst_date = enst_date;
+}
+
+public String getDcmi_date() {
+	return dcmi_date;
+}
+
+public void setDcmi_date(String dcmi_date) {
+	this.dcmi_date = dcmi_date;
+}
+
+public String getRemk_text() {
+	return remk_text;
+}
+
+public void setRemk_text(String remk_text) {
+	this.remk_text = remk_text;
+}
+
+public String getRsep_epdt() {
+	return rsep_epdt;
+}
+
+public void setRsep_epdt(String rsep_epdt) {
+	this.rsep_epdt = rsep_epdt;
+}
+
+public String getRsep_year() {
+	return rsep_year;
+}
+
+public void setRsep_year(String rsep_year) {
+	this.rsep_year = rsep_year;
+}
+
+public String getMajr_name() {
+	return majr_name;
+}
+
+public void setMajr_name(String majr_name) {
+	this.majr_name = majr_name;
+}
+
+public String getStnt_shyr() {
+	return stnt_shyr;
+}
+
+public void setStnt_shyr(String stnt_shyr) {
+	this.stnt_shyr = stnt_shyr;
+}
+
+public String getPtrn_name() {
+	return ptrn_name;
+}
+
+public void setPtrn_name(String ptrn_name) {
+	this.ptrn_name = ptrn_name;
+}
+
+public String getPtrn_jobc() {
+	return ptrn_jobc;
+}
+
+public void setPtrn_jobc(String ptrn_jobc) {
+	this.ptrn_jobc = ptrn_jobc;
+}
+
+public String getPtrn_rlnm() {
+	return ptrn_rlnm;
+}
+
+public void setPtrn_rlnm(String ptrn_rlnm) {
+	this.ptrn_rlnm = ptrn_rlnm;
+}
+
+public String getPtrn_zipc() {
+	return ptrn_zipc;
+}
+
+public void setPtrn_zipc(String ptrn_zipc) {
+	this.ptrn_zipc = ptrn_zipc;
+}
+
+public String getPtrn_bsar() {
+	return ptrn_bsar;
+}
+
+public void setPtrn_bsar(String ptrn_bsar) {
+	this.ptrn_bsar = ptrn_bsar;
+}
+
+public String getPtrn_dtar() {
+	return ptrn_dtar;
+}
+
+public void setPtrn_dtar(String ptrn_dtar) {
+	this.ptrn_dtar = ptrn_dtar;
+}
+
+public String getPtrn_tele() {
+	return ptrn_tele;
+}
+
+public void setPtrn_tele(String ptrn_tele) {
+	this.ptrn_tele = ptrn_tele;
+}
+
+public String getLect_year() {
+	return lect_year;
+}
+
+public void setLect_year(String lect_year) {
+	this.lect_year = lect_year;
+}
+
+public String getLect_shtm() {
+	return lect_shtm;
+}
+
+public void setLect_shtm(String lect_shtm) {
+	this.lect_shtm = lect_shtm;
+}
+
+public String getLect_week() {
+	return lect_week;
+}
+
+public void setLect_week(String lect_week) {
+	this.lect_week = lect_week;
+}
+
+public String getLect_week_nm() {
+	return lect_week_nm;
+}
+
+public void setLect_week_nm(String lect_week_nm) {
+	this.lect_week_nm = lect_week_nm;
+}
+
+public String getLect_week_date() {
+	return lect_week_date;
+}
+
+public void setLect_week_date(String lect_week_date) {
+	this.lect_week_date = lect_week_date;
+}
+
+public String getLect_dday_nm() {
+	return lect_dday_nm;
+}
+
+public void setLect_dday_nm(String lect_dday_nm) {
+	this.lect_dday_nm = lect_dday_nm;
+}
+
+public String getLect_term() {
+	return lect_term;
+}
+
+public void setLect_term(String lect_term) {
+	this.lect_term = lect_term;
+}
+
+public String getTerm_numb() {
+	return term_numb;
+}
+
+public void setTerm_numb(String term_numb) {
+	this.term_numb = term_numb;
+}
+
+public String getLect_time() {
+	return lect_time;
+}
+
+public void setLect_time(String lect_time) {
+	this.lect_time = lect_time;
+}
+
+public String getLect_mond() {
+	return lect_mond;
+}
+
+public void setLect_mond(String lect_mond) {
+	this.lect_mond = lect_mond;
+}
+
+public String getLect_tued() {
+	return lect_tued;
+}
+
+public void setLect_tued(String lect_tued) {
+	this.lect_tued = lect_tued;
+}
+
+public String getLect_wedd() {
+	return lect_wedd;
+}
+
+public void setLect_wedd(String lect_wedd) {
+	this.lect_wedd = lect_wedd;
+}
+
+public String getLect_thrd() {
+	return lect_thrd;
+}
+
+public void setLect_thrd(String lect_thrd) {
+	this.lect_thrd = lect_thrd;
+}
+
+public String getLect_satd() {
+	return lect_satd;
+}
+
+public void setLect_satd(String lect_satd) {
+	this.lect_satd = lect_satd;
+}
+
+public String getLect_sund() {
+	return lect_sund;
+}
+
+public void setLect_sund(String lect_sund) {
+	this.lect_sund = lect_sund;
+}
+
+public String getLect_frid() {
+	return lect_frid;
+}
+
+public void setLect_frid(String lect_frid) {
+	this.lect_frid = lect_frid;
+}
+
+public String getLect_yesh() {
+	return lect_yesh;
+}
+
+public void setLect_yesh(String lect_yesh) {
+	this.lect_yesh = lect_yesh;
+}
+
+public String getLect_haks() {
+	return lect_haks;
+}
+
+public void setLect_haks(String lect_haks) {
+	this.lect_haks = lect_haks;
+}
+
+public String getAvrg_mrks() {
+	return avrg_mrks;
+}
+
+public void setAvrg_mrks(String avrg_mrks) {
+	this.avrg_mrks = avrg_mrks;
+}
+
+public String getTotl_aqpt() {
+	return totl_aqpt;
+}
+
+public void setTotl_aqpt(String totl_aqpt) {
+	this.totl_aqpt = totl_aqpt;
+}
+
+public String getAvto_mrks() {
+	return avto_mrks;
+}
+
+public void setAvto_mrks(String avto_mrks) {
+	this.avto_mrks = avto_mrks;
+}
+
+public String getAcqt_pont() {
+	return acqt_pont;
+}
+
+public void setAcqt_pont(String acqt_pont) {
+	this.acqt_pont = acqt_pont;
+}
+
+public String getGyot_pont() {
+	return gyot_pont;
+}
+
+public void setGyot_pont(String gyot_pont) {
+	this.gyot_pont = gyot_pont;
+}
+
+public String getJunt_pont() {
+	return junt_pont;
+}
+
+public void setJunt_pont(String junt_pont) {
+	this.junt_pont = junt_pont;
+}
+
+public String getJoed_pont() {
+	return joed_pont;
+}
+
+public void setJoed_pont(String joed_pont) {
+	this.joed_pont = joed_pont;
+}
+
+public String getGyed_pont() {
+	return gyed_pont;
+}
+
+public void setGyed_pont(String gyed_pont) {
+	this.gyed_pont = gyed_pont;
+}
+
+public String getJued_pont() {
+	return jued_pont;
+}
+
+public void setJued_pont(String jued_pont) {
+	this.jued_pont = jued_pont;
+}
+
+public String getPobt_flag() {
+	return pobt_flag;
+}
+
+public void setPobt_flag(String pobt_flag) {
+	this.pobt_flag = pobt_flag;
+}
+
+public String getSbjt_krnm() {
+	return sbjt_krnm;
+}
+
+public void setSbjt_krnm(String sbjt_krnm) {
+	this.sbjt_krnm = sbjt_krnm;
+}
+
+public String getLect_pont() {
+	return lect_pont;
+}
+
+public void setLect_pont(String lect_pont) {
+	this.lect_pont = lect_pont;
+}
+
+public String getLect_grad() {
+	return lect_grad;
+}
+
+public void setLect_grad(String lect_grad) {
+	this.lect_grad = lect_grad;
+}
+
+public String getGrad_pont() {
+	return grad_pont;
+}
+
+public void setGrad_pont(String grad_pont) {
+	this.grad_pont = grad_pont;
+}
+
+public String getAdpt_year() {
+	return adpt_year;
+}
+
+public void setAdpt_year(String adpt_year) {
+	this.adpt_year = adpt_year;
+}
+
+public String getAdpt_shtm() {
+	return adpt_shtm;
+}
+
+public void setAdpt_shtm(String adpt_shtm) {
+	this.adpt_shtm = adpt_shtm;
+}
+
+public String getEntr_amnt() {
+	return entr_amnt;
+}
+
+public void setEntr_amnt(String entr_amnt) {
+	this.entr_amnt = entr_amnt;
+}
+
+public String getLesn_amnt() {
+	return lesn_amnt;
+}
+
+public void setLesn_amnt(String lesn_amnt) {
+	this.lesn_amnt = lesn_amnt;
+}
+
+public String getRegi_amnt() {
+	return regi_amnt;
+}
+
+public void setRegi_amnt(String regi_amnt) {
+	this.regi_amnt = regi_amnt;
+}
+
+public String getShsh_amnt() {
+	return shsh_amnt;
+}
+
+public void setShsh_amnt(String shsh_amnt) {
+	this.shsh_amnt = shsh_amnt;
+}
+
+public String getRlpd_amnt() {
+	return rlpd_amnt;
+}
+
+public void setRlpd_amnt(String rlpd_amnt) {
+	this.rlpd_amnt = rlpd_amnt;
+}
+
+public String getPaid_stat() {
+	return paid_stat;
+}
+
+public void setPaid_stat(String paid_stat) {
+	this.paid_stat = paid_stat;
+}
+
+public String getPaid_date() {
+	return paid_date;
+}
+
+public void setPaid_date(String paid_date) {
+	this.paid_date = paid_date;
+}
+
+public String getScho_name() {
+	return scho_name;
+}
+
+public void setScho_name(String scho_name) {
+	this.scho_name = scho_name;
+}
+
+public String getScho_amnt() {
+	return scho_amnt;
+}
+
+public void setScho_amnt(String scho_amnt) {
+	this.scho_amnt = scho_amnt;
+}
+
+public String getRegi_yesh() {
+	return regi_yesh;
+}
+
+public void setRegi_yesh(String regi_yesh) {
+	this.regi_yesh = regi_yesh;
+}
+
+public String getRegi_year() {
+	return regi_year;
+}
+
+public void setRegi_year(String regi_year) {
+	this.regi_year = regi_year;
+}
+
+public String getRegi_shtm() {
+	return regi_shtm;
+}
+
+public void setRegi_shtm(String regi_shtm) {
+	this.regi_shtm = regi_shtm;
+}
+
+public String getSrst_stat() {
+	return srst_stat;
+}
+
+public void setSrst_stat(String srst_stat) {
+	this.srst_stat = srst_stat;
+}
+
+public String getUpdt_addr() {
+	return updt_addr;
+}
+
+public void setUpdt_addr(String updt_addr) {
+	this.updt_addr = updt_addr;
+}
+
+public String getSrcg_rscd() {
+	return srcg_rscd;
+}
+
+public void setSrcg_rscd(String srcg_rscd) {
+	this.srcg_rscd = srcg_rscd;
+}
+
+public String getCsst_date() {
+	return csst_date;
+}
+
+public void setCsst_date(String csst_date) {
+	this.csst_date = csst_date;
+}
+
+public String getPrtn_numb() {
+	return prtn_numb;
+}
+
+public void setPrtn_numb(String prtn_numb) {
+	this.prtn_numb = prtn_numb;
+}
+
+public String getCsst_shyr() {
+	return csst_shyr;
+}
+
+public void setCsst_shyr(String csst_shyr) {
+	this.csst_shyr = csst_shyr;
+}
+
+public String getCsst_shtm() {
+	return csst_shtm;
+}
+
+public void setCsst_shtm(String csst_shtm) {
+	this.csst_shtm = csst_shtm;
+}
+
+public String getAply_date() {
+	return aply_date;
+}
+
+public void setAply_date(String aply_date) {
+	this.aply_date = aply_date;
+}
+
+public String getApst_code() {
+	return apst_code;
+}
+
+public void setApst_code(String apst_code) {
+	this.apst_code = apst_code;
+}
+
+public String getAply_date_format() {
+	return aply_date_format;
+}
+
+public void setAply_date_format(String aply_date_format) {
+	this.aply_date_format = aply_date_format;
+}
+
+public String getApst_name() {
+	return apst_name;
+}
+
+public void setApst_name(String apst_name) {
+	this.apst_name = apst_name;
+}
+
+public String getCsst_date_format() {
+	return csst_date_format;
+}
+
+public void setCsst_date_format(String csst_date_format) {
+	this.csst_date_format = csst_date_format;
+}
+
+public String getAppy_flag() {
+	return appy_flag;
+}
+
+public void setAppy_flag(String appy_flag) {
+	this.appy_flag = appy_flag;
+}
+
+public String getLect_type() {
+	return lect_type;
+}
+
+public void setLect_type(String lect_type) {
+	this.lect_type = lect_type;
+}
+
+public String getPrbl_numb() {
+	return prbl_numb;
+}
+
+public void setPrbl_numb(String prbl_numb) {
+	this.prbl_numb = prbl_numb;
+}
+
+public String getPrbl_type() {
+	return prbl_type;
+}
+
+public void setPrbl_type(String prbl_type) {
+	this.prbl_type = prbl_type;
+}
+
+public String getPrbl_ctnt() {
+	return prbl_ctnt;
+}
+
+public void setPrbl_ctnt(String prbl_ctnt) {
+	this.prbl_ctnt = prbl_ctnt;
+}
+
+public String getPrbl_scor() {
+	return prbl_scor;
+}
+
+public void setPrbl_scor(String prbl_scor) {
+	this.prbl_scor = prbl_scor;
+}
+
+public String getPrbl_stnt() {
+	return prbl_stnt;
+}
+
+public void setPrbl_stnt(String prbl_stnt) {
+	this.prbl_stnt = prbl_stnt;
+}
+
+public String getLect_type_code() {
+	return lect_type_code;
+}
+
+public void setLect_type_code(String lect_type_code) {
+	this.lect_type_code = lect_type_code;
+}
+
+public String getSspt_flag() {
+	return sspt_flag;
+}
+
+public void setSspt_flag(String sspt_flag) {
+	this.sspt_flag = sspt_flag;
+}
+
+public String getShsh_krnm() {
+	return shsh_krnm;
+}
+
+public void setShsh_krnm(String shsh_krnm) {
+	this.shsh_krnm = shsh_krnm;
+}
+
+}

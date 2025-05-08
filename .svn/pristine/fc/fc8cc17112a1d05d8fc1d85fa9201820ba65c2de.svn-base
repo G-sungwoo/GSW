@@ -1,0 +1,94 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page session="false" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<html>
+<head>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;">
+    <meta name="viewport" content="width=device-width,user-scalable=yes">
+    <meta name="keywords" content="오산대학교, 오산대 포탈, 오산대, 포탈" />
+    <meta name="description" content="오산대학교 포탈" />
+    <meta name="author" content="오산대학교" />
+    <link rel="icon" type="image/png"  href="resources/img/favico.ico"/>
+    <title>오산대학교 포탈</title>
+    <script src="resources/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+    <script src="resources/js/jquery-ui.min.js" type="text/javascript"></script>
+    <link type="text/css" href="resources/css/layout.css" rel="stylesheet" />
+    <script type="text/javascript" src="resources/js/login.js"></script>
+    <script type="text/javascript" src="resources/js/common.js"></script>
+    <script type="text/javascript">
+    /*비밀번호 수정*/
+    function updatePassword(){
+        var newPassword = $("#newPassword").val();
+        var confirmPassword = $("#confirmPassword").val();
+        if(newPassword != confirmPassword){
+            alert("신규 비밀번호가 일치하지 않습니다.");
+            return;
+        }else{
+            if(checkPassWord(newPassword)){
+                var formData = $("#userPasswordForm").serialize();
+                $.ajax({
+                    type : "POST",
+                    async : false,
+                    url : "/updateUserPassword",
+                    data : formData,
+                    dataType : "text",
+                    success : updatePasswordOk
+                });
+            }else{
+                $("#newPassword").focus();
+                return;
+            }
+        }
+    }
+    /*비밀번호 수정 callback*/
+    function updatePasswordOk(data, status){
+        if(data == "UPDATE_OK"){
+            alert("비밀번호가 변경되었습니다.");
+            $("#userPasswordForm").attr("action", "/main");
+            $("#userPasswordForm").submit();
+        }else if(data == "WRONG_PASSWORD"){
+            alert("현재 비밀번호가 일치하지 않습니다.");
+            return;
+        }else{
+            alert("비밀번호가 변경이 정상적으로 처리되지 않았습니다.");
+            return;
+        }
+    }
+    </script>
+</head>
+<body>
+    <div class="login_img">
+        <ul>
+            <li style="background-image:url('resources/img/login_bg.jpg')"></li>
+            <li style="background-image:url('resources/img/login_bg2.jpg')"></li>
+        </ul>
+        <ol>
+            <li><a href="javascript:;" class="on">1</a></li>
+            <li><a href="javascript:;" >2</a></li>
+        </ol>
+    </div>
+    <div class="login_box">
+        <div style="background:url('resources/img/opred.png') repeat">
+            <img src="resources/img/osanlogo.png" ><br/><br/>
+            <form action="" method="post" name="userPasswordForm" id="userPasswordForm">
+                <p>장기간 비밀번호를 변경하지 않고 동일한 비밀번호를 사용 중이십니다. 개인정보 보호를 위해 비밀번호를 변경을 안내해 드리고 있습니다. 정기적인 비밀번호 변경으로 개인정보를 보호해주세요.</p>
+                <ul>
+                    <li><input type="password" name="password" id= "password" value="" placeholder= "현재 비밀번호" class="pw" /></li>
+                    <li><input type="password" name="newPassword" id="newPassword" value="" placeholder= "새 비밀번호" class="pw" /></li>
+                    <li><input type="password" name="confirmPassword" id="confirmPassword" value="" placeholder= "새 비밀번호 확인" class="pw confirm" /></li>
+                </ul>
+                <p>비밀번호는 영문, 숫자, 특수문자를 혼합하여 8~12자리 이내로 입력해주세요.</p>
+                <ol>
+                    <li><button type="button" onclick="updatePassword();">비밀번호 변경</button></li>
+                    <li><a href="/main">다음에 변경하기</a></li>
+                </ol>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
